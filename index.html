@@ -1,23 +1,52 @@
 ---
-layout: default
+layout: page
 ---
 
-<div class="home">
+<div class="row fullscreen">
+  <div class="column">
+    <div class="container">
+      <div class="row" style="margin-top: 10em">
+        <div class="column column-75 column-offset-25 column-mobile-100">
+          <img src="/assets/img/speedshop_wordmark.svg">
+          <p>
+            Speedshop is a one-man Ruby on Rails performance consultancy that
+            optimizes the full stack - frontend, backend and environment - to generate
+            revenue and cut scaling costs for businesses on Rails.
+          </p>
 
-  <h1 class="page-heading">Posts</h1>
+          <h2>Products</h2>
 
-  <ul class="post-list">
-    {% for post in site.posts %}
-      <li>
-        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+          <ul>
+            <li>
+              <b>The Complete Guide to Rails Performance</b>
+            </li>
+            <li>
+              <b>Speedshop Blog</b>
+            </li>
+          </ul>
 
-        <h2>
-          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title | escape }}</a>
-        </h2>
-      </li>
-    {% endfor %}
-  </ul>
+          <h2>Services</h2>
 
-  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
+          <ul>
+            <li>
+              <b>Speedshop Overhaul</b>
+            </li>
+            <li>
+              <b>Speedshop Tune</b>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column visible-desktop" style="background: black">
+    <div class="container" style="height: 100%">
+      <div class="row row-center" style="height: 100%">
+        <div class="column column-75">
+          <img src="/assets/img/speedshop_double_s.svg" style="fill: white">
+        </div>
+      </div>
+    </div>
 
+  </div>
 </div>
