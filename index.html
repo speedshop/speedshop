@@ -2,9 +2,7 @@
 layout: page
 ---
 
-<div class="row fullscreen">
-  <div class="column">
-    <div class="container">
+<div class="container">
       <div class="row" style="margin-top: 10em">
         <div class="column column-50 column-mobile-100">
           <img src="/assets/img/speedshop_wordmark.svg" alt="Speedshop">
@@ -34,28 +32,64 @@ layout: page
           <h2>Who is Speedshop?</h2>
 
           <p>
-            Speedshop is <b>Nate Berkopec</b>
+            Speedshop is me,
+            <a href="https://www.nateberkopec.com/"><b>Nate Berkopec</b></a>. I've worked for several
+            startups, including Craft Coffee (YC S14), Unwind Me (YC S14),
+            Scaffold (500 Startups), Branch (now a division of Facebook) and
+            many others. I'm a contributor to several open source projects, such
+            as Ruby on Rails and Sentry.
           </p>
-
-          <h2>What does Speedshop do?</h2>
 
           <p>
-            Speedshop is a one-man Ruby on Rails performance consultancy that
-            optimizes the full stack - frontend, backend and environment - to generate
-            revenue and cut scaling costs for businesses on Rails. Fast sites are
-            profitable sites. Speed is a feature.
+            I've given talks at NYC.rb, GORUCO, Rubyconf and Railsconf.
+          </p>
+
+          <h2>Philosophy</h2>
+
+          <ul>
+            <li>
+              <b>Full-stack and user-first.</b> Your users have to go through
+              the full stack to use your application - so we optimize at every
+              level. HTML, JavaScript, CSS often contribute far more to perceived
+              load than your application response times.
+            </li>
+            <li>
+              <b>Less before more.</b> No code is the fastest code. When given
+              a choice, we prefer less code to more code, fewer dependencies,
+              and smaller libraries. Do just enough to meet the requirements, and
+              no more. This website, for example, weighs just 30KB.
+            </li>
+            <li>
+              <b>...but business comes first.</b> That's not to say that we eschew
+              all complexity! Speedshop prefers modifying existing solutions rather
+              than complete rewrites. The goal of performance optimization is either
+              to save money by reducing server costs or increase revenue by providing
+              a better user experience. Both of these goals have to be weighed against
+              any performance optimization.
+            </li>
+            <li>
+              <b>Not a rocketship.</b> Speedshop will never take outside equity
+              funding.
+            </li>
+          </ul>
+
+          <p>
+            You can contact Speedshop via <a href="mailto:nateberkopec@gmail.com">email</a>.
           </p>
         </div>
       </div>
     </div>
+<div class="visible-desktop" style="z-index:-100;background: black; position: absolute; width: 50%; left: 50%; top: 0%; height: 100vh">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920px" height="1080px" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <mask id="mask" x="0" y="0" width="1920" height="1080" >
+        <rect x="0" y="0" width="1920" height="1080"/>
+          <path d="M432.82 936.54c8.66-6.23 26.27-20.04 37.37-32.5 32.73-37.1 32.5-76.64-200.85-394.57-77.72-106.03-106.97-168.72-106.97-231 17.2-155.47 144.9-146 218.96-146 65-.8 149.36 0 215.3 0l-20.04 14.2c-38.32 26.4-65 54.18-50.9 97.78C536 275.2 611 388.67 707.12 518.67c107.4 144.9 139.5 205.55 143.56 272.7 2.15 120.8-114.16 156.14-181.2 156.28H417.66z" /><circle r="171.02" cy="777.98" cx="185.56" /><circle cx="825.23" cy="302.02" r="171.02" /><path d="M1342.03 936.54c8.66-6.23 26.27-20.04 37.37-32.5 32.77-37.1 32.5-76.64-200.8-394.57-77.74-106.03-106.98-168.72-106.98-231C1088.82 123 1216.5 132.5 1290.57 132.5c65-.83 149.36 0 215.3 0l-20.04 14.2c-38.32 26.4-65 54.16-50.9 97.76 10.28 30.74 85.3 144.2 181.43 274.2 107.38 144.9 139.47 205.55 143.53 272.7 2.13 120.8-114.18 156.14-181.2 156.28h-251.87z" /><circle cx="1094.77" cy="777.98" r="171.02" /><circle r="171.02" cy="302.02" cx="1734.44" />
+      </mask>
+    </defs>
+    <rect x="0" y="0" width="1920" height="1080"/>
+  </svg>
+  <video style="clip-path: url(#svgPath);" id="video" autoplay="autoplay" muted="muted" preload="auto" loop="loop">
+      <source src="/assets/img/output.webm" type="video/webm">
+  </video>
   </div>
-  <div class="column visible-desktop" style="background: black; position: fixed; width: 50%; margin-left: 50%; height: 100vh">
-    <div class="container" style="height: 100%">
-      <div class="row row-center" style="height: 100%">
-        <div class="column column-75">
-          <img src="/assets/img/speedshop_double_s.svg" style="fill: white">
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
