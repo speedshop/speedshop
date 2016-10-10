@@ -3,7 +3,7 @@ layout: page
 ---
 
 <div class="container">
-  <div class="row" style="margin-top: 10em">
+  <div class="row margin-top-xl">
     <div class="column column-50 column-mobile-100">
       <img src="/assets/img/speedshop_wordmark.svg" alt="Speedshop">
       <p>
@@ -80,9 +80,9 @@ layout: page
     </div>
   </div>
 </div>
-<div class="visible-desktop" style="z-index:-100;background: black; position: fixed; height: 100%; width: 50%; left: 50%; top: 0%; height: 100vh">
-  <object style="position: absolute;top: 0;left: 0;" type="image/svg+xml" data={% asset_path 'speedshop_double_s_mask.svg' %}></object>
-  <video class="fader" id="video" autoplay="autoplay" muted="muted" preload="auto" loop="loop">
+<div id="big-black-bar" class="visible-desktop">
+  <object type="image/svg+xml" data={% asset_path 'speedshop_double_s_mask.svg' %} aria-label="Speedshop logo"></object>
+  <video class="fader" id="logo-vid" autoplay="autoplay" muted="muted" loop="loop">
     <source src="/assets/img/output.webm" type="video/webm">
     <source src="/assets/img/output.mp4" type="video/mp4">
   </video>
