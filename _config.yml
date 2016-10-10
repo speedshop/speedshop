@@ -22,6 +22,37 @@ description: > # this means to ignore newlines until "baseurl:"
   profitable sites. Speed is a feature.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site
-
+gems:
+  - jekyll-assets
 # Build settings
 markdown: kramdown
+
+assets:
+  css_compressor: sass
+  compress:
+    css: true
+    js: true
+  autowrite: true
+  # cdn: https://cdn.example.com
+  skip_baseurl_with_cdn: false
+  skip_prefix_with_cdn: false
+  prefix: "/assets"
+
+  assets:
+    - "*.png"
+    - "*.jpg"
+    - "*.svg"
+    - "*.webm"
+    - "*.mp4"
+    - "main.css"
+  #  - "application.js"
+  digest: true
+  sources:
+    - "assets"
+    - "assets/css"
+    - "assets/img"
+  #  - "assets/js"
+    - "_sass"
+
+  features:
+    liquid: true
