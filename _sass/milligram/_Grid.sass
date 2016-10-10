@@ -150,9 +150,12 @@
 		.column-center
 			align-self: center
 
-// Larger than mobile screen
-@media (min-width: 40.0rem) // Safari desktop has a bug using `rem`, but Safari mobile works
+@media (max-width: 768px)
+	.container
+		padding: 0 4.0rem
 
+// Larger than mobile screen
+@media (min-width: 768px) // Safari desktop has a bug using `rem`, but Safari mobile works
 	.row
 		flex-direction: row
 		margin-left: -1.0rem

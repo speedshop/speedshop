@@ -31,7 +31,7 @@ assets:
   css_compressor: sass
   compress:
     css: true
-    js: true
+    js: false
   autowrite: true
   # cdn: https://cdn.example.com
   skip_baseurl_with_cdn: false
@@ -45,13 +45,13 @@ assets:
     - "*.webm"
     - "*.mp4"
     - "main.css"
-  #  - "application.js"
+    - "*.js"
   digest: true
   sources:
     - "assets"
     - "assets/css"
     - "assets/img"
-  #  - "assets/js"
+    - "assets/js"
     - "_sass"
 
   features:

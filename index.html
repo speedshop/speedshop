@@ -5,7 +5,7 @@ layout: page
 <div class="container">
   <div class="row margin-top-xl">
     <div class="column column-50 column-mobile-100">
-      <img src="/assets/img/speedshop_wordmark.svg" alt="Speedshop">
+      {% asset "speedshop_wordmark.svg" %}
       <p>
         Speedshop is a one-man Ruby on Rails performance consultancy that
         optimizes the full stack - frontend, backend and environment - to generate
@@ -81,9 +81,9 @@ layout: page
   </div>
 </div>
 <div id="big-black-bar" class="visible-desktop">
-  <object type="image/svg+xml" data={% asset_path 'speedshop_double_s_mask.svg' %} aria-label="Speedshop logo"></object>
-  <video class="fader" id="logo-vid" autoplay="autoplay" muted="muted" loop="loop">
-    <source src="/assets/img/output.webm" type="video/webm">
-    <source src="/assets/img/output.mp4" type="video/mp4">
+  <video height="640" width="720" class="b-lazy fader" id="logo-vid" autoplay="autoplay" muted="muted" loop="loop">
+    <source src="" data-src="/assets/img/output.webm" type="video/webm">
+    <source src="" data-src="/assets/img/output.mp4" type="video/mp4">
   </video>
+  {% asset 'speedshop_double_s_mask.svg' %}
 </div>
