@@ -10,7 +10,7 @@ $color-tertiary: #f4f5f6
 $color-quaternary: #d1d1d1
 $color-quinary: #e1e1e1
 
-@import "normalize.css"
+@import "mini-reset.css"
 @import "milligram/milligram"
 @import "home"
 @import "visibility"
@@ -28,26 +28,10 @@ html
   height: 100%
   width: 100%
 
-svg
-  position: absolute
-  top: 0
-  left: -10px
-
-svg mask path, svg mask circle
-  transform: scale(0.2) translate(100px, 700px)
-
-svg mask rect
-  fill: rgba(255, 255, 255, 1)
-
-svg > rect
-  fill: black
-  -webkit-mask: url(#mask)
-  mask: url(#mask)
-
 video
   position: absolute
   top: 0%
-  left: 0%
+  left: 2px
   width: 70%
   z-index: -1
   overflow: hidden
