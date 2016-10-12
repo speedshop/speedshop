@@ -47,7 +47,7 @@ layout: default
   {% for t in post.categories %}{% for ref in page.categories %}
     {% if t == ref %}{% assign related = true %}{% endif %}
   {% endfor %}{% endfor %}
-  {% if related and (post.title != page.title) %}
+  {% if related and post.title != page.title %}
     {% cycle 'add row' : '<div class="row">', nil %}
       <div class="col-md-6">
         <h3>

@@ -52,6 +52,7 @@ assets:
     - "assets/css"
     - "assets/img"
     - "assets/js"
+    - "assets/posts/img"
     - "_sass"
 
   features:

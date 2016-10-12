@@ -10,7 +10,7 @@ image: https://i.imgur.com/7ep6bdy.jpg
 ---
 
 {% marginnote_block %}
-{% gif /assets/gifs/yC6kwyY.gif%}
+<img src='/assets/posts/img/yC6kwyY.gif'>
 <br>
 Okay, way too much magical pixie dust.
 {% endmarginnote_block %}
@@ -69,7 +69,7 @@ This compression will probably be one of the first HTTP2 features that Rails app
 ### Multiplexing
 
 {% marginnote_block %}
-{% gif /assets/gifs/mcxYuDb.gif%}
+<img src="/assets/posts/img/mcxYuDb.gif"></img>
 <br>
 Damn, shoulda multiplexed.
 {% endmarginnote_block %}
@@ -99,7 +99,7 @@ HTTP/2 will especially benefit users in high-latency environments like mobile ne
 ### Binary
 
 {% marginnote_block %}
-{% gif /assets/gifs/computers.gif%}
+<img src="/assets/gifs/computers.gif">
 <br>
 <a href="https://www.youtube.com/watch?v=1eA3XCvrK90">I'm a computer!</a>
 {% endmarginnote_block %}
