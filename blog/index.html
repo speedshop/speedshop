@@ -1,0 +1,39 @@
+---
+layout: default
+title: Blog
+---
+<div class="container">
+  <div class="row">
+    <div class="column">
+      <h1>speedshop blog</h1>
+      <h2 style="display: inline-block">
+        The #1 Rails performance blog on the web.
+      </h2>
+      <a href="/">(what's Speedshop?)</a>
+    </div>
+  </div>
+
+  {% assign counter = 0 %}
+  {% assign maxPostsPerRow = 3 %}
+  {% for post in site.posts %}
+    {% if counter == 0 %}
+      <div class="row">
+    {% endif %}
+
+    <div class="column" style="min-height: 420px">
+      <h3>
+        <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+      </h3>
+      <p>
+        {{ post.summary | strip_html | truncatewords: 50 }}
+      </p>
+      <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
+    </div>
+    {% assign counter=counter | plus:1 %}
+
+    {% if counter == maxPostsPerRow %}
+      </div>
+      {% assign counter = 0 %}
+    {% endif %}
+  {% endfor %}
+</div>

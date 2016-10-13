@@ -9,11 +9,15 @@ readtime: 2112 words/11 minutes
 image: https://i.imgur.com/7ep6bdy.jpg
 ---
 
-{% marginnote_block %}
-<img src='/assets/posts/img/yC6kwyY.gif'>
+{% marginnote_block 'no-mobile' %}
+<img src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' data-src="/assets/posts/img/yC6kwyY.gif" class='b-lazy'>
+<noscript>
+<img src="/assets/posts/img/yC6kwyY.gif">
+</noscript>
 <br>
 Okay, way too much magical pixie dust.
 {% endmarginnote_block %}
+
 HTTP/2 is coming! No, wait, HTTP/2 is here! [After publication in Q1 of 2015](https://github.com/http2/http2-spec), HTTP/2 is now an "official thing" in Web-land. As of writing (December 2015), [caniuse.com estimates about 70% of browsers globally can now support HTTP/2](http://caniuse.com/#feat=http2). So, I can use HTTP/2 in my Ruby application *today*, right? After all, Google says that [some pages can load up to 50% faster just by adding HTTP/2/SPDY support](https://www.chromium.org/spdy/spdy-whitepaper 50% reduction in load time
 ), it's magical web-speed pixie dust! Let's get it going!
 

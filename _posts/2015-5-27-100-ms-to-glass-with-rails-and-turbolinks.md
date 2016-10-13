@@ -12,7 +12,7 @@ A perceived benefit of a client-side JS framework is the responsiveness of its i
 
 Is Rails dead? Can the old Ruby web framework no longer keep up in this age of "native-like" performance?
 
-A few days ago (May 21, 2015), Shopify IPO'd. Shopify (an e-commerce provider that lets you set up your own online shop) had [over 150,000 customers](http://www.sec.gov/Archives/edgar/data/1594805/000119312515129273/d863202df1.htm) and is a [Top 1000](http://www.alexa.com/siteinfo/shopify.com) site on Alexa{% sidenote 1 "<img src='https://i.imgur.com/F49D9La.png'>" %}. In addition, Shopify hosts their customers' sites, with an average of 100ms response times for over 300 million monthly page views. Now that's Web Scale. And they did it all on Rails.
+A few days ago (May 21, 2015), Shopify IPO'd. Shopify (an e-commerce provider that lets you set up your own online shop) had [over 150,000 customers](http://www.sec.gov/Archives/edgar/data/1594805/000119312515129273/d863202df1.htm) and is a [Top 1000](http://www.alexa.com/siteinfo/shopify.com) site on Alexa.{% marginnote "<img src='https://i.imgur.com/F49D9La.png'>" %} In addition, Shopify hosts their customers' sites, with an average of 100ms response times for over 300 million monthly page views. Now that's Web Scale. And they did it all on Rails.
 
 They're not the only ones doing huge deployments with blazing fast response times on Rails. [DHH claims Basecamp's average server response time is 27ms](https://www.youtube.com/watch?v=yhseQP52yIY). [Github averages about 60ms](https://status.github.com/).
 
@@ -30,9 +30,9 @@ But there was a critical difference between Turbolinks and their SPA brethren: i
 
 And just what is an instantaneous response? Thankfully, the guidelines for human-computer interaction speeds have remained constant since [they were first discovered in the late 60's](http://theixdlibrary.com/pdf/Miller1968.pdf):
 
-> * **0.1 second** is about the limit for having the user feel that the system is reacting instantaneously, meaning that no special feedback is necessary except to display the result.
-> * **1.0 second** is about the limit for the user's flow of thought to stay uninterrupted, even though the user will notice the delay. Normally, no special feedback is necessary during delays of more than 0.1 but less than 1.0 second, but the user does lose the feeling of operating directly on the data.
-> * **10 seconds** is about the limit for keeping the user's attention focused on the dialogue. For longer delays, users will want to perform other tasks while waiting for the computer to finish, so they should be given feedback indicating when the computer expects to be done. Feedback during the delay is especially important if the response time is likely to be highly variable, since users will then not know what to expect. {% sidenote 2 "This is the Nielsen Norman group's interpretation of the linked paper. See the rest of their take on response times <a href='http://www.nngroup.com/articles/response-times-3-important-limits/'>here</a>." %}
+* **0.1 second** is about the limit for having the user feel that the system is reacting instantaneously, meaning that no special feedback is necessary except to display the result.
+* **1.0 second** is about the limit for the user's flow of thought to stay uninterrupted, even though the user will notice the delay. Normally, no special feedback is necessary during delays of more than 0.1 but less than 1.0 second, but the user does lose the feeling of operating directly on the data.
+* **10 seconds** is about the limit for keeping the user's attention focused on the dialogue. For longer delays, users will want to perform other tasks while waiting for the computer to finish, so they should be given feedback indicating when the computer expects to be done. Feedback during the delay is especially important if the response time is likely to be highly variable, since users will then not know what to expect. {% sidenote 1 "This is the Nielsen Norman group's interpretation of the linked paper. See the rest of their take on response times <a href='http://www.nngroup.com/articles/response-times-3-important-limits/'>here</a>." %}
 
 ## Can Turbolinks help us achieve sub-0.1 second interaction?
 
@@ -59,7 +59,9 @@ Other than asking to re-evaluate the way you write your frontend JS, Turbolinks 
 
 Look in any Rails project, and for better or for worse, you're going to see a lot of this:
 
-    $(document).ready(function () { ... } );
+```javascript
+$(document).ready(function () { ... } );
+```
 
 Rails developers are usually pretty lazy when it comes to Javascript (although, most *developers* are pretty lazy). [JQuery waits for DOMContentLoaded to fire](https://github.com/jquery/jquery/blob/master/src/core/ready.js#L81) before handing off execution to the function in `ready`. But Turbolinks takes DOMContentLoaded away from us, and [gives us a couple other events instead](https://github.com/rails/turbolinks#events). Try attaching events to these instead, or using JQuery's `.on` to attach event handlers to the document (as opposed to individual nodes). This removal of the `load` and `DOMContentLoaded` events can wreak havoc on existing Javascript that uses page ready listeners everywhere, and why I wouldn't recommend using Turbolinks on existing projects, and using it for greenfield only.
 
@@ -73,7 +75,7 @@ Caching can be a double-edged sword in small apps, though. Sometimes, the amount
 
 ### rack-mini-profiler and the flamegraph
 
-[rack-mini-profiler](https://github.com/MiniProfiler/rack-mini-profiler) {% sidenote 3 "<img src='https://i.imgur.com/1J1hlPt.png'>" %} has become an indispensable part of my Ruby workflow. It's written by the incredible Sam Saffron, who's doing absolutely vital work (along with others) on Ruby speed over at  [RubyBench.org](https://rubybench.org).
+[rack-mini-profiler](https://github.com/MiniProfiler/rack-mini-profiler) {% marginnote "<img src='https://i.imgur.com/1J1hlPt.png'>" %} has become an indispensable part of my Ruby workflow. It's written by the incredible Sam Saffron, who's doing absolutely vital work (along with others) on Ruby speed over at  [RubyBench.org](https://rubybench.org).
 
 rack-mini-profiler puts a little white box at the upper left of a page, showing you exactly how long the last request took to process, along with a breakdown of how many SQL queries were executed. The amount of unnecessary SQL queries I've eliminated with this tool must number in the thousands.
 
@@ -81,7 +83,7 @@ But that's not even rack-mini-profiler's killer feature. If you add in the `flam
 
 ### Chrome Timeline - the sub-100ms developer's best friend
 
-When you're aiming for a sub-100ms-to-glass Turbolinks app, every ms counts. So allow me introduce you to my little friend: the Chrome Timeline{% sidenote 3 "<img src='https://i.imgur.com/izy57wD.png'>" %}.
+When you're aiming for a sub-100ms-to-glass Turbolinks app, every ms counts. So allow me introduce you to my little friend: the Chrome Timeline.{% marginnote  "<img src='https://i.imgur.com/izy57wD.png'>" %}
 
 This bad boy shows you, in flamegraph format, exactly where each of your 100ms goes. Read up on Google's documentation on exactly how to use this tool, and exactly what means what, but it'll give you a great idea of which parts of your Javascript are slowing down your page.
 
@@ -95,10 +97,12 @@ Turbolinks 3 introduces a progress bar to the top of the page (you can see it in
 
 100ms-to-glass is *not* a lot of time. In most cases, you may not even have time to redirect. Consider this typical bit of Rails controller logic:
 
-    def create
-      thing = Thing.new(params[:thing])
-      if thing.save
-        redirect_to ...
+```ruby
+def create
+  thing = Thing.new(params[:thing])
+  if thing.save
+    redirect_to #...
+```
 
 Unfortunately, you've just doubled the number of round-trips to the server - one for the POST, and one for the GET when you get your response back from the redirect. I've found that this alone puts you beyond 100ms. With remote forms and Turbolinks, it seems to be far better to do non-RESTFUL responses here and [just re-render the (updated) index view](https://github.com/nateberkopec/todomvc-turbolinks/blob/master/app/controllers/todos_controller.rb#L8).
 
@@ -108,7 +112,7 @@ Partials in Rails have always been slow-ish. They're fast enough if you're aimin
 
 ### Response time goals and Apache bench
 
-Another key tool for keeping your Turbolinks-enabled Rails app below 100ms-to-glass is to keep your server response times ridiculously fast - 50ms should be your goal. Apache Bench {% sidenote 4 "<img src='https://i.imgur.com/nsSgaBj.png'>" %} is a great tool for doing this, but siege is another popular tool that does the same thing - slams your web server as fast as it can to get an idea of your max requests/second.
+Another key tool for keeping your Turbolinks-enabled Rails app below 100ms-to-glass is to keep your server response times ridiculously fast - 50ms should be your goal. Apache Bench{% marginnote "<img src='https://i.imgur.com/nsSgaBj.png'>" %} is a great tool for doing this, but siege is another popular tool that does the same thing - slams your web server as fast as it can to get an idea of your max requests/second.
 
 Be sure to load up your rails server in production mode when benchmarking with these tools so that you don't have code reloading slowing down each request!
 
@@ -128,8 +132,8 @@ I noticed I was spending 30-40ms in scripting on each Turbolinks request. As a h
 
 ### Common mistakes
 
-* Be absolutely certain that a page load that you *think* is Turbolinks enabled, is actually Turbolinks enabled. Click a link with the Developer console open - if the console says something like "Navigated to http://www.whatever.com/foo", that link wasn't Turbolinks-enabled.
-* Don't render erb responses that do things like append items to the current page. Instead, a Turbolinks-enabled action should return a full HTML page. Let Turbolinks do the work of swapping out the document, instead of writing your own, manual "$("#todo-list").append("<%= j(render(@todo)) %>");" calls. For an example, [check out my TodoMVC implementation](https://github.com/nateberkopec/todomvc-turbolinks/blob/master/app/views/todos/index.html.erb), which only uses an index template. Keep state (elements having certain classes, for example) in the template, rather than allowing too much DOM state to leak into your Javascript. It's just unnecessary work that Turbolinks frees us from doing.
+* **Be absolutely certain that a page load that you *think* is Turbolinks enabled, is actually Turbolinks enabled.** Click a link with the Developer console open - if the console says something like "Navigated to http://www.whatever.com/foo", that link wasn't Turbolinks-enabled.
+* **Don't render erb responses that do things like append items to the current page.** Instead, a Turbolinks-enabled action should return a full HTML page. Let Turbolinks do the work of swapping out the document, instead of writing your own, manual "$("#todo-list").append("<%= j(render(@todo)) %>");" calls. For an example, [check out my TodoMVC implementation](https://github.com/nateberkopec/todomvc-turbolinks/blob/master/app/views/todos/index.html.erb), which only uses an index template. Keep state (elements having certain classes, for example) in the template, rather than allowing too much DOM state to leak into your Javascript. It's just unnecessary work that Turbolinks frees us from doing.
 
 ### Limitations and caveats
 
