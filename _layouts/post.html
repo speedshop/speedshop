@@ -3,7 +3,7 @@ layout: default
 ---
 <div class="container">
   <div class="row">
-    <div class="column column-67 post">
+    <div class="column column-67 column-collapsible post">
       <article>
         <h1>{{ page.title | titleize }}</h1>
         <div style="margin-top: -24px;">
@@ -52,7 +52,7 @@ layout: default
   {% for post in site.posts %}
     {% if post.title != page.title %}
       {% cycle 'add row' : '<div class="row">', nil %}
-        <div class="column column-50">
+        <div class="column column-50 column-collapsible">
           <h3>
             <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
           </h3>

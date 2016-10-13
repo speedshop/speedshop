@@ -332,7 +332,9 @@
 });
 
 document.addEventListener("DOMContentLoaded", function(event) {
-  bLazy = new Blazy();
+  bLazy = new Blazy({
+    container: ".container",
+  });
 });
 
 //temp hack

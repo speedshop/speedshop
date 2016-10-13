@@ -7,3 +7,50 @@ ul
 html
   height: 100%
   width: 100%
+
+pre > code
+  white-space: normal
+  overflow: auto
+
+.column.column-collapsible
+  @media screen and (max-width: $medium-breakpoint)
+    flex: 0 0 100% !important
+    max-width: 100% !important
+
+// Grid
+
+@media (max-width: $medium-breakpoint)
+  .container
+    padding: 0 4.0rem
+
+@media (min-width: $medium-breakpoint) // Safari desktop has a bug using `rem`, but Safari mobile works
+  .row
+    flex-direction: row
+    margin-left: -1.0rem
+    width: calc(100% + 2.0rem)
+
+    .column
+      margin-bottom: inherit
+      padding: 0 1.0rem
+
+// Typography
+
+@media (min-width: $medium-breakpoint) // Safari desktop has a bug using `rem`, but Safari mobile works
+
+  h1
+    font-size: 5.0rem
+
+  h2
+    font-size: 4.2rem
+
+  h3
+    font-size: 3.6rem
+
+  h4
+    font-size: 3.0rem
+
+  h5
+    font-size: 2.4rem
+
+  h6
+    font-size: 1.5rem

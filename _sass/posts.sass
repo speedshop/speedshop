@@ -18,8 +18,8 @@
   .sidenote, .marginnote
     float: right
     clear: right
-    margin-right: -70%
-    width: 60%
+    margin-right: -50%
+    width: 43%
     margin-top: 0rem
     margin-bottom: 1.96rem
     font-size: 0.65em
@@ -27,18 +27,24 @@
     position: relative
 
   .sidenote img, .marginnote img
+    height: auto
     max-width: 100%
 
-  @media screen and (max-width: 600px)
-    .sidenote, .marginnote
+  @media screen and (max-width: $medium-breakpoint)
+    .sidenote
       width: 25%
       margin-right: -35%
+    .marginnote
+      width: auto
+      text-align: center
+      margin: 0
+      float: none
     .no-mobile
       display: none
 
-  @media screen and (max-width: 400px)
-    .sidenote, .marginnote
-      display: none
+  @media screen and (min-width: $hd-breakpoint)
+    .sidenote img, .marginnote img
+      max-width: 200%
 
   .footnotes
     margin-bottom: 1.4rem

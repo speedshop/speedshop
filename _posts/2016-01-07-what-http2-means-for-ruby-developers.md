@@ -66,17 +66,22 @@ Cookies, especially, can balloon the size of HTTP requests and responses. Unfort
 <br>
 Huffman coding, duh!
 {% endmarginnote_block %}
+
 Headers can make up 800-1400KB of a request or response - multiply this to Web Scale and you're talking about a *lot* of bandwidth. HTTP/2 will reduce this *greatly* by compressing headers with something fancy called Huffman coding. You don't really need to understand how that works, just know this - HTTP/2 makes HTTP headers smaller by nearly 80%. And you, as an application author, won't need to do anything to take advantage of this benefit, because the compression/decompression will happen at lower levels (probably in Rack or some new layer directly below).
 
 This compression will probably be one of the first HTTP2 features that Rails apps will be able to take advantage of, since header compression/decompression can happen at the load balancer or at the web server, before the request gets to Rack. You can take advantage of header compression today, for example, by placing your app behind Cloudflare’s network, which provides HTTP/2 termination at their load balancers.
 
 ### Multiplexing
 
-{% marginnote_block %}
-<img src="/assets/posts/img/mcxYuDb.gif"></img>
+{% marginnote_block 'no-mobile' %}
+<img src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' data-src="/assets/posts/img/mcxYuDb.gif" class='b-lazy'>
+<noscript>
+<img src="/assets/posts/img/mcxYuDb.gif">
+</noscript>
 <br>
 Damn, shoulda multiplexed.
 {% endmarginnote_block %}
+
 
 Multiplexing is a fancy word for two-way communication. HTTP 1.x was a one-way street - you could only communicate in one direction at a time. This is sort of like a walkie-talkie - if one person is transmitting with a walkie-talkie, the person on the other walkie-talkie can't transmit until the first person lets off the "transmit" button.
 
@@ -102,8 +107,11 @@ HTTP/2 will especially benefit users in high-latency environments like mobile ne
 
 ### Binary
 
-{% marginnote_block %}
-<img src="/assets/gifs/computers.gif">
+{% marginnote_block 'no-mobile' %}
+<img src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' data-src="/assets/posts/img/computers.gif" class='b-lazy'>
+<noscript>
+<img src="/assets/posts/img/computers.gif">
+</noscript>
 <br>
 <a href="https://www.youtube.com/watch?v=1eA3XCvrK90">I'm a computer!</a>
 {% endmarginnote_block %}
