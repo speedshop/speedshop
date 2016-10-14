@@ -9,7 +9,11 @@ module Jekyll
     end
 
     def render(context)
-      "<sup class='sidenote-number'>#{@text[0]}</sup><span class='sidenote'><sup class='sidenote-number'>#{@text[0]}</sup> #{@text[1]}</span>"
+      output = "<sup class='sidenote-number'>"
+      output += "#{@text[0]}</sup>"
+      output += "<span class='sidenote-parens'>(#{@text[1]})</span>"
+      output += "<span class='sidenote'>"
+      output += "<sup class='sidenote-number'>#{@text[0]}</sup> #{@text[1]}</span>"
     end
   end
 end

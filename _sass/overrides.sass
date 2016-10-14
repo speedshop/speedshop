@@ -9,7 +9,7 @@ html
   width: 100%
 
 pre > code
-  white-space: normal
+  white-space: pre-wrap
   overflow: auto
 
 .column.column-collapsible
@@ -21,7 +21,11 @@ pre > code
 
 @media (max-width: $medium-breakpoint)
   .container
-    padding: 0 4.0rem
+    padding: 0 4rem
+
+@media (max-width: $mini-breakpoint)
+  .container
+    padding: 0 2rem
 
 @media (min-width: $medium-breakpoint) // Safari desktop has a bug using `rem`, but Safari mobile works
   .row

@@ -1,69 +1,77 @@
----
-layout: default
----
-<div class="container">
-  <div class="row">
-    <div class="column column-67 column-collapsible post">
-      <article>
-        <h1>{{ page.title | titleize }}</h1>
-        <div style="margin-top: -24px;">
-          <div>by <b>Nate Berkopec</b> (<a target="_blank" href="http://twitter.com/nateberkopec">@nateberkopec</a>)</div>
-          {% include social-bar.html %}
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+
+  {% include post_head.html %}
+
+  <body>
+    <main class="" aria-label="Content">
+      <div class="container">
+        <div class="row">
+          <div class="column column-67 column-collapsible post">
+            <article>
+              <h1>{{ page.title | titleize }}</h1>
+              <div style="margin-top: -24px;">
+                <div>by <b>Nate Berkopec</b> (<a target="_blank" href="http://twitter.com/nateberkopec">@nateberkopec</a>)</div>
+                {% include social-bar.html %}
+              </div>
+
+              {% if page.summary %}
+                <p style="background: rgb(221, 221, 221); padding: 10px">
+                  <b>Summary:</b> {{ page.summary }} <i>({{page.readtime}})</i>
+                </p>
+              {% endif %}
+
+              {{ content }}
+
+              {% include social-bar.html %}
+
+              <h2>Want a faster website?</h2>
+
+              <p>
+                I'm Nate Berkopec
+                (<a href="https://twitter.com/nateberkopec">@nateberkopec</a>).
+                I write online about web performance from a full-stack developer's
+                perspective. I primarily write about frontend performance and Ruby
+                backends. If you liked this article and want to hear about the next
+                one, click below. I don't spam - you'll receive about 1 email per week.
+                It's all low-key, straight from me.
+              </p>
+
+              {% include mailchimp.html %}
+
+              <h2>Now Available: The Complete Guide to Rails Performance</h2>
+
+              <p>I've authored an in-depth course for making Ruby and Rails applications faster. The Complete Guide to Rails Performance is a full-stack course that gives you the tools to make Ruby on Rails applications faster, more scalable, and simpler to maintain. It includes a 361 page PDF and over 15 hours of video content.</p>
+
+              <a href="https://www.railsspeed.com/">Learn more at railsspeed.com</a>.
+            </article>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <h2>More Posts</h2>
+          </div>
         </div>
 
-        {% if page.summary %}
-          <p style="background: rgb(221, 221, 221); padding: 10px">
-            <b>Summary:</b> {{ page.summary }} <i>({{page.readtime}})</i>
-          </p>
-        {% endif %}
+        {% for post in site.posts %}
+          {% if post.title != page.title %}
+            {% cycle 'add row' : '<div class="row">', nil %}
+              <div class="column column-50 column-collapsible">
+                <h3>
+                  <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+                </h3>
+                <p>
+                  {{ post.summary | strip_html | truncatewords: 50 }}
+                </p>
+                <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
+              </div>
+            {% cycle 'end row' : nil, '</div>' %}
+          {% endif %}
 
-        {{ content }}
+        {% endfor %}
+        {% cycle 'end row' : nil, '</div>' %}
+      </div>
+    </main>
+  </body>
 
-        {% include social-bar.html %}
-
-        <h2>Want a faster website?</h2>
-
-        <p>
-          I'm Nate Berkopec
-          (<a href="https://twitter.com/nateberkopec">@nateberkopec</a>).
-          I write online about web performance from a full-stack developer's
-          perspective. I primarily write about frontend performance and Ruby
-          backends. If you liked this article and want to hear about the next
-          one, click below. I don't spam - you'll receive about 1 email per week.
-          It's all low-key, straight from me.
-        </p>
-
-        {% include mailchimp.html %}
-
-        <h2>Now Available: The Complete Guide to Rails Performance</h2>
-
-        <p>I've authored an in-depth course for making Ruby and Rails applications faster. The Complete Guide to Rails Performance is a full-stack course that gives you the tools to make Ruby on Rails applications faster, more scalable, and simpler to maintain. It includes a 361 page PDF and over 15 hours of video content.</p>
-
-        <a href="https://www.railsspeed.com/">Learn more at railsspeed.com</a>.
-      </article>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12">
-      <h2>More Posts</h2>
-    </div>
-  </div>
-
-  {% for post in site.posts %}
-    {% if post.title != page.title %}
-      {% cycle 'add row' : '<div class="row">', nil %}
-        <div class="column column-50 column-collapsible">
-          <h3>
-            <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-          </h3>
-          <p>
-            {{ post.summary | strip_html | truncatewords: 50 }}
-          </p>
-          <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
-        </div>
-      {% cycle 'end row' : nil, '</div>' %}
-    {% endif %}
-
-  {% endfor %}
-  {% cycle 'end row' : nil, '</div>' %}
-</div>
+</html>

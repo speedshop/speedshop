@@ -1,16 +1,21 @@
 .post
   font-family: Georgia,Cambria,"Times New Roman",Times,serif
-
-  p
-    font-size: 2.2rem
+  margin-top: 2rem
 
   dl,
   ol,
-  ul
+  ul,
+  code,
+  p
     font-size: 2.2rem
 
-  code
-    font-size: 2.2rem
+  @media screen and (max-width: $mini-breakpoint)
+    dl,
+    ol,
+    ul,
+    code,
+    p
+      font-size: 1.7rem
 
   img
     max-width: 100%
@@ -30,15 +35,20 @@
     height: auto
     max-width: 100%
 
+  .sidenote-parens
+    display: none
+
   @media screen and (max-width: $medium-breakpoint)
-    .sidenote
-      width: 25%
-      margin-right: -35%
+    .sidenote, .sidenote-number
+      display: none
+    .sidenote-parens
+      display: inline
     .marginnote
       width: auto
       text-align: center
       margin: 0
       float: none
+      display: block
     .no-mobile
       display: none
 

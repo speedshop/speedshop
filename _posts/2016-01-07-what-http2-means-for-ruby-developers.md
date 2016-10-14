@@ -9,23 +9,13 @@ readtime: 2112 words/11 minutes
 image: https://i.imgur.com/7ep6bdy.jpg
 ---
 
-{% marginnote_block 'no-mobile' %}
-<img src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' data-src="/assets/posts/img/yC6kwyY.gif" class='b-lazy'>
-<noscript>
-<img src="/assets/posts/img/yC6kwyY.gif">
-</noscript>
-<br>
-Okay, way too much magical pixie dust.
-{% endmarginnote_block %}
+{% marginnote_lazy yC6kwyY.gif|Okay, way too much magical pixie dust|true %}
 
 HTTP/2 is coming! No, wait, HTTP/2 is here! [After publication in Q1 of 2015](https://github.com/http2/http2-spec), HTTP/2 is now an "official thing" in Web-land. As of writing (December 2015), [caniuse.com estimates about 70% of browsers globally can now support HTTP/2](http://caniuse.com/#feat=http2). So, I can use HTTP/2 in my Ruby application *today*, right? After all, Google says that [some pages can load up to 50% faster just by adding HTTP/2/SPDY support](https://www.chromium.org/spdy/spdy-whitepaper 50% reduction in load time
 ), it's magical web-speed pixie dust! Let's get it going!
 
-{% marginnote_block %}
-{% image rHXhQoM.jpg %}
-<br>
-Uh, hello Aaron? Yeah, could you like, fix Rack please?
-{% endmarginnote_block %}
+{% marginnote_lazy rHXhQoM.jpg|Uh, hello Aaron? Yeah, could you like, fix Rack please? %}
+
 Well, no. Not really. Ilya Grigorik has written an experimental HTTP/2 webserver in Ruby, but it's not compatible with Rack, and therefore not compatible with any Ruby web framework. While [@tenderlove](http://tenderlovemaking.com/) has done [some](https://github.com/tenderlove/the_metal) [experiments](https://github.com/tenderlove/arghhh) [with HTTP/2](https://twitter.com/tenderlove/status/626044968419721217), Rack remains firmly stuck in an HTTP/1.1 world. [While it was discussed that this would change with Rack 2 and Rails 5](https://github.com/tenderlove/the_metal/issues/5), very little actually changed. Until the situation changes at the Rack level, Rails and all other Ruby web frameworks are stuck with HTTP/1.1.
 
 Part of the reason why progress has been slow here (other than, apparently, that [@tenderlove](http://tenderlovemaking.com/) is the only one that wants to work on this stuff) is that Rack is thoroughly designed for an HTTP/1.1 world. In a lot of ways, HTTP/2's architecture will probably mean that whatever solution we come up with will bear more resemblance to ActionCable than it does to to Rack 1.0.
@@ -37,7 +27,7 @@ Ilya Grigorik, Google's public web performance advocate, [has laid out 4 princip
 * **Communication with backend servers should be message-oriented**. Here's one of the main hangups - Rack is designed around the request/response cycle. Client makes a request, server makes a response. While we have some limited functionality for server pushes (see [ActionController::Live::SSE](http://api.rubyonrails.org/classes/ActionController/Live/SSE.html)), communication in Rack is mostly designed around request/response, not arbitrary messages that can go in either direction.
 * **Communication between clients and backends should be bi-directional**. Another problem for Rack - it isn't really designed for pushes straight from the server without a corresponding request. Rack essentially assumes it has direct read/write access to a socket, but HTTP/2 complicates that considerably.
 
-If you're paying attention, you'll realize these 4 principles sound a hell of a lot like WebSockets. HTTP/2, in a lot of ways, obviates Ruby developers' needs for WebSockets. [As I mentioned in my guide to ActionCable](https://www.nateberkopec.com/2015/09/30/action-cable.html), WebSockets are a layer *below* HTTP, and one of the major barriers of WebSocket adoption for application developers will be that many of the things you're used to with HTTP (RESTful architecture, HTTP caching, redirection, etc) need to be *re-implemented* with WebSockets. Once HTTP/2 gets a JavaScript API for opening bi-directional streams to our Rails servers, the reasons for using WebSockets at all pretty much evaporate.
+If you're paying attention, you'll realize these 4 principles sound a hell of a lot like WebSockets. HTTP/2, in a lot of ways, obviates Ruby developers' needs for WebSockets. [As I mentioned in my guide to ActionCable](/2015/09/30/action-cable.html), WebSockets are a layer *below* HTTP, and one of the major barriers of WebSocket adoption for application developers will be that many of the things you're used to with HTTP (RESTful architecture, HTTP caching, redirection, etc) need to be *re-implemented* with WebSockets. Once HTTP/2 gets a JavaScript API for opening bi-directional streams to our Rails servers, the reasons for using WebSockets at all pretty much evaporate.
 
 When these hurdles are surmounted, HTTP/2 could bring, potentially, great performance benefits to Ruby web applications.
 
@@ -61,11 +51,7 @@ user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (K
 
 Cookies, especially, can balloon the size of HTTP requests and responses. Unfortunately, there is no provision in the HTTP 1.x specification for compressing these - unlike response bodies, which we can compress with things like `gzip`.
 
-{% marginnote_block %}
-{% image ITu2NDW.jpg %}
-<br>
-Huffman coding, duh!
-{% endmarginnote_block %}
+{% marginnote_lazy ITu2NDW.jpg|Huffman coding, duh! %}
 
 Headers can make up 800-1400KB of a request or response - multiply this to Web Scale and you're talking about a *lot* of bandwidth. HTTP/2 will reduce this *greatly* by compressing headers with something fancy called Huffman coding. You don't really need to understand how that works, just know this - HTTP/2 makes HTTP headers smaller by nearly 80%. And you, as an application author, won't need to do anything to take advantage of this benefit, because the compression/decompression will happen at lower levels (probably in Rack or some new layer directly below).
 
@@ -73,15 +59,7 @@ This compression will probably be one of the first HTTP2 features that Rails app
 
 ### Multiplexing
 
-{% marginnote_block 'no-mobile' %}
-<img src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' data-src="/assets/posts/img/mcxYuDb.gif" class='b-lazy'>
-<noscript>
-<img src="/assets/posts/img/mcxYuDb.gif">
-</noscript>
-<br>
-Damn, shoulda multiplexed.
-{% endmarginnote_block %}
-
+{% marginnote_lazy mcxYuDb.gif|Damn, shoulda multiplexed.|true %}
 
 Multiplexing is a fancy word for two-way communication. HTTP 1.x was a one-way street - you could only communicate in one direction at a time. This is sort of like a walkie-talkie - if one person is transmitting with a walkie-talkie, the person on the other walkie-talkie can't transmit until the first person lets off the "transmit" button.
 

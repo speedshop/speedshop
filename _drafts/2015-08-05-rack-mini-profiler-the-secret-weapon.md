@@ -8,7 +8,7 @@ summary: rack-mini-profiler is a powerful Swiss army knife for Rack app performa
 readtime: 3328 words/16 minutes
 ---
 
-`rack-mini-profiler` is a a performance tool for Rack applications, maintained by the talented [@samsaffron](https://twitter.com/samsaffron). [rack-mini-profiler](https://github.com/MiniProfiler/rack-mini-profiler) provides an entire suite of tools for measuring the performance of Rack-enabled web applications, including detailed drill downs on SQL queries, server response times (with a breakdown for each template and partial), incredibly detailed millisecond-by-millisecond breakdowns of execution times with the incredible `flamegraph` feature, and will even help you track down memory leaks with its excellent garbage collection features. **I wouldn't hesitate to say that `rack-mini-profiler` is my favorite and most important tool for developing fast Ruby webapps.** {% sidenote 1 "<img src='https://i.imgur.com/DgONqEH.gif'></img>" %}
+`rack-mini-profiler` is a a performance tool for Rack applications, maintained by the talented [@samsaffron](https://twitter.com/samsaffron). [rack-mini-profiler](https://github.com/MiniProfiler/rack-mini-profiler) provides an entire suite of tools for measuring the performance of Rack-enabled web applications, including detailed drill downs on SQL queries, server response times (with a breakdown for each template and partial), incredibly detailed millisecond-by-millisecond breakdowns of execution times with the incredible `flamegraph` feature, and will even help you track down memory leaks with its excellent garbage collection features. **I wouldn't hesitate to say that `rack-mini-profiler` is my favorite and most important tool for developing fast Ruby webapps.** {% sidenote 1 "<img src='https://i.imgur.com/DgONqEH.gif'>" %}
 
 The best part - `rack-mini-profiler` is designed to be run in production. Yeah! You can accurately profile production performance (say that three times fast) with `rack-mini-profiler`. Of course, it also works fine in development. But your development environment is usually a lot different than production - hardware, virtualization environments, and system configuration can all be different and play a huge part in performance. Not to mention Rails' development mode settings, like reloading classes on every request!
 
@@ -37,7 +37,7 @@ gem 'memory_profiler'
 
 `memory_profiler` will let us use `rack-mini-profiler`'s GC features.
 
-Fire up a server in development mode and hit a page. You should see the new speed badge in the upper left. {% sidenote 2 "<img src='https://i.imgur.com/3euqzxD.png'></img>" %} We'll get to what that does in a second.
+Fire up a server in development mode and hit a page. You should see the new speed badge in the upper left. {% sidenote 2 "<img src='https://i.imgur.com/3euqzxD.png'>" %} We'll get to what that does in a second.
 
 To see a full list of rack-mini-profiler's features and info on how to trigger them, add `?pp=help` to the end of any URL {% sidenote 3 "In more recent versions of rack-mini-profiler, there's also a 'help' button on the speed badge" %} - this prints the help screen and lists the various commands available (all used by adding to the URL query string){% marginnote "![Imgur](https://i.imgur.com/p3zgkM5.png)" %}.
 
@@ -110,7 +110,7 @@ These queries look like the view was probably looking up the `current_user` (or 
 * Find a way to either eliminate this query or cache the result in the view
 * Add an `includes` call to the original query so that the profile is loaded along with the User, reducing my query count by 1.
 
-I follow this process for every query on the page - see if I can remove it or cache the result. [For my full guide on Rails caching, check this post out](http://www.nateberkopec.com/2015/07/15/the-complete-guide-to-rails-caching.html).
+I follow this process for every query on the page - see if I can remove it or cache the result. [For my full guide on Rails caching, check this post out](/2015/07/15/the-complete-guide-to-rails-caching.html).
 
 ## The Flamegraph
 

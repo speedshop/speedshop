@@ -44,7 +44,8 @@ assets:
     - "*.svg"
     - "*.webm"
     - "*.mp4"
-    - "main.css"
+    - "posts.css"
+    - "home.css"
     - "*.js"
   digest: true
   sources:
