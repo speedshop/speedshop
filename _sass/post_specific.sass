@@ -1,6 +1,14 @@
 .post
-  font-family: Georgia,Cambria,"Times New Roman",Times,serif
+  font-family: "Palatino Linotype", Palatino, Palladio, "URW Palladio L", "Book Antiqua", Baskerville, "Bookman Old Style", "Bitstream Charter", "Nimbus Roman No9 L", Garamond, "Apple Garamond", "ITC Garamond Narrow", "New Century Schoolbook", "Century Schoolbook", "Century Schoolbook L", Georgia, serif
   margin-top: 2rem
+
+  h1,h2,h3,h4,h5,h6
+    font-family: "Helvetica Neue", Helvetica, Frutiger, "Frutiger Linotype", Univers, Calibri, "Gill Sans", "Gill Sans MT", "Myriad Pro", Myriad, "DejaVu Sans Condensed", "Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, Arial, sans-serif
+
+  h2
+    background: black
+    color: white
+    padding: 3.5rem 5px
 
   dl,
   ol,
@@ -8,6 +16,9 @@
   code,
   p
     font-size: 2.2rem
+
+  p
+    margin-bottom: 3.5rem
 
   @media screen and (max-width: $mini-breakpoint)
     dl,
@@ -56,8 +67,33 @@
     .sidenote img, .marginnote img
       max-width: 200%
 
-  .footnotes
-    margin-bottom: 1.4rem
+.innocuous
+  width: 39%
+  padding: 10px 20px
+  position: fixed
+  height: 150px
+  left: 61%
+  bottom: 0
+  background: #DDD
+  display: none
 
-  .newthought
-    font-variant: small-caps
+  .email
+    font-size: 1.6rem
+    background: #FFF
+    width: 250px
+
+  @media screen and (max-width: $hd-breakpoint)
+    width: 35%
+    left: 65%
+    height: 170px
+  @media screen and (max-width: $desktop-breakpoint)
+    width: 34%
+    left: 66%
+    height: 265px
+  @media screen and (max-width: $large-breakpoint)
+    width: 100%
+    left: 0
+    height: 166px
+  @media screen and (max-width: $mini-breakpoint)
+    .email
+      width: 200px

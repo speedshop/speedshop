@@ -13,6 +13,48 @@
   <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | prepend: full_base_url }}">
   <link rel="shortcut icon" type="image/x-icon" href="/assets/icons/favicon.ico"/>
 
+  <script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+        var ROOT = (function () {
+          var html = document.documentElement;
+          var htmlScrollTop = html.scrollTop++;
+          var root = html.scrollTop == htmlScrollTop + 1 ? html : document.body;
+          html.scrollTop = htmlScrollTop;
+          return root;
+      })();
+
+      // may be recalculated on resize
+      var limit = (document.body.scrollHeight - window.innerHeight) * 0.5;
+      var last = +new Date;
+      var didScroll = false;
+
+      if (document.cookie.replace(/(?:(?:^|.*;\s*)nateberkopecShowSignup\s*\=\s*([^;]*).*$)|^.*$/, "$1") !== "true") {
+        window.addEventListener("scroll", function() {
+          didScroll = true;
+        });
+
+        setInterval(function(){
+          if(didScroll){
+            didScroll = false;
+            if (ROOT.scrollTop > limit) {
+              showSignup();
+            }
+          }
+        }, 30);
+      }
+
+      function showSignup(){
+        el = document.getElementById("innocuous");
+        el.style.display = "block";
+      }
+
+      el = document.getElementById("innocuous-close");
+      el.addEventListener("click", function() {
+        el.style.display = "none";
+        document.cookie = "nateberkopecShowSignup=true; expires=Fri, 31 Dec 9999 23:59:59 GMT";
+      });
+    });
+  </script>
   {% include twitter.html %}
   {% include opengraph.html %}
 </head>
