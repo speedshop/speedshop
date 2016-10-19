@@ -1,32 +1,33 @@
 box: ruby
 build:
     steps:
-        # Run a smart version of bundle install
-        # which improves build execution time of
-        # future builds
-        - bundle-install
+      # Run a smart version of bundle install
+      # which improves build execution time of
+      # future builds
+      - bundle-install
 
-        - script:
-            name: generate site
-            code: bundle exec jekyll build --trace
+      - script:
+        name: generate site
+        code: bundle exec jekyll build --trace
 
 compress:
-        - script:
-          name: unstable debian
-          code: |
-            sudo chmod a+w /etc/apt/sources.list
-            sudo echo 'deb http://ftp.us.debian.org/debian unstable main contrib non-free' >> /etc/apt/sources.list
+  steps:
+    - script:
+      name: unstable debian
+      code: |
+        sudo chmod a+w /etc/apt/sources.list
+        sudo echo 'deb http://ftp.us.debian.org/debian unstable main contrib non-free' >> /etc/apt/sources.list
 
-        - install-packages:
-          packages: brotli zopfli
+    - install-packages:
+      packages: brotli zopfli
 
-        - script:
-            name: zopfli
-            code: find _site -type f '!' -name '*.jpg' '!' -name '*.gif' '!' -name '*.png' '!' -name '*.jpg' | xargs zopfli --i50
+    - script:
+        name: zopfli
+        code: find _site -type f '!' -name '*.jpg' '!' -name '*.gif' '!' -name '*.png' '!' -name '*.jpg' | xargs zopfli --i50
 
-        - script:
-            name: brotli
-            code: find _site -type f '!' -name '*.jpg' '!' -name '*.gif' '!' -name '*.png' '!' -name '*.jpg' '!' -name "*.gz" | xargs -I{} brotli --quality 11 --input {} --output {}.br
+    - script:
+        name: brotli
+        code: find _site -type f '!' -name '*.jpg' '!' -name '*.gif' '!' -name '*.png' '!' -name '*.jpg' '!' -name "*.gz" | xargs -I{} brotli --quality 11 --input {} --output {}.br
 
 deploy:
   steps:
