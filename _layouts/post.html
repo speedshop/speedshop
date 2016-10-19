@@ -12,7 +12,12 @@
               <article>
                 <h1 style="margin-bottom: 1rem;">{{ page.title | titleize }}</h1>
                 <div style="margin: 0rem 0 2rem 0">
-                  <div>by <b>Nate Berkopec</b> (<a target="_blank" href="http://twitter.com/nateberkopec">@nateberkopec</a>) of <a target="_blank" href="/">Speedshop</a>, a Rails performance consultancy.</div>
+                  by <b>Nate Berkopec</b>
+                  (<a target="_blank" href="http://twitter.com/nateberkopec">@nateberkopec</a>)
+                  of <a target="_blank" href="/" style="display: inline-block;width: 9rem;position: relative;top: 0.3rem;">
+                    {% asset "speedshop_wordmark.svg" %}
+                  </a> <a target="_blank" href="/">(who?)</a>,
+                  a Rails performance consultancy.
                 </div>
 
                 <div class="marginnote">
@@ -20,7 +25,7 @@
                 </div>
 
                 {% if page.summary %}
-                  <p style="background: rgb(221, 221, 221); padding: 10px">
+                  <p style="background: rgb(221, 221, 221); padding: 1rem; position: relative; left: -1rem">
                     <b>Summary:</b> {{ page.summary }} <i>({{page.readtime}})</i>
                   </p>
                 {% endif %}
