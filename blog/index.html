@@ -3,7 +3,7 @@ layout: default
 title: Blog
 ---
 <div class="container">
-  <div class="row" style="margin-top: 3rem">
+  <div class="row" class="margin-top-xl">
     <div class="column">
       {% asset "speedshop_wordmark_blog.svg" %}
       <h2 style="display: inline-block">
@@ -16,6 +16,7 @@ title: Blog
 
   {% assign counter = 0 %}
   {% assign maxPostsPerRow = 2 %}
+  {% assign post_counter = 0 %}
   {% for post in site.posts %}
     {% if counter == 0 %}
       <div class="row">
@@ -31,10 +32,21 @@ title: Blog
       <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
     </div>
     {% assign counter=counter | plus:1 %}
+    {% assign post_counter=post_counter | plus:1 %}
 
-    {% if counter == maxPostsPerRow %}
+    {% assign posts_count = site.posts | size %}
+    {% if counter == maxPostsPerRow or post_counter == posts_count %}
       </div>
       {% assign counter = 0 %}
     {% endif %}
   {% endfor %}
+
+  <hr>
+
+  {% include cgrp.html %}
+
+  <hr>
+
+  {% include mailing.html %}
+
 </div>
