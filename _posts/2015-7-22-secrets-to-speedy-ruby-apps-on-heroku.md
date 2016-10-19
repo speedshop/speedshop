@@ -11,11 +11,11 @@ I've seen a lot of slow Ruby web apps. Sometimes, it feels like my entire consul
 
 Why is the case? If you read [that bastion of intellectual thought, Hacker News](https://twitter.com/shit_hn_says), you'd think it was because Go rocks, Ruby sucks, and Rails is crappy old-news bloatware. Also, something about how concurrency is the future, and dynamic typing is for fake programmers that can't code.
 
-{% marginnote "<img src='https://i.imgur.com/qQvbbt9.png'>" %}
+{% marginnote_lazy https://i.imgur.com/qQvbbt9.png %}
 
 And yet, top-1000 websites like [Basecamp](https://www.youtube.com/watch?v=yhseQP52yIY#t=50m30s), [Shopify](https://docs.shopify.com/partners/partner-resources/for-clients/why-shopify) and [Github](https://status.github.com) consistently achieve server response times of less than 100 milliseconds with Rails. That's pretty good for a dynamic, garbage-collected language, if you ask me.
 
-Most of my clients deploy on Heroku nowadays, since it's so easy and the payoff for teams without dedicated devops is obvious. Why spend hours of developer time (worth at least $100/hr in most cases) setting up and maintaining a home-brewed devops setup, when with Heroku you can set it up in minutes?{% marginnote "<img src='https://i.imgur.com/6MnUrju.png'><i>Actual client graph. Slopes for the slope throne!</i>" %}
+Most of my clients deploy on Heroku nowadays, since it's so easy and the payoff for teams without dedicated devops is obvious. Why spend hours of developer time (worth at least $100/hr in most cases) setting up and maintaining a home-brewed devops setup, when with Heroku you can set it up in minutes?{% marginnote_lazy https://i.imgur.com/6MnUrju.png|Actual client graph. Slopes for the slope throne! %}
 
 However, Heroku sometimes makes things a little *too* easy. Ruby apps on Heroku are often slow, with bloated memory requirements and poor webserver choices, leading to hundreds of dollars per month in wasted server costs. In addition, the combination of restricted introspection ability (you can't ssh into a dyne while it's running) and reduced devops skill requirements means that most developers that deploy on Heroku have no idea how to solve the performance problems that they've created.
 
@@ -25,9 +25,9 @@ However, Heroku sometimes makes things a little *too* easy. Ruby apps on Heroku 
 
 The number one enemy of Ruby applications on Heroku? Memory.
 
-Most *nix systems use something called swap space when they run out of RAM. This is essentially the operating system using the file system as RAM. However, the filesystem is a lot slower than RAM - 10-50x slower, in fact.
+Most Unix systems use something called swap space when they run out of RAM. This is essentially the operating system using the file system as RAM. However, the filesystem is a lot slower than RAM - 10-50x slower, in fact.
 
-{% marginnote "<img src='https://i.imgur.com/amwiTJI.jpg'><i>Heroku's metrics dashboard. Red is swap memory. Red bad, purple good.</i>" %}If we run out of memory on Heroku, we’ll start using swap memory instead of regular, fast RAM memory. This can slow your app to a crawl. If you’re using swap memory on Heroku, you’re Doing It Wrong and need to reduce your memory usage through any means available.
+{% marginnote_lazy https://i.imgur.com/amwiTJI.jpg|Heroku's metrics dashboard. Red is swap memory. Red bad, purple good. %}If we run out of memory on Heroku, we’ll start using swap memory instead of regular, fast RAM memory. This can slow your app to a crawl. If you’re using swap memory on Heroku, you’re Doing It Wrong and need to reduce your memory usage through any means available.
 
 ### Memory bloat and swap usage
 
@@ -69,7 +69,7 @@ So you know how I said I don't like worker-killer gems? Well, there's one specia
 
 If you’ve got a memory leak you can’t track down (more on this in a future post), you need to employ a solution that will restart your workers when they start to use swap memory. There are a lot of ways to do this. Several gems, like puma-worker-killer, will do it for you.
 
-{% marginnote "<img src='https://i.stack.imgur.com/nlwy8.png'><i>What a leak looks like. Note the steep slope of the graph, which crashes back down to low numbers when the dyno restarts. This graph never really levels off.</i>" %}
+{% marginnote_lazy https://i.stack.imgur.com/nlwy8.png|What a leak looks like. Note the steep slope of the graph, which crashes back down to low numbers when the dyno restarts. This graph never really levels off. %}
 
 Remember, **you only need to employ a worker killer if your application is leaking memory - not if it’s just bloated**. How do you know the difference between bloat and leaks?
 
@@ -114,7 +114,7 @@ Tools like [bullet](https://github.com/flyerhzm/bullet) are somewhat useful, but
 
 ## Caching. DO IT.
 
-{% marginnote "<img src='https://i.imgur.com/Y82ScT5.gif'><i>You can do it. Make your response time dreams come true.</i>" %}
+{% marginnote_lazy https://i.imgur.com/Y82ScT5.gif|You can do it. Make your response time dreams come true|true %}
 
 If your server response times are still greater than 250ms after you’ve knocked down the usual suspects of N+1 queries and memory usage, you need to start caching. If you’re already caching, cache more than you do already. Rails apps can be fast - Shopify, Github, and Basecamp all achieve <100ms server response times with millions more requests per hour than you have. You can do it - cache more!
 
