@@ -30,8 +30,8 @@ build:
 deploy:
   steps:
     - edgecaseadmin/install-aws-cli:
-        key: $KEY
-        secret: $SECRET
+        key: $AWS_CLI_KEY
+        secret: $AWS_CLI_SECRET
 
     - script:
         name: aws non-gz non-br
