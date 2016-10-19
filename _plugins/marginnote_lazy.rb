@@ -1,7 +1,5 @@
 module Jekyll
   class RenderMarginNoteTag < Liquid::Tag
-    require "shellwords"
-
     def initialize(tag_name, params, tokens)
       super
       @params = params.split("|").map(&:strip)
