@@ -2,7 +2,7 @@ box: ruby
 build:
     steps:
       # Run a smart version of bundle install
-      # which improves build execution time of
+      # which improves build execution time 
       # future builds
       - bundle-install
 
