@@ -244,7 +244,7 @@ This is a great way to implement something like Google's Instant Pages or Facebo
 
 Of course, you have to be careful and considerate when using prefetch and prerender. If you're prefetching something on your own server, you're effectively adding another request to your server load for every prefetch directive. A prerender directive can be even more load-intensive because the browser will also fetch all sub resources (CSS/JS/images, etc), which may also come from your servers. It's important to only use prerender and prefetch where you can be pretty certain a user will actually use those resources on the next navigation.
 
-There's another caveat to prerender - like all resource hints, pretenders are given much lower priority by the browser and aren't always executed. [Here's straight from the spec](http://www.w3.org/TR/resource-hints/#speculative-resource-prefetching-prefetch):
+There's another caveat to prerender - like all resource hints, prerenders are given much lower priority by the browser and aren't always executed. [Here's straight from the spec](http://www.w3.org/TR/resource-hints/#speculative-resource-prefetching-prefetch):
 
 "The user agent may:
 * Allocate fewer CPU, GPU, or memory resources to pre rendered content.

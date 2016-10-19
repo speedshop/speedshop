@@ -13,6 +13,9 @@ build:
     # Read more about steps on our dev center:
     # http://devcenter.wercker.com/docs/steps/index.html
     steps:
+        - install-packages:
+          packages: brotli zopfli
+          
         # Run a smart version of bundle install
         # which improves build execution time of
         # future builds
@@ -23,6 +26,7 @@ build:
         - script:
             name: generate site
             code: bundle exec jekyll build --trace
+
 deploy:
   steps:
     - s3sync:
@@ -31,3 +35,10 @@ deploy:
         bucket_url: $URL
         source_dir: _site/
         opts: --acl-public --delete-removed
+        # --exclude='*.gz'
+    # - s3sync:
+    #     key_id: $KEY
+    #     key_secret: $SECRET
+    #     bucket_url: $URL
+    #     source_dir: _site/
+    #     opts: --acl-public --delete-removed --exclude='*' --include='*.gz'
