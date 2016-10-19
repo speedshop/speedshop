@@ -114,7 +114,7 @@ Most Ruby apps response time histograms look like an power curve. Remember what 
 
 ### What realm of RPM are we playing in?
 
-{% marginnote_lazy http://i.imgur.com/cEKvA82.gif|<i>What it looks like optimizing a high-scale app in production</i>|true %}  It's always helpful to check what "order of magnitude" we're at as far as scale. Here are my rules of thumb:
+{% marginnote_lazy https://i.imgur.com/cEKvA82.gif|<i>What it looks like optimizing a high-scale app in production</i>|true %}  It's always helpful to check what "order of magnitude" we're at as far as scale. Here are my rules of thumb:
 
 | Requests per minute | Scale |
 | -------- | -------- |
