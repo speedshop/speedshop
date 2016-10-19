@@ -39,5 +39,6 @@ deploy:
         key_id: $KEY
         key_secret: $SECRET
         bucket_url: $URL
+        opts: |
+          --guess-mime-type --acl-public --delete-removed --exclude='*' --add-header "Cache-Control:public, max-age=3600" --add-header "Content-Encoding: gzip"
         source_dir: _site/
-        opts: --guess-mime-type --acl-public --delete-removed --exclude='*' --add-header "Cache-Control:public, max-age=3600" --add-header "Content-Encoding: gzip"
