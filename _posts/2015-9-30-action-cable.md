@@ -8,7 +8,7 @@ summary: Action Cable will be one of the main features of Rails 5, to be release
 readtime: 4205 words/21 minutes
 ---
 
-One of the marquee features of Rails 5 (likely releasing sometime Q1/Q2 2016) is Action Cable, Rails' new framework for dealing with WebSockets. Action Cable has generated a lot of interest, though perhaps for the wrong reasons. "WebSockets are those cool things the Node people get to use, right?" and "I heard WebSockets are The Future™" seem to be the prevailing attitudes, resulting in a lot of confusion and uncertainty about Action Cable's purpose and promise. It doesn't help that current online conversation around WebSockets is thick with overly fancy buzzwords like "realtime" and "full-duplex". {% marginnote "<img src="https://i.imgur.com/U7vo0Hs.gif" /> <br> <i>Full-duplex? That's twice as good as half-duplex right?</i>" %}  In addition, some claim that a WebSockets-based application is somehow more scalable than traditional implementations. What's a Rails application developer to make of all of this?
+One of the marquee features of Rails 5 (likely releasing sometime Q1/Q2 2016) is Action Cable, Rails' new framework for dealing with WebSockets. Action Cable has generated a lot of interest, though perhaps for the wrong reasons. "WebSockets are those cool things the Node people get to use, right?" and "I heard WebSockets are The Future™" seem to be the prevailing attitudes, resulting in a lot of confusion and uncertainty about Action Cable's purpose and promise. It doesn't help that current online conversation around WebSockets is thick with overly fancy buzzwords like "realtime" and "full-duplex". {% marginnote_lazy https://i.imgur.com/U7vo0Hs.gif|Full-duplex? That's twice as good as half-duplex right? |true %}  In addition, some claim that a WebSockets-based application is somehow more scalable than traditional implementations. What's a Rails application developer to make of all of this?
 
 This won't be a tutorial or a how-to article - instead, we're going to get into the *why* of Action Cable, not the *how*.
 
@@ -32,7 +32,7 @@ Over the years, we've developed a lot of different solutions to these problems. 
 
 ### Polling
 
-Polling involves the client asking the server, on a set interval (say, three seconds) if there is any new data. {% marginnote "<img src="https://i.imgur.com/dKNsN7L.gif" /> <br> <i>Hey! Hey server! You got any new data? Server? SERVER!</i>." %} Returning to the "live comments" example, let's say we have a page with a comments section. To create this application with polling, we can write some Javascript to ask the server every three seconds for the latest comment data in JSON format. If there is new data, we can update the comment section.
+Polling involves the client asking the server, on a set interval (say, three seconds) if there is any new data. {% marginnote_lazy https://i.imgur.com/dKNsN7L.gif|Hey! Hey server! You got any new data? Server? SERVER!|true %} Returning to the "live comments" example, let's say we have a page with a comments section. To create this application with polling, we can write some Javascript to ask the server every three seconds for the latest comment data in JSON format. If there is new data, we can update the comment section.
 
 The advantage of polling is that it's rock-solid and extremely simple to set up. For these reasons, it's in wide use all over the Web. It's also very resistant to network outage and latency - if you miss 1 or 2 polls because the network went out, for example, no problem! You just keep polling until eventually it works again. Also, thanks to the stateless nature of HTTP, IP address changes (say, a mobile client with data roaming) won't break the application.
 
@@ -52,7 +52,7 @@ However, it quickly falls apart if data changes often. Instead of a live comment
 
 ### Server-sent Events (SSEs)
 
-Server-sent Events are essentially a one-way connection from the server to the client. Clients can't use SSEs to send data back to the server. Server-sent Events got turned into a browser API back in 2006, and is currently supported by every major browser *except* any version of Internet Explorer.{% marginnote "<img src="https://i.imgur.com/FHB2E1f.gif" />" %}
+Server-sent Events are essentially a one-way connection from the server to the client. Clients can't use SSEs to send data back to the server. Server-sent Events got turned into a browser API back in 2006, and is currently supported by every major browser *except* any version of Internet Explorer.{% marginnote_lazy https://i.imgur.com/FHB2E1f.gif | |true %}
 
 Using server-side events is really quite simple from the (Javascript) client's side. You set up an `EventSource` object, define an `onmessage` callback describing what you'll do when you get a new message from the server, and you're off to the races.
 
@@ -110,7 +110,7 @@ What does all of this mean to us though? Not a whole lot. You could easily do so
 
 ### Two-way communication
 
-{% marginnote "<img src="https://www.reactiongifs.com/r/prs.gif" /> <br> <i>How many duplexes do YOU have, Red Ranger?</i>" %} One thing you hear a lot about WebSockets is that they're "full-duplex". What the hell does that mean? Well, clearly, *full* duplex is *better* than *half-duplex* right? That's double the duplexes!
+{% marginnote_lazy https://www.reactiongifs.com/r/prs.gif|How many duplexes do YOU have, Red Ranger?|true %} One thing you hear a lot about WebSockets is that they're "full-duplex". What the hell does that mean? Well, clearly, *full* duplex is *better* than *half-duplex* right? That's double the duplexes!
 
 All that full-duplex really means is **simultaneous communication**. With HTTP, the client usually has to complete their request to the server before the server can respond. Not so with WebSockets - clients (and servers) can send messages across the pipe at any time.
 
