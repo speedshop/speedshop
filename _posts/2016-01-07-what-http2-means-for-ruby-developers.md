@@ -85,14 +85,7 @@ HTTP/2 will especially benefit users in high-latency environments like mobile ne
 
 ### Binary
 
-{% marginnote_block 'no-mobile' %}
-<img src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' data-src="/assets/posts/img/computers.gif" class='b-lazy'>
-<noscript>
-<img src="/assets/posts/img/computers.gif">
-</noscript>
-<br>
-<a href="https://www.youtube.com/watch?v=1eA3XCvrK90">I'm a computer!</a>
-{% endmarginnote_block %}
+{% marginnote_lazy /assets/posts/img/computers.gif|<a href="https://www.youtube.com/watch?v=1eA3XCvrK90">I'm a computer!</a>|true %}
 
 HTTP/2 is a binary protocol. This means that, instead of plain text being sent across the wire, we're sending 1s and 0s. In short, this means HTTP/2 will be easier for implementers, because plain-text protocols are often more difficult to control for edge-cases. But for clients and servers, we should see slightly better bandwidth utilization.
 
