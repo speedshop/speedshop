@@ -19,7 +19,7 @@ compress:
 
         - install-packages:
           packages: brotli zopfli
-          
+
         - script:
             name: zopfli
             code: find _site -type f '!' -name '*.jpg' '!' -name '*.gif' '!' -name '*.png' '!' -name '*.jpg' | xargs zopfli --i50
@@ -38,3 +38,11 @@ deploy:
         name: aws non-gz non-br
         code: |
           aws s3 sync _site/ $URL --acl public-read --cache-control "public, max-age=3600" --delete --exclude "*.gz" --exclude "*.br"
+    - script:
+        name: aws gz
+        code: |
+          aws s3 sync _site/ $URL --acl public-read --cache-control "public, max-age=3600" --content-encoding "gzip" --delete --exclude "*" --include "*.gz"
+    - script:
+        name: aws br
+        code: |
+          aws s3 sync _site/ $URL --acl public-read --cache-control "public, max-age=3600" --content-encoding "br" --delete --exclude "*" --include "*.br"
