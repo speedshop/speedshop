@@ -31,6 +31,8 @@ exclude:
    - _h2o
    - Procfile
    - wercker.yml
+   - Gemfile
+   - Gemfile.lock
 
 assets:
   css_compressor: sass
