@@ -1,6 +1,6 @@
 a:visited
   color: #551A8B
-  
+
 ol
   list-style: decimal outside
 
@@ -18,6 +18,9 @@ pre > code
 .button, button, dd, dt, li
   margin-bottom: 0
 
+.button, button
+  height: auto
+
 .column.column-collapsible
   @media screen and (max-width: $medium-breakpoint)
     flex: 0 0 100% !important
@@ -26,6 +29,11 @@ pre > code
 h1, h2, h3, h4, h5, h6
   margin-bottom: 3.5rem
   font-weight: 600
+
+a
+  &:hover,
+  &:focus
+    color: rgb(100,100,255)
 
 // Grid
 

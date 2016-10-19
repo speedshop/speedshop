@@ -10,9 +10,12 @@
           <div class="row">
             <div class="column column-67 column-collapsible">
               <article>
-                <h1>{{ page.title | titleize }}</h1>
-                <div style="margin-top: -24px;">
+                <h1 style="margin-bottom: 1rem;">{{ page.title | titleize }}</h1>
+                <div style="margin: 0rem 0 2rem 0">
                   <div>by <b>Nate Berkopec</b> (<a target="_blank" href="http://twitter.com/nateberkopec">@nateberkopec</a>) of <a target="_blank" href="/">Speedshop</a>, a Rails performance consultancy.</div>
+                </div>
+
+                <div class="marginnote">
                   {% include social-bar.html %}
                 </div>
 
@@ -25,45 +28,54 @@
                 {{ content }}
 
                 {% include social-bar.html %}
+                <div style="height: 3rem"></div>
               </article>
             </div>
           </div>
           <div class="row">
-            <div class="column column-50">
+            <div class="column">
               <h2>Want a faster website?</h2>
-
+            </div>
+          </div>
+          <div class="row">
+            <div class="column column-50 column-collapsible">
               <p>
                 I'm Nate Berkopec
-                (<a href="https://twitter.com/nateberkopec">@nateberkopec</a>).
+                (<a target="_blank" href="https://twitter.com/nateberkopec">@nateberkopec</a>).
                 I write online about web performance from a full-stack developer's
                 perspective. I primarily write about frontend performance and Ruby
                 backends. If you liked this article and want to hear about the next
                 one, click below. I don't spam - you'll receive about 1 email per week.
                 It's all low-key, straight from me.
               </p>
-
+            </div>
+            <div class="column column-50 column-collapsible">
               {% include mailchimp.html %}
             </div>
-            <div class="column column-50">
-              <h2>Rails Performance</h2>
-
-              {% img coursestuff.jpg %}
-
+          </div>
+          <div class="row">
+            <div class="column">
+              <h2>The Complete Guide to Rails Performance</h2>
+            </div>
+          </div>
+          <div style="margin-bottom: 2rem" class="row">
+            <div class="column column-50 column-collapsible">
               <p>
-                I've authored an in-depth course for making Ruby and
-                Rails applications faster. The Complete Guide to
+                Look what I wrote! The Complete Guide to
                 Rails Performance is a full-stack course that gives
                 you the tools to make Ruby on Rails applications
                 faster, more scalable, and simpler to maintain.
                 It includes a 361 page PDF, private Slack, and over
                 15 hours of video content.
               </p>
-
-              <a href="https://www.railsspeed.com/">Learn more at railsspeed.com</a>.
+              <a class="button" style="width: 100%;font-family:Helvetica Neue,Helvetica,Arial;font-size: 2rem;color:white" href="https://www.railsspeed.com/">Learn more</a>
+            </div>
+            <div class="column column-50 no-mobile">
+              {% img coursestuff.jpg %}
             </div>
           </div>
           <div class="row">
-            <div class="col-md-12">
+            <div class="column">
               <h2>More Posts</h2>
             </div>
           </div>
