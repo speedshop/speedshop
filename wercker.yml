@@ -21,11 +21,11 @@ build:
 
         - script:
             name: zopfli
-            code: find _site -type f | xargs zopfli --i50
+            code: find _site -type f '!' -name '*.jpg' '!' -name '*.gif' '!' -name '*.png' '!' -name '*.jpg' | xargs zopfli --i50
 
         - script:
             name: brotli
-            code: find _site -type f ! -name "*.gz" | xargs -I{} brotli --quality 11 --input {} --output {}.br
+            code: find _site -type f !' -name '*.jpg' '!' -name '*.gif' '!' -name '*.png' '!' -name '*.jpg' '!' -name "*.gz" | xargs -I{} brotli --quality 11 --input {} --output {}.br
 
 deploy:
   steps:
