@@ -27,6 +27,10 @@ gems:
 # Build settings
 markdown: kramdown
 encoding: utf-8
+exclude:
+   - _h2o
+   - Procfile
+   - wercker.yml
 
 assets:
   css_compressor: sass

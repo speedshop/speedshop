@@ -2,8 +2,6 @@
 layout: post
 title:  "Ludicrously Fast Page Loads - A Guide for Full-Stack Devs"
 date:   2015-10-07 8:00:00
-categories:
-  - performance
 summary: Your website is slow, but the backend is fast. How do you diagnose performance issues on the frontend of your site? We'll discuss everything involved in constructing a webpage and how to profile it at sub-millisecond resolution with Chrome Timeline, Google's flamegraph-for-the-browser.
 readtime: 4428 words/22 minutes
 ---

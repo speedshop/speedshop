@@ -2,8 +2,6 @@
 layout: post
 title:  "Action Cable - Friend or Foe?"
 date:   2015-09-30 11:00:00
-categories:
-  - performance
 summary: Action Cable will be one of the main features of Rails 5, to be released sometime this winter. But what can Action Cable do for Rails developers? Are WebSockets really as useful as everyone says?
 readtime: 4205 words/21 minutes
 ---

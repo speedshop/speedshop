@@ -2,8 +2,6 @@
 layout: post
 title:  "Scaling Ruby Apps to 1000 Requests per Minute - A Beginner's Guide"
 date:   2015-07-29 11:00:00
-categories:
-  - performance
 summary: Most "scaling" resources for Ruby apps are written by companies with hundreds of requests per second. What about scaling for the rest of us?
 readtime: 5289 words/26 minutes
 ---

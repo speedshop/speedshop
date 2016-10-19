@@ -2,8 +2,6 @@
 layout: post
 title:  "Hacking Your Webpage's Head Tags for Speed and Profit"
 date:   2015-10-21 7:00:00
-categories:
-  - performance
 summary: One of the most important parts of any webpage's performance is the content and organization of the head element. We'll take a deep dive on some easy optimizations that can be applied to any site.
 readtime: 2754 words/13 minutes
 ---

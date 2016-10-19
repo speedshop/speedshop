@@ -2,8 +2,6 @@
 layout: post
 title:  "100ms to Glass with Rails and Turbolinks"
 date:   2015-05-27 12:00:00
-categories:
-  - performance
 summary: Is Rails dead? Can the old Ruby web framework no longer keep up in this age of "native-like" performance? Turbolinks provides one solution.
 readtime: 3030 words/15 minutes
 ---

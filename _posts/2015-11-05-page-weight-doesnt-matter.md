@@ -2,8 +2,6 @@
 layout: post
 title:  "Page Weight Doesn't Matter"
 date:   2015-11-05 7:00:00
-categories:
-  - performance
 summary: "The total size of a webpage, measured in bytes, has little to do with
 its load time. Instead, increase network utilization: make your site preloader-friendly, minimize parser blocking, and start downloading resources ASAP with Resource Hints."
 readtime: 4697 words/23 minutes
