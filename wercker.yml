@@ -34,11 +34,11 @@ deploy:
         key_secret: $SECRET
         bucket_url: $URL
         source_dir: _site/
-        opts: --guess-mime-type --acl-public --delete-removed --exclude='*.gz' --add-header="Cache-Control:public, max-age=3600"
+        opts: --guess-mime-type --acl-public --delete-removed --exclude='*.gz' --add-header Cache-Control:public,max-age=3600
     - wercker/s3sync@2.1.0:
         key_id: $KEY
         key_secret: $SECRET
         bucket_url: $URL
         opts: |
-          --guess-mime-type --acl-public --delete-removed --exclude='*' --add-header="Cache-Control:public, max-age=3600" --add-header="Content-Encoding: gzip"
+          --guess-mime-type --acl-public --delete-removed --exclude='*' --add-header Cache-Control:public,max-age=3600 --add-header Content-Encoding:gzip
         source_dir: _site/
