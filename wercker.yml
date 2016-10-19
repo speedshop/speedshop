@@ -25,7 +25,7 @@ build:
 
         - script:
             name: brotli
-            code: find _site -type f !' -name '*.jpg' '!' -name '*.gif' '!' -name '*.png' '!' -name '*.jpg' '!' -name "*.gz" | xargs -I{} brotli --quality 11 --input {} --output {}.br
+            code: find _site -type f '!' -name '*.jpg' '!' -name '*.gif' '!' -name '*.png' '!' -name '*.jpg' '!' -name "*.gz" | xargs -I{} brotli --quality 11 --input {} --output {}.br
 
 deploy:
   steps:
