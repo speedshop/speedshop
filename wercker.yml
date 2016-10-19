@@ -29,16 +29,11 @@ build:
 
 deploy:
   steps:
-    - wercker/s3sync@2.1.0:
-        key_id: $KEY
-        key_secret: $SECRET
-        bucket_url: $URL
-        source_dir: _site/
-        opts: --guess-mime-type --acl-public --delete-removed --exclude '*.gz' --add-header Cache-Control:public,max-age=3600
-    - wercker/s3sync@2.1.0:
-        key_id: $KEY
-        key_secret: $SECRET
-        bucket_url: $URL
-        opts: |
-          --guess-mime-type --acl-public --delete-removed --exclude '*' --include '*.gz' --add-header Cache-Control:public,max-age=3600 --add-header Content-Encoding:gzip
-        source_dir: _site/
+    - edgecaseadmin/install-aws-cli:
+        key: $KEY
+        secret: $SECRET
+
+    - script:
+        name: aws non-gz non-br
+        code: |
+          aws s3 cp _site/ $url --recursive --exclude "*.gz" --exclude "*.br"
