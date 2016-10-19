@@ -12,7 +12,7 @@ A perceived benefit of a client-side JS framework is the responsiveness of its i
 
 Is Rails dead? Can the old Ruby web framework no longer keep up in this age of "native-like" performance?
 
-A few days ago (May 21, 2015), Shopify IPO'd. Shopify (an e-commerce provider that lets you set up your own online shop) had [over 150,000 customers](http://www.sec.gov/Archives/edgar/data/1594805/000119312515129273/d863202df1.htm) and is a [Top 1000](http://www.alexa.com/siteinfo/shopify.com) site on Alexa.{% marginnote "<img src='https://i.imgur.com/F49D9La.png'>" %} In addition, Shopify hosts their customers' sites, with an average of 100ms response times for over 300 million monthly page views. Now that's Web Scale. And they did it all on Rails.
+A few days ago (May 21, 2015), Shopify IPO'd. Shopify (an e-commerce provider that lets you set up your own online shop) had [over 150,000 customers](http://www.sec.gov/Archives/edgar/data/1594805/000119312515129273/d863202df1.htm) and is a [Top 1000](http://www.alexa.com/siteinfo/shopify.com) site on Alexa.{% marginnote_lazy https://i.imgur.com/F49D9La.png %} In addition, Shopify hosts their customers' sites, with an average of 100ms response times for over 300 million monthly page views. Now that's Web Scale. And they did it all on Rails.
 
 They're not the only ones doing huge deployments with blazing fast response times on Rails. [DHH claims Basecamp's average server response time is 27ms](https://www.youtube.com/watch?v=yhseQP52yIY). [Github averages about 60ms](https://status.github.com/).
 
@@ -75,7 +75,7 @@ Caching can be a double-edged sword in small apps, though. Sometimes, the amount
 
 ### rack-mini-profiler and the flamegraph
 
-[rack-mini-profiler](https://github.com/MiniProfiler/rack-mini-profiler) {% marginnote "<img src='https://i.imgur.com/1J1hlPt.png'>" %} has become an indispensable part of my Ruby workflow. It's written by the incredible Sam Saffron, who's doing absolutely vital work (along with others) on Ruby speed over at  [RubyBench.org](https://rubybench.org).
+[rack-mini-profiler](https://github.com/MiniProfiler/rack-mini-profiler) {% marginnote_lazy https://i.imgur.com/1J1hlPt.png %} has become an indispensable part of my Ruby workflow. It's written by the incredible Sam Saffron, who's doing absolutely vital work (along with others) on Ruby speed over at  [RubyBench.org](https://rubybench.org).
 
 rack-mini-profiler puts a little white box at the upper left of a page, showing you exactly how long the last request took to process, along with a breakdown of how many SQL queries were executed. The amount of unnecessary SQL queries I've eliminated with this tool must number in the thousands.
 
@@ -83,7 +83,7 @@ But that's not even rack-mini-profiler's killer feature. If you add in the `flam
 
 ### Chrome Timeline - the sub-100ms developer's best friend
 
-When you're aiming for a sub-100ms-to-glass Turbolinks app, every ms counts. So allow me introduce you to my little friend: the Chrome Timeline.{% marginnote  "<img src='https://i.imgur.com/izy57wD.png'>" %}
+When you're aiming for a sub-100ms-to-glass Turbolinks app, every ms counts. So allow me introduce you to my little friend: the Chrome Timeline.{% marginnote_lazy https://i.imgur.com/izy57wD.png %}
 
 This bad boy shows you, in flamegraph format, exactly where each of your 100ms goes. Read up on Google's documentation on exactly how to use this tool, and exactly what means what, but it'll give you a great idea of which parts of your Javascript are slowing down your page.
 
@@ -112,7 +112,7 @@ Partials in Rails have always been slow-ish. They're fast enough if you're aimin
 
 ### Response time goals and Apache bench
 
-Another key tool for keeping your Turbolinks-enabled Rails app below 100ms-to-glass is to keep your server response times ridiculously fast - 50ms should be your goal. Apache Bench{% marginnote "<img src='https://i.imgur.com/nsSgaBj.png'>" %} is a great tool for doing this, but siege is another popular tool that does the same thing - slams your web server as fast as it can to get an idea of your max requests/second.
+Another key tool for keeping your Turbolinks-enabled Rails app below 100ms-to-glass is to keep your server response times ridiculously fast - 50ms should be your goal. Apache Bench{% marginnote_lazy https://i.imgur.com/nsSgaBj.png %} is a great tool for doing this, but siege is another popular tool that does the same thing - slams your web server as fast as it can to get an idea of your max requests/second.
 
 Be sure to load up your rails server in production mode when benchmarking with these tools so that you don't have code reloading slowing down each request!
 
