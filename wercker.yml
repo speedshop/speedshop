@@ -13,9 +13,13 @@ build:
     # Read more about steps on our dev center:
     # http://devcenter.wercker.com/docs/steps/index.html
     steps:
+        - script: |
+          sudo chmod a+w /etc/apt/sources.list
+          sudo echo 'deb http://ftp.us.debian.org/debian unstable main contrib non-free' >> /etc/apt/sources.list
+
         - install-packages:
           packages: brotli zopfli
-          
+
         # Run a smart version of bundle install
         # which improves build execution time of
         # future builds
