@@ -34,11 +34,10 @@ deploy:
         key_secret: $SECRET
         bucket_url: $URL
         source_dir: _site/
-        opts: --acl-public --delete-removed
-        # --exclude='*.gz'
-    # - s3sync:
-    #     key_id: $KEY
-    #     key_secret: $SECRET
-    #     bucket_url: $URL
-    #     source_dir: _site/
-    #     opts: --acl-public --delete-removed --exclude='*' --include='*.gz'
+        opts: --acl-public --delete-removed --exclude='*.gz'
+    - s3sync:
+        key_id: $KEY
+        key_secret: $SECRET
+        bucket_url: $URL
+        source_dir: _site/
+        opts: --acl-public --delete-removed --exclude='*' --include='*.gz' --add-header='Content-Encoding:gzip'
