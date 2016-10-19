@@ -26,6 +26,7 @@ gems:
   - jekyll-assets
 # Build settings
 markdown: kramdown
+encoding: utf-8
 
 assets:
   css_compressor: sass
