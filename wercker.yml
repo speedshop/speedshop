@@ -2,32 +2,13 @@ box: ruby
 build:
     steps:
       # Run a smart version of bundle install
-      # which improves build execution time 
+      # which improves build execution time
       # future builds
       - bundle-install
 
       - script:
         name: generate site
         code: bundle exec jekyll build --trace
-
-compress:
-  steps:
-    - script:
-      name: unstable debian
-      code: |
-        sudo chmod a+w /etc/apt/sources.list
-        sudo echo 'deb http://ftp.us.debian.org/debian unstable main contrib non-free' >> /etc/apt/sources.list
-
-    - install-packages:
-      packages: brotli zopfli
-
-    - script:
-        name: zopfli
-        code: find _site -type f '!' -name '*.jpg' '!' -name '*.gif' '!' -name '*.png' '!' -name '*.jpg' | xargs zopfli --i50
-
-    - script:
-        name: brotli
-        code: find _site -type f '!' -name '*.jpg' '!' -name '*.gif' '!' -name '*.png' '!' -name '*.jpg' '!' -name "*.gz" | xargs -I{} brotli --quality 11 --input {} --output {}.br
 
 deploy:
   steps:
@@ -36,14 +17,10 @@ deploy:
         secret: $AWS_CLI_SECRET
 
     - script:
-        name: aws non-gz non-br
+        name: aws html
         code: |
-          aws s3 sync _site/ $URL --acl public-read --cache-control "public, max-age=3600" --delete --exclude "*.gz" --exclude "*.br"
+          aws s3 sync _site/ $URL --acl public-read --cache-control "public, max-age=31536000" --delete --exclude "*.html"
     - script:
-        name: aws gz
+        name: aws all else
         code: |
-          aws s3 sync _site/ $URL --acl public-read --cache-control "public, max-age=3600" --content-encoding "gzip" --delete --exclude "*" --include "*.gz"
-    - script:
-        name: aws br
-        code: |
-          aws s3 sync _site/ $URL --acl public-read --cache-control "public, max-age=3600" --content-encoding "br" --delete --exclude "*" --include "*.br"
+          aws s3 sync _site/ $URL --acl public-read --cache-control "public, max-age=3600" --delete --exclude "*" --include "*.html"
