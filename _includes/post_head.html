@@ -37,7 +37,9 @@
           if(didScroll){
             didScroll = false;
             if (ROOT.scrollTop > limit) {
-              showSignup();
+              if (document.cookie.replace(/(?:(?:^|.*;\s*)nateberkopecShowSignup\s*\=\s*([^;]*).*$)|^.*$/, "$1") !== "true") {
+               showSignup();
+             }
             }
           }
         }, 30);
