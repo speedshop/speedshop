@@ -22,7 +22,7 @@ description: > # this means to ignore newlines until "baseurl:"
   profitable sites. Speed is a feature.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://www.speedshop.co" # the base hostname & protocol for your site
-permalink: /:year/:month/:day/:title
+permalink: /:year/:month/:day/:title.html
 gems:
   - jekyll-assets
 # Build settings
