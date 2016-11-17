@@ -1,5 +1,5 @@
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:site" content="@nateberkopec"/>
-<meta name="twitter:image" content="{% asset_path 'opengraph.jpg' %}">
+<meta name="twitter:image" content="{{ asset_url 'opengraph.jpg' }}">
 <meta name="twitter:title" content="{% if page.title %}{{ page.title | escape }}{% else %}{{ site.title | escape }}{% endif %}" />
 <meta name="twitter:description" content="{{ page.summary | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}" />

@@ -9,7 +9,7 @@
   {% assign full_base_url = custom_url %}
   <style>{% asset home %}</style>
   {% include blazy.html %}
-  <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: full_base_url }}">
+  <link rel="canonical" href="{{ page.url | prepend: full_base_url }}">
   <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | prepend: full_base_url }}">
   <link rel="shortcut icon" type="image/x-icon" href="/assets/icons/favicon.ico"/>
 
