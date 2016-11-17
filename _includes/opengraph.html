@@ -1,1 +1,1 @@
-<meta property="og:image" content="{{ asset_url 'opengraph.jpg' }}" />
+<meta property="og:image" content="{% if page.image %}{{ page.image }}{% else %}{{ asset_url 'opengraph.jpg' }}{% endif %}" />
