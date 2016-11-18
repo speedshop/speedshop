@@ -8,13 +8,11 @@ image: rubyconf.jpg
 ---
 
 {% marginnote_lazy tired.gif|Post-conference haze|true %}
-
 Woo! I just got back from RubyConf. It was a great conference (as usual), and so nice to meet a few of you, my readers, there. I've got a lot to report on the performance front, so let's jump right in.
 
 ## JRuby+Truffle
 
 {% marginnote_lazy chrisseaton.jpeg|Chris Seaton %}
-
 JRuby+Truffle member Chris Seaton presented an excellent talk on the problem with C-extensions in Ruby and what he (and other Ruby implementations) are doing about it.
 
 JRuby+Truffle is a research project, sponsored by Oracle, which combines JRuby with the Graal and Truffle projects. It's sort of an *alternative* to the *alternative* Ruby implementation (JRuby). Though it runs on the JVM, like JRuby, it uses the [Truffle language framework](https://github.com/graalvm/truffle) to give itself nearly automatic just-in-time compilation and a host of other optimizations. It's a lot further behind than JRuby in terms of compatibility, but it's getting there.
@@ -22,27 +20,22 @@ JRuby+Truffle is a research project, sponsored by Oracle, which combines JRuby w
 C-extensions have always been a problem for alternative Ruby implementations because Ruby's C API was never clearly defined, so C-extensions essentially just accessed the private internals of MRI. This meant that other Ruby implementations like JRuby had to *pretend* they were actually MRI to get C-extensions to work.
 
 {% marginnote_lazy truffle_rails.jpg | [From Chris' slides.](http://chrisseaton.com/rubytruffle/rubyconf16/rubyconf16-cexts.pdf) JRuby+Truffle progress on Rails tests. %}
-
 I learned alot about the JRuby+Truffle project from Chris' talk, and, if it can achieve greater compatibility with Rails, it could be an amazing alternative implementation. Interestingly, JRuby+Truffle is actually the largest paid Ruby implementation team, with more paid developers than even MRI! They're most of the way to running Rails applications, but C-extensions (especially Nokogiri and OpenSSL) remain the main stumbling block. Chris said that almost 25% of all lines of code in Rubygems are actually C-extensions - ouch!
 
 {% marginnote_lazy menard.jpg | A "rope" style string representation %}
-
 A lot of the things that the project does are really radical: see this talk from [Kevin Menard about how JRuby+Truffle represents strings as ropes](https://www.youtube.com/watch?v=UQnxukip368), which no other Ruby implementation does. In addition, because of the way the Graal compiler works in combination with the [Sulong interpreter](https://github.com/graalvm/sulong), JRuby+Truffle can optimize C code and Ruby code together, and at the same time. That is, from the compilers perspective, both Ruby and C code are identical. That's powerful stuff! All of this means that, on some specific, limited benchmarks, JRuby+Truffle can be 30-100x faster than MRI!
 
 ## Upcoming Changes to CRuby
 
 {% marginnote_lazy deopt.jpg | [Shyouhei's slides](https://speakerdeck.com/shyouhei/optimizing-ruby) showed impressive benchmarks. %}
-
 Shyouhei Urabe gave a talk about a de-optimizing engine for CRuby. Basically, compilers can optimize VM instructions when certain assumptions are made - for example, we can speed up "2 +  2" if we know "+" is not overridden. To make those optimizations, though, we also need to de-optimize if someone *does* override the "+" operator. JRuby has been doing this for a long time now, but we've never had anything of the sort in CRuby.
 
 So, since basically anything can be overridden in Ruby, a de-optimizer is actually required before we can start on any optimizations. Shyouhei has proposed one - the details are pretty technical, but [you can read more about it here](https://github.com/ruby/ruby/pull/1419). He showed that in the worst case, it makes a Rails app about 5% slower and uses no additional memory. Of course, the Rails app will be *faster* (and probably use more memory) once the optimizations are built on top of the de-optimizer.
 
 {% marginnote_lazy aaron_talk.jpg | Aaron cheated at #rubyfriends. | true %}
-
 Aaron Patterson gave a great overview of garbage collection and memory management in Ruby as a prelude to his optimizations for Ruby's heap structure. Basically, we can improve copy-on-write performance and total RSS usage if we allocate objects into two separate areas - probably old (objects which won't be GC'd, like Classes, Modules, etc) and probably new (everything else). RSS usage on Github improved by about 10%. [You can see his PR to Github's Ruby fork here](https://github.com/github/ruby/pull/32).
 
 {% marginnote_lazy heap_compact.png | [Read more about heap compaction on Wikipedia](https://en.wikipedia.org/wiki/Mark-compact_algorithm). %}
-
 In addition, there was some hallway discussion about a compacting garbage collector for CRuby. This would be a *very* big deal for total memory usage. Previously, Ruby hasn't had a compacting GC because C-extensions can hold memory addresses directly to Ruby objects - moving the object in memory would cause a segfault. However, Ruby 2.1 introduced "sunny/shady" objects - sunny objects have never been accessed by C-extensions, vice versa for shady objects. CRuby *could* move sunny objects around the heap to optimize total memory usage. Aaron Patterson has said on Twitter that he's experimenting with it now, and it looks like he's making great progress.
 
 Matz clarified the goal of Ruby3x3 (making Ruby "3 times faster"). One of the main ways the core team are measuring that progress is [through the optcarrot benchmark](https://github.com/mame/optcarrot). Ruby 3 should run the optcarrot benchmark 3 times faster than Ruby 2.0.
@@ -50,17 +43,14 @@ Matz clarified the goal of Ruby3x3 (making Ruby "3 times faster"). One of the ma
 ## Everything Else
 
 {% marginnote_lazy tokyo2020.jpg | Another reason to look forward to the next Summer Olympics. | true %}
-
 Don't look for true static typing in Ruby anytime soon. Matz said that he thinks type annotations aren't DRY and aren't human-friendly. He did say he liked Crystal though! Instead, Matz re-iterated his proposal for "soft" or "inferred" types in Ruby - if the compiler can tell that you're going to call `to_s` on an object that doesn't define that method, it will throw an error. Look for this in Ruby 3 (which Matz has said has a target release date of "before the Tokyo Olympics in 2020").
 
 I gave a talk on reducing memory usage in Ruby applications. [You can see the slides and notes here](https://gist.github.com/nateberkopec/2b1f585046adad9a55e7058c941d3850). If you purchased [the Complete Guide to Rails Performance](https://www.railsspeed.com), there's probably not much new there to you, but if you haven't, go buy it!
 
 {% marginnote_lazy pumacore.jpg |  | true %}
-
 Evan Phoenix has added myself and Richard Schneeman (of Heroku) to Puma. We're going to try to reduce the issue/PR backlog, but do send us more bug reports if you're having trouble with Puma!
 
 {% marginnote_lazy killthreads.jpg | It's hard to read, I know, but Koichi's shirt really does say "Kill Threads". | true %}
-
 One interesting aspect of the conference was how much the Ruby core team (Matz and Koichi, mostly) were hostile to Threads. Matz said in his opening keynote that in retrospect, he wished he had never added Thread to Ruby. It seemed like, from a language designer's perspective, he thought it was a poor abstraction and was too difficult to use. Koichi even wore a "Kill Threads!" shirt while presenting about Guilds, the new proposed Ruby concurrency model.
 
 Speaking of Guilds, Koichi discussed some more details around the proposed model. GC will remain global and will not be per-Guild. Overhead for creating a new Guild should be extremely low - akin to creating a new Thread. Transferring big objects (like huge Hashes) between Guilds will probably require a new datastructure, like "BigHash" or "BigArray". Feedback has been very positive to Guilds so far, and many believe it could be just what we need. It seems like we should see Guilds in Ruby some time prior to Ruby 3 - maybe in a few years, so Ruby 2.6 or 2.7.

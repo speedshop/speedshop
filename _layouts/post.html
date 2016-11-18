@@ -25,9 +25,9 @@
                 </div>
 
                 {% if page.summary %}
-                  <p style="background: rgb(221, 221, 221); padding: 1rem; position: relative; left: -1rem">
+                  <div class="summary">
                     <b>Summary:</b> {{ page.summary }} <i>({{page.readtime}})</i>
-                  </p>
+                  </div>
                 {% endif %}
 
                 {{ content }}
