@@ -51,7 +51,7 @@ Using these rules-of-thumb, I decided we had some work to do to improve Rubygems
 
 ## Auditing font usage
 
-WebFonts are awesome - they really make the web beautiful. The web is typography {% sidenote 4 "[Web Design is 95% Typography](https://ia.net/know-how/the-web-is-all-about-typography-period)" %}, so changing fonts can have a huge effect on the character and feel of a website. For these reasons, WebFonts have become extremely popular *very* quickly - HTTP Archive estimates about 51% of sites currently use WebFonts {% marginnote_lazy "https://imgur.com/KzlGyN9.png|[via HTTP Archive](http://httparchive.org/trends.php#perFonts) %}, and that number is still growing.
+WebFonts are awesome - they really make the web beautiful. The web is typography {% sidenote 4 "[Web Design is 95% Typography](https://ia.net/know-how/the-web-is-all-about-typography-period)" %}, so changing fonts can have a huge effect on the character and feel of a website. For these reasons, WebFonts have become extremely popular *very* quickly - HTTP Archive estimates about 51% of sites currently use WebFonts {% marginnote_lazy https://imgur.com/KzlGyN9.png|[via HTTP Archive](http://httparchive.org/trends.php#perFonts) %}, and that number is still growing.
 
 WebFonts are here to stay, but that doesn't mean it's impossible to use them poorly.
 
