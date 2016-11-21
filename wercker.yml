@@ -12,15 +12,9 @@ build:
 
 deploy:
   steps:
-    - edgecaseadmin/install-aws-cli:
-        key: $AWS_CLI_KEY
-        secret: $AWS_CLI_SECRET
-
-    - script:
-        name: aws non html
-        code: |
-          aws s3 sync _site/ $URL --acl public-read --cache-control "public, max-age=31536000" --delete --exclude "*.html"
-    - script:
-        name: aws html
-        code: |
-          aws s3 sync _site/ $URL --acl public-read --cache-control "public, max-age=3600" --delete --exclude "*" --include "*.html"
+    - s3sync:
+        key_id: $KEY
+        key_secret: $SECRET
+        bucket_url: $URL
+        source_dir: _site/
+        opts: --acl-public --delete-removed
