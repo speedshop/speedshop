@@ -47,15 +47,10 @@
 	&.row-baseline
 		align-items: baseline
 
-	&.row-no-padding
-		padding: 0
-
-		&> .column
-			padding: 0
-
 	.column
 		display: block
-		flex: 1
+		// IE 11 required specifying the flex-basis otherwise it breaks mobile
+		flex: 1 1 auto
 		margin-left: 0
 		max-width: 100%
 		width: 100%
@@ -150,12 +145,9 @@
 		.column-center
 			align-self: center
 
-@media (max-width: 768px)
-	.container
-		padding: 0 4.0rem
-
 // Larger than mobile screen
-@media (min-width: 768px) // Safari desktop has a bug using `rem`, but Safari mobile works
+@media (min-width: 40.0rem) // Safari desktop has a bug using `rem`, but Safari mobile works
+
 	.row
 		flex-direction: row
 		margin-left: -1.0rem
