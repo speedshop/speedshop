@@ -4,7 +4,7 @@ title:  "Understanding Ruby GC through GC.stat"
 date:   2017-03-09 7:00:00
 summary: "Have you ever wondered how the heck Ruby's GC works? Let's see what we can learn by reading some of the statistics it provides us in the GC.stat hash."
 readtime: 1560 words/8 minutes
-image: rubyconf.jpg
+image: gcquote.jpg
 ---
 
 {% marginnote_lazy garbage.gif|I call that an object leak.|true %}
