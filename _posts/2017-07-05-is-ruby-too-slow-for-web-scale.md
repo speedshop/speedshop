@@ -71,7 +71,7 @@ You can read his full article on the topic [here](https://www.nngroup.com/articl
 
 ### On the web, how fast is fast enough?
 
-Let's assume that all our little web application is return an HTML response with *no* JavaScript or CSS. It's just a flat, HTML document with the default browser styling.{% sidenote 3 "Imagine if you would, for a moment, a website whose styling is even more boring than this one." %} How long would it take for a user to visit `www.oursite.com` and receive a response?
+Let's assume that all our little web application does is return an HTML response with *no* JavaScript or CSS. It's just a flat, HTML document with the default browser styling.{% sidenote 3 "Imagine if you would, for a moment, a website whose styling is even more boring than this one." %} How long would it take for a user to visit `www.oursite.com` and receive a response?
 
 Well, if our user is on a desktop computer in the same country as our servers, it will take about 20 milliseconds for their packets to get from their computer to our servers, and another 20 milliseconds back. This is a *best case scenario*: if they're on the other side of the world, this could easily be 100 milliseconds each way. If they're on a mobile cellular connection, we're talking ~300-400 milliseconds. My home DSL connection fluctuates from 50-150 milliseconds to most US servers.
 
@@ -87,7 +87,7 @@ Vanishingly little. Nowadays, the average webpage takes 5 seconds to render. Som
 
 Server response times simply make up a teeny-tiny part of the actual user experience of loading and interacting with a webpage - cutting 99 milliseconds off the server response time just doesn't make a difference.
 
-### Theres a Ceiling: Web Apps Aren't Video Games
+### There's a Ceiling: Web Apps Aren't Video Games
 
 In the video gaming world, speed matters. Faster languages can mean more polygons on the screen per frame. There's really no upper limit for this - more polygons will always be good, so a faster language will always help with increasing the fidelity of the simulation.
 {% marginnote_lazy sortafast.gif|[for those unfamiliar with the meme](https://www.youtube.com/watch?v=hU7EHKFNMQg)|false %}
