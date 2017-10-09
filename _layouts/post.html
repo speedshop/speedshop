@@ -50,7 +50,7 @@
 
           {% for post in site.posts %}
             {% if post.title != page.title %}
-              {% cycle 'add row' : '<div class="row">', nil %}
+              {% cycle 'add row' : '<div class="row">', '' %}
                 <div class="column column-50 column-collapsible">
                   <h3>
                     <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
@@ -60,7 +60,7 @@
                   </p>
                   <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
                 </div>
-              {% cycle 'end row' : nil, '</div>' %}
+              {% cycle 'end row' : '', '</div>' %}
             {% endif %}
 
           {% endfor %}
