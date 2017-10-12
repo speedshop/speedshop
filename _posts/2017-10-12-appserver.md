@@ -4,7 +4,7 @@ title:  "Configuring Puma, Unicorn and Passenger for Maximum Efficiency"
 date:   2017-10-12 7:00:00
 summary: "Application server configuration can make a major impact on the throughput and performance-per-dollar of your Ruby web application. Let's talk about the most important settings."
 readtime: 2846 words/13 minutes
-image: 
+image: bigserver.png
 ---
 
 {% marginnote_lazy unicorn_car.jpg||true %}
