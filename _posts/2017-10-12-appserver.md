@@ -145,7 +145,7 @@ end
 
 In theory, you have to do this for every database your application uses. However, in practice, Sidekiq doesn't try to connect to Redis until you actually try to do something, so unless you're running Sidekiq jobs during application boot, you don't have to reconnect after fork.
 
-Unfortunately, there are limits to the gains of copy-on-write. Transparent Huge Pages can cause even a 1-byte memory modification to copy an entire 2MB page, and [fragmentation can also limit savings](https://brandur.org/ruby-memory). But it doesn't hurt, so turn on
+Unfortunately, there are limits to the gains of copy-on-write. Transparent Huge Pages can cause even a 1-bit memory modification to copy an entire 2MB page, and [fragmentation can also limit savings](https://brandur.org/ruby-memory). But it doesn't hurt, so turn on
 preloading anyway.
 
 ### Container size
