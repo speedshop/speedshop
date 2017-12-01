@@ -1,335 +1,4 @@
-/*!
-  hey, [be]Lazy.js - v1.7.0 - 2016.10.10
-  A fast, small and dependency free lazy load script (https://github.com/dinbror/blazy)
-  (c) Bjoern Klinggaard - @bklinggaard - http://dinbror.dk/blazy
-*/
-;
-(function(root, blazy) {
-    if (typeof define === 'function' && define.amd) {
-        // AMD. Register bLazy as an anonymous module
-        define(blazy);
-    } else if (typeof exports === 'object') {
-        // Node. Does not work with strict CommonJS, but
-        // only CommonJS-like environments that support module.exports,
-        // like Node.
-        module.exports = blazy();
-    } else {
-        // Browser globals. Register bLazy on window
-        root.Blazy = blazy();
-    }
-})(this, function() {
-    'use strict';
-
-    //private vars
-    var _source, _viewport, _isRetina, _attrSrc = 'src',
-        _attrSrcset = 'srcset';
-
-    // constructor
-    return function Blazy(options) {
-        //IE7- fallback for missing querySelectorAll support
-        if (!document.querySelectorAll) {
-            var s = document.createStyleSheet();
-            document.querySelectorAll = function(r, c, i, j, a) {
-                a = document.all, c = [], r = r.replace(/\[for\b/gi, '[htmlFor').split(',');
-                for (i = r.length; i--;) {
-                    s.addRule(r[i], 'k:v');
-                    for (j = a.length; j--;) a[j].currentStyle.k && c.push(a[j]);
-                    s.removeRule(0);
-                }
-                return c;
-            };
-        }
-
-        //options and helper vars
-        var scope = this;
-        var util = scope._util = {};
-        util.elements = [];
-        util.destroyed = true;
-        scope.options = options || {};
-        scope.options.error = scope.options.error || false;
-        scope.options.offset = scope.options.offset || 100;
-        scope.options.root = scope.options.root || document;
-        scope.options.success = scope.options.success || false;
-        scope.options.selector = scope.options.selector || '.b-lazy';
-        scope.options.separator = scope.options.separator || '|';
-        scope.options.container = scope.options.container ? document.querySelectorAll(scope.options.container) : false;
-        scope.options.errorClass = scope.options.errorClass || 'b-error';
-        scope.options.breakpoints = scope.options.breakpoints || false; // obsolete
-        scope.options.loadInvisible = scope.options.loadInvisible || false;
-        scope.options.successClass = scope.options.successClass || 'b-loaded';
-        scope.options.validateDelay = scope.options.validateDelay || 25;
-        scope.options.saveViewportOffsetDelay = scope.options.saveViewportOffsetDelay || 50;
-        scope.options.srcset = scope.options.srcset || 'data-srcset';
-        scope.options.src = _source = scope.options.src || 'data-src';
-        _isRetina = window.devicePixelRatio > 1;
-        _viewport = {};
-        _viewport.top = 0 - scope.options.offset;
-        _viewport.left = 0 - scope.options.offset;
-
-
-        /* public functions
-         ************************************/
-        scope.revalidate = function() {
-            initialize(this);
-        };
-        scope.load = function(elements, force) {
-            var opt = this.options;
-            if (elements.length === undefined) {
-                loadElement(elements, force, opt);
-            } else {
-                each(elements, function(element) {
-                    loadElement(element, force, opt);
-                });
-            }
-        };
-        scope.destroy = function() {
-            var self = this;
-            var util = self._util;
-            if (self.options.container) {
-                each(self.options.container, function(object) {
-                    unbindEvent(object, 'scroll', util.validateT);
-                });
-            }
-            unbindEvent(window, 'scroll', util.validateT);
-            unbindEvent(window, 'resize', util.validateT);
-            unbindEvent(window, 'resize', util.saveViewportOffsetT);
-            util.count = 0;
-            util.elements.length = 0;
-            util.destroyed = true;
-        };
-
-        //throttle, ensures that we don't call the functions too often
-        util.validateT = throttle(function() {
-            validate(scope);
-        }, scope.options.validateDelay, scope);
-        util.saveViewportOffsetT = throttle(function() {
-            saveViewportOffset(scope.options.offset);
-        }, scope.options.saveViewportOffsetDelay, scope);
-        saveViewportOffset(scope.options.offset);
-
-        //handle multi-served image src (obsolete)
-        each(scope.options.breakpoints, function(object) {
-            if (object.width >= window.screen.width) {
-                _source = object.src;
-                return false;
-            }
-        });
-
-        // start lazy load
-        setTimeout(function() {
-            initialize(scope);
-        }); // "dom ready" fix
-
-    };
-
-
-    /* Private helper functions
-     ************************************/
-    function initialize(self) {
-        var util = self._util;
-        // First we create an array of elements to lazy load
-        util.elements = toArray(self.options);
-        util.count = util.elements.length;
-        // Then we bind resize and scroll events if not already binded
-        if (util.destroyed) {
-            util.destroyed = false;
-            if (self.options.container) {
-                each(self.options.container, function(object) {
-                    bindEvent(object, 'scroll', util.validateT);
-                });
-            }
-            bindEvent(window, 'resize', util.saveViewportOffsetT);
-            bindEvent(window, 'resize', util.validateT);
-            bindEvent(window, 'scroll', util.validateT);
-        }
-        // And finally, we start to lazy load.
-        validate(self);
-    }
-
-    function validate(self) {
-        var util = self._util;
-        for (var i = 0; i < util.count; i++) {
-            var element = util.elements[i];
-            if (elementInView(element) || hasClass(element, self.options.successClass)) {
-                self.load(element);
-                util.elements.splice(i, 1);
-                util.count--;
-                i--;
-            }
-        }
-        if (util.count === 0) {
-            self.destroy();
-        }
-    }
-
-    function elementInView(ele) {
-        var rect = ele.getBoundingClientRect();
-        return (
-            // Intersection
-            rect.right >= _viewport.left && rect.bottom >= _viewport.top && rect.left <= _viewport.right && rect.top <= _viewport.bottom
-        );
-    }
-
-    function loadElement(ele, force, options) {
-        // if element is visible, not loaded or forced
-        if (!hasClass(ele, options.successClass) && (force || options.loadInvisible || (ele.offsetWidth > 0 && ele.offsetHeight > 0))) {
-            var dataSrc = ele.getAttribute(_source) || ele.getAttribute(options.src); // fallback to default 'data-src'
-            if (dataSrc) {
-                var dataSrcSplitted = dataSrc.split(options.separator);
-                var src = dataSrcSplitted[_isRetina && dataSrcSplitted.length > 1 ? 1 : 0];
-                var srcset = ele.getAttribute(options.srcset);
-                var isImage = equal(ele, 'img');
-                var parent = ele.parentNode;
-                var isPicture = parent && equal(parent, 'picture');
-                // Image or background image
-                if (isImage || ele.src === undefined) {
-                    var img = new Image();
-                    // using EventListener instead of onerror and onload
-                    // due to bug introduced in chrome v50
-                    // (https://productforums.google.com/forum/#!topic/chrome/p51Lk7vnP2o)
-                    var onErrorHandler = function() {
-                        if (options.error) options.error(ele, "invalid");
-                        addClass(ele, options.errorClass);
-                        unbindEvent(img, 'error', onErrorHandler);
-                        unbindEvent(img, 'load', onLoadHandler);
-                    };
-                    var onLoadHandler = function() {
-                        // Is element an image
-                        if (isImage) {
-                            if(!isPicture) {
-                                handleSources(ele, src, srcset);
-                            }
-                        // or background-image
-                        } else {
-                            ele.style.backgroundImage = 'url("' + src + '")';
-                        }
-                        itemLoaded(ele, options);
-                        unbindEvent(img, 'load', onLoadHandler);
-                        unbindEvent(img, 'error', onErrorHandler);
-                    };
-
-                    // Picture element
-                    if (isPicture) {
-                        img = ele; // Image tag inside picture element wont get preloaded
-                        each(parent.getElementsByTagName('source'), function(source) {
-                            handleSource(source, _attrSrcset, options.srcset);
-                        });
-                    }
-                    bindEvent(img, 'error', onErrorHandler);
-                    bindEvent(img, 'load', onLoadHandler);
-                    handleSources(img, src, srcset); // Preload
-
-                } else { // An item with src like iframe, unity, simpelvideo etc
-                    setSrc(ele, src);
-                    itemLoaded(ele, options);
-                }
-            } else {
-                // video with child source
-                if (equal(ele, 'video')) {
-                    each(ele.getElementsByTagName('source'), function(source) {
-                        handleSource(source, _attrSrc, options.src);
-                    });
-                    ele.load();
-                    itemLoaded(ele, options);
-                } else {
-                    if (options.error) options.error(ele, "missing");
-                    addClass(ele, options.errorClass);
-                }
-            }
-        }
-    }
-
-    function itemLoaded(ele, options) {
-        addClass(ele, options.successClass);
-        if (options.success) options.success(ele);
-        // cleanup markup, remove data source attributes
-        ele.removeAttribute(options.src);
-        ele.removeAttribute(options.srcset);
-        each(options.breakpoints, function(object) {
-            ele.removeAttribute(object.src);
-        });
-    }
-
-    function setSrc(ele, src) {
-        ele[_attrSrc] = src;
-    }
-
-    function handleSource(ele, attr, dataAttr) {
-        var dataSrc = ele.getAttribute(dataAttr);
-        if (dataSrc) {
-            ele[attr] = dataSrc;
-            ele.removeAttribute(dataAttr);
-        }
-    }
-
-    function handleSources(ele, src, srcset){
-        if(srcset) {
-            ele[_attrSrcset] = srcset; //srcset
-        }
-        setSrc(ele, src); //src
-    }
-
-    function equal(ele, str) {
-        return ele.nodeName.toLowerCase() === str;
-    }
-
-    function hasClass(ele, className) {
-        return (' ' + ele.className + ' ').indexOf(' ' + className + ' ') !== -1;
-    }
-
-    function addClass(ele, className) {
-        if (!hasClass(ele, className)) {
-            ele.className += ' ' + className;
-        }
-    }
-
-    function toArray(options) {
-        var array = [];
-        var nodelist = (options.root).querySelectorAll(options.selector);
-        for (var i = nodelist.length; i--; array.unshift(nodelist[i])) {}
-        return array;
-    }
-
-    function saveViewportOffset(offset) {
-        _viewport.bottom = (window.innerHeight || document.documentElement.clientHeight) + offset;
-        _viewport.right = (window.innerWidth || document.documentElement.clientWidth) + offset;
-    }
-
-    function bindEvent(ele, type, fn) {
-        if (ele.attachEvent) {
-            ele.attachEvent && ele.attachEvent('on' + type, fn);
-        } else {
-            ele.addEventListener(type, fn, { capture: false, passive: true });
-        }
-    }
-
-    function unbindEvent(ele, type, fn) {
-        if (ele.detachEvent) {
-            ele.detachEvent && ele.detachEvent('on' + type, fn);
-        } else {
-            ele.removeEventListener(type, fn, { capture: false, passive: true });
-        }
-    }
-
-    function each(object, fn) {
-        if (object && fn) {
-            var l = object.length;
-            for (var i = 0; i < l && fn(object[i], i) !== false; i++) {}
-        }
-    }
-
-    function throttle(fn, minDelay, scope) {
-        var lastCall = 0;
-        return function() {
-            var now = +new Date();
-            if (now - lastCall < minDelay) {
-                return;
-            }
-            lastCall = now;
-            fn.apply(scope, arguments);
-        };
-    }
-});
+for(_='var GthisUfunctionQQ(~orJDelay9set8&&4"scroll",3||ZreturnYleX)}%ent$c.#){breakpointstachEv$destroyremovewindowloada.Classoptions.off8Xngth);srcGgetEXm$sByTagName("source"),~bc=(b,Ev$Listener(c,a,{capture:!1,passive:!0}%Q nodeName.toLowerCase()docum$b.	.querySeXctJAll(,"resize",successerrJ.options.containervalidateAttribute(saveViewpJtOff8/*!hey, [be]Lazy.js - v1.7.0 - 2016.10.10A fast, small and dependency free lazy  script (https://githu	com/dinbrJ/blazy)(c) Bjoern Klinggaard - @bklinggaard - http://dinbrJ.dk/blazy*/(~n,h"Q"===typeof define4define.amd?define(h):"object"===typeof expJts?moduX.expJts=h():n.Blazy=h(%)(U,~Q n(bc=	_util;#eXm$s=B(	options#count=#eXm$s.;#ed4(#ed=!1,b4l(b,~am(a,3#T%),m#T),m#T),m(,3#T)h(b%Q h(bfJ(Gc=	_util,a=0;a<#count;a++d=#eXm$s[a],f=d.getBoundingCli$Rect(if(f.right>=e.Xft4f.bottom>=e.top4f.Xft<=e.right4f.top<=e.bottomZp(d,	options.))	(d),#eXm$s.splice(a,1),#count--,a--}0===#count4	(%Q vc,aif(!p)4(cZInvisibXZ0<	Width40<	Height))if(c=	getq)Z	get)c=#split(separatJGd=c[w41<#?1:0],f=	get8),x="img"===	,e=(c=	par$Node)4"picture"===#;if(xZvoid 0===	g=new Image,t=~4"invalid"rk(g,"",tk(g,"",h%,h=~x?eZyd,f):	styX.backgroundImage=\'url("\'+d+\'")\';uak(g,"",hk(g,"",t%;e4(g=b,l(#8,f=	getcf4(	8=f,	c)%)m(g,"",tm(g,"",hy(g,d,f%else 	=d,ua%else"video"===	?(l(	,f=	getcf4(	=f,	c)%),	(),ua)):(4"missing"),r)%Q ucr##4#(b	#	#8l(#,~a	%%Q yc,aa4(	8=a	=c}Q pcY-1!==(" "+	className+" ").indexOf(" "+c+" "%Q rcpc)Z(	className+=" "+c%Q B(bc=[];b=	root(	seXctJfJ(Ga=	;a--;#unshift(b[a])Y c}Q z(be.bottom=(.innerHeightZ.EXm$.cli$Height)+b;e.right=(.innerWidthZ.EXm$.cli$Width)+b}Q mc,a	at?	at4	at("on"+c,a):	addkc,a	de?	de4	de("on"+c,a):	lcif(b4c)fJ(Ga=	,d=0;d<a4!1!==c(b[d],dd++}Q Ac,ad=0;Y ~f=+new Date;f-d<cZ(d=f,	apply(a,argum$s)%}Gq,e,w;Y ~bif(!c=.createStyXSheet(=~a,b,d,g,ee=.all;b=[];a=replace(/\\[fJ\\b/gi,"[htmlFJ").split(","fJ(d=;d--;#addRuX(a[d],"k:v"fJ(g=e.;g--;)e[g].curr$StyX.k4	push(e[g]#RuX(0%Y b}}Ga=U,d=_util={};d.eXm$s=[];d.ed=!0;options=bZ{};=Z!1;=Z100;root=rootZ;=Z!1;seXctJ=seXctJZ".b-lazy";separatJ=separatJZ"|";a=a?(a):!1;=Z"b-";=Z!1;InvisibX=InvisibXZ!1;=Z"b-ed";9=9Z25;9=9Z50;8=8Z"data-8";=q=Z"data-";w=1<.devicePixelRatio;e={};e.top=0-;e.Xft=0-;re=~n(U%;=~a,bc=U.options;void 0===?v(a,b,c):l(a,~av(a,b,c%%;=~a=U._util;U4l(U,~bk3T%k(,3TkTkTcount=0;eXm$s.=0;ed=!0};d.T=A(~h(a%,9,ad.T=A(~z(%,9,az(l(,~aif(width>=.screen.width)Y q=,!1}8Timeout(~n(a%%}';G=/[-#-%X-Z3489J~QUG]/.exec(_);)with(_.split(G))_=join(shift());eval(_);
 
 document.addEventListener("DOMContentLoaded", function(event) {
   bLazy = new Blazy({

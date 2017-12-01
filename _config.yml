@@ -36,16 +36,7 @@ exclude:
    - Gemfile.lock
 
 assets:
-  css_compressor: sass
-  compress:
-    css: true
-    js: false
-  autowrite: true
-  # cdn: https://cdn.example.com
-  skip_baseurl_with_cdn: false
-  skip_prefix_with_cdn: false
   prefix: "/assets"
-
   assets:
     - "*.png"
     - "*.jpg"
@@ -55,7 +46,6 @@ assets:
     - "posts.css"
     - "home.css"
     - "*.js"
-  digest: true
   sources:
     - "assets"
     - "assets/css"
@@ -63,6 +53,3 @@ assets:
     - "assets/js"
     - "assets/posts/img"
     - "_sass"
-
-  features:
-    liquid: true
