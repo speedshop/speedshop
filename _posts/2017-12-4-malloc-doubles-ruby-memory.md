@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Malloc Can Double Mulithreaded Ruby Program Memory Usage"
+title:  "Malloc Can Double Multi-threaded Ruby Program Memory Usage"
 date:   2017-12-04 7:00:00
 summary: "Memory fragmentation is difficult to measure and diagnose, but it can also sometimes be very easy to fix. Let's look at one source of memory fragmentation in multi-threaded CRuby programs: malloc's per-thread memory arenas."
 readtime: 3343 words/20 minutes
