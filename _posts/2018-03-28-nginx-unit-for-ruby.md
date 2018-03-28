@@ -85,7 +85,24 @@ The router process is pretty much what it sounds like - the thing which turns HT
 
 To me, this is one of the most exciting parts of NGINX Unit for Rubyists. It is very difficult for Ruby application servers to deal with HTTP connections without some kind of reverse proxy in front of the app server. Unicorn, for example, is recommended for use only behind a reverse proxy because it cannot buffer requests. That is, if a client sends one byte of their request and then stops (due to network conditions, a bad cellphone connection perhaps), then the Unicorn process just stops all work and cannot continue until that request has finished buffering. Using NGINX, for example, in front of Unicorn allows NGINX to buffer that request before it reaches Unicorn. Since NGINX is written in highly optimized C and it's *not*  restricted by Ruby's GVL, it can buffer hundreds of connections for Unicorn. Passenger solves this problem by basically just being an addon for NGINX or Apache{% sidenote 3 "Now you know why it's called *Passenger*!" %} (`mod_ruby`!) and offloading all of the connection-related work to the webserver. In this way, NGINX Unit is more similar to Passenger than it is to Unicorn.
 
-The application configuration has a `processes` key. Currently, application processes are started on demand. That is, application processes are only started when a router thread asks for a process. This is not ideal for Ruby applications, since most take at least 10 seconds to boot, and can take up to a minute. However, NGINX has stated that preforking (similar to Puma's `preload_app!` and similar settings in Passenger and Unicorn) is "coming soon", so you will be able to start up processes before they are needed *and* take advantage of copy-on-write memory.
+The application configuration has a `processes` key. This key can have a minimum number and maximum number of processes:
+
+```
+{
+  "rails-new": {
+      "type": "ruby",
+      "processes": {
+        "spare": 5
+        "max": 10
+      },
+      "script": "/www/rails-new-app/config.ru"
+  }
+}
+```
+
+For some reason, the "minimum" number of processes is called "spare". The config above will start 5 processes immediately, and will scale to 10 if the load requires it.
+
+No word yet on if any settings like Puma's `preload_app!` and similar settings in Passenger and Unicorn are available so you will be able to start up processes before they are needed *and* take advantage of copy-on-write memory.
 
 This leaves the application processes. The interesting and novel thing here is that the router does not communicate with the application processes via HTTP - it uses Unix sockets and shared memory. This looks like an optimization aimed at microservice architectures, as communicating between services on the same machine will be considerably faster without any HTTP in between. I have yet to see any Ruby code examples of how this could work, however.
 
