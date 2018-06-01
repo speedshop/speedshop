@@ -4,7 +4,7 @@ title:  "The Complete Guide to Rails Performance, Version 2"
 date:   2018-06-01 7:00:00
 summary: "I've completed the 'second edition' of my course, the CGRP. What's changed since I released the course two years ago? Where do I see Rails going in the future?"
 readtime: 1288 words/5 minutes
-image: nginxunit-share.jpg
+image: cgrp2.jpg
 ---
 
 Today, the Complete Guide to Rails Performance has been updated to version 2.0. [You can purchase it here](https://www.railsspeed.com).
