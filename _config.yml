@@ -27,6 +27,8 @@ plugins:
   - jekyll-assets
 # Build settings
 markdown: kramdown
+kramdown:
+  auto_ids: true
 encoding: utf-8
 exclude:
    - _h2o
