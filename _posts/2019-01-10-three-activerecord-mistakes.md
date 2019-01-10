@@ -303,7 +303,7 @@ Alright, that's my style gripe. I understand that you may not agree. `present?` 
 
 The answer is *two*. One will be an existence check, triggered by `@lonely_repos.present?` (`SELECT  1 AS one FROM ... LIMIT 1`), then the `@lonely_repos.each` line will trigger a loading of the entire relation (`SELECT "repos".* FROM "repos" WHERE ...`).
 
-Why? I think you know the drill by know. [Here's the implementation of `empty?` on ActiveRecord::Relation](https://github.com/rails/rails/blob/94b5cd3a20edadd6f6b8cf0bdf1a4d4919df86cb/activerecord/lib/active_record/relation.rb#L215) (Remember: objects are `present?` if they are not `blank?`, and objects are not `blank?` if they are not `empty?`):
+Why? I think you know the drill by now. [Here's the implementation of `empty?` on ActiveRecord::Relation](https://github.com/rails/rails/blob/94b5cd3a20edadd6f6b8cf0bdf1a4d4919df86cb/activerecord/lib/active_record/relation.rb#L215) (Remember: objects are `present?` if they are not `blank?`, and objects are not `blank?` if they are not `empty?`):
 
 ```ruby
 def empty?
