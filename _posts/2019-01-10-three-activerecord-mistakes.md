@@ -13,7 +13,7 @@ ActiveRecord is great. Really, it is. But it's an abstraction, intended to insul
 
 Unfortunately, the performance costs of many features of ActiveRecord means we can't afford to ignore unnecessary usage or treat our ORM as just an implementation detail. We need to understand exactly what queries are being run on our performance-sensitive endpoints. Freedom isn't free, and neither is ActiveRecord.
 
-One particular case of ActiveRecord misuse that I find is common amongst my clients is that ActiveRecord is executing SQL queries that aren't really unnecessary, and most of my clients are completely unaware that this is even happening.  
+One particular case of ActiveRecord misuse that I find is common amongst my clients is that ActiveRecord is executing SQL queries that aren't really necessary. Most of my clients are completely unaware that this is even happening.  
 
 {% marginnote_lazy dirtythree.jpg||true %}
 
