@@ -31,7 +31,8 @@ The number of SQL queries per table can be easily seen on NewRelic, for example,
 
 {% marginnote_lazy washeyes.jpg|I keep an eyewash station next to my desk for really bad N+1s|true %}
 
-Another rule of thumb is that **most queries should during the first half of a controller action's response, and almost never during partials**. Queries executed during partials are usually unintentional, and are often N+1s. These are easy to spot during a controller's execution if you just read the logs in development mode. For example, if you see this:
+Another rule of thumb is that **most queries should
+execute during the first half of a controller action's response, and almost never during partials**. Queries executed during partials are usually unintentional, and are often N+1s. These are easy to spot during a controller's execution if you just read the logs in development mode. For example, if you see this:
 
 ```
 User Load (0.6ms)  SELECT  "users".* FROM "users" WHERE "users"."id" = $1 LIMIT 1  [["id", 2]]
@@ -190,7 +191,7 @@ Allow me to sum this up with two rules: **Don't call scopes on associations when
 
 Calling scopes on associations means we cannot preload the result. In the example above, we can preload the comments on a post, but we can't preload the *active* comments on a post, so we have to go back to the database and execute new queries for every element in the collection.
 
-This isn't a problem when you only do it once, and not on every element of a collection (like every post, as above). Feel free to use scopes galore in those situations - for example, if this was a PostsController#show action that only displayed one post and it's associated comments. But in collections, scopes on associations cause N+1s, every time.
+This isn't a problem when you only do it once, and not on every element of a collection (like every post, as above). Feel free to use scopes galore in those situations - for example, if this was a PostsController#show action that only displayed one post and its associated comments. But in collections, scopes on associations cause N+1s, every time.
 
 The best way I've found to fix this particular problem is to **create a new association**. [Justin Weiss](https://www.justinweiss.com/), of "Practicing Rails", taught me this in [this blog post about preloading Rails scopes](https://www.justinweiss.com/articles/how-to-preload-rails-scopes/). The idea is that you create a new association, which you *can* preload:
 
@@ -243,9 +244,9 @@ What happens if the view looks like this?
 
 {% marginnote_lazy rules.gif||true %}
 
-That's a SQL query on every post, regardless of what you preloaded. In my experience, **every instance method on an ActiveRecord::Base class will eventually get called inside a collection**. Someone adds a new feature and isn't paying attention. Maybe it's by a different developer than the one that wrote the method originally, and they didn't fully read the implementation. Ta-da, now you've got an N+1. The example I gave could be rewritten as an association, like I described eariler. That can still cause an N+1, but at least it can be fixed easily with the correct preloading.
+That's a SQL query on every post, regardless of what you preloaded. In my experience, **every instance method on an ActiveRecord::Base class will eventually get called inside a collection**. Someone adds a new feature and isn't paying attention. Maybe it's by a different developer than the one who wrote the method originally, and they didn't fully read the implementation. Ta-da, now you've got an N+1. The example I gave could be rewritten as an association, like I described earlier. That can still cause an N+1, but at least it can be fixed easily with the correct preloading.
 
-What ActiveRecord methods should we *avoid* inside of our ActiveRecord model instance methods? Generally, it's pretty much everything in the [`QueryMethods`](https://api.rubyonrails.org/classes/ActiveRecord/QueryMethods.html), [`FinderMethods`](https://api.rubyonrails.org/classes/ActiveRecord/FinderMethods.html), and [`Calculations`](https://api.rubyonrails.org/classes/ActiveRecord/Calculations.html). Any of these methods will usually *try* to run a SQL query, and are resistant to preloading. `where` is the most frequent offender, however.
+Which ActiveRecord methods should we *avoid* inside of our ActiveRecord model instance methods? Generally, it's pretty much everything in the [`QueryMethods`](https://api.rubyonrails.org/classes/ActiveRecord/QueryMethods.html), [`FinderMethods`](https://api.rubyonrails.org/classes/ActiveRecord/FinderMethods.html), and [`Calculations`](https://api.rubyonrails.org/classes/ActiveRecord/Calculations.html). Any of these methods will usually *try* to run a SQL query, and are resistant to preloading. `where` is the most frequent offender, however.
 
 ## any? or exists? and present?
 
@@ -312,7 +313,7 @@ def empty?
 end
 ```
 
-This looks a lot like `count` - if the records are `loaded?` do a very simple method call on a basic Array, if they're not loaded, *always run a SQL query*. `exists?` has no caching or memoization built in, just like ActiveRecord::Calculations. This means that `exists?`, which is another method people like to write in these circumstances, is actually even worse than `present?`. This code would execute two queries (first a full load of the relation, than a SELECT 1 exists check) where `present?` wouldn't:
+This reminds me of the implementation of `size` - if the records are `loaded?` do a very simple method call on a basic Array, if they're not loaded, *always run a SQL query*. `exists?` has no caching or memoization built in, just like ActiveRecord::Calculations. This means that `exists?`, which is another method people like to write in these circumstances, is actually even worse than `present?`. This code would execute two queries (first a full load of the relation, than a SELECT 1 exists check) where `present?` wouldn't:
 
 ```
 - @lonely_repos.each do |repo|
