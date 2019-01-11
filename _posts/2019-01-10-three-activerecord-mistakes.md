@@ -248,7 +248,7 @@ That's a SQL query on every post, regardless of what you preloaded. In my experi
 
 Which ActiveRecord methods should we *avoid* inside of our ActiveRecord model instance methods? Generally, it's pretty much everything in the [`QueryMethods`](https://api.rubyonrails.org/classes/ActiveRecord/QueryMethods.html), [`FinderMethods`](https://api.rubyonrails.org/classes/ActiveRecord/FinderMethods.html), and [`Calculations`](https://api.rubyonrails.org/classes/ActiveRecord/Calculations.html). Any of these methods will usually *try* to run a SQL query, and are resistant to preloading. `where` is the most frequent offender, however.
 
-## any? or exists? and present?
+## any?, exists? and present?
 
 Rails programmers have been struck by a major affliction - they're adding a particular predicate method to just about every variable in their applications. `present?` has spread across Rails codebases faster than the plague in 13th century Europe. The vast majority of the time, the predicate adds nothing but verbosity, and really, all the author needed was a truthy/falsey check, which they could have done by just writing the variable name.
 
@@ -291,59 +291,94 @@ Using `present?` in cases like this is the wrong tool for the job. If you don't 
 
 Alright, that's my style gripe. I understand that you may not agree. `present?` makes more sense when dealing with strings, which can frequently be empty (`""`).
 
-**Where people get into trouble is calling `present?` on ActiveRecord::Relation objects.** What SQL queries do you think [the following code, also from CodeTriage](https://github.com/codetriage/codetriage/blob/b92e347e0f4714b4646be930e341be5a44761b95/app/views/users/token_delete.html.slim#L23) will execute? Assume `@lonely_repos` is an ActiveRecord::Relation.
+**Where people get into trouble is calling predicates, such as `present?`, on ActiveRecord::Relation objects.** Let's say you need to know if an ActiveRecord::Relation has any records. You can use the English-language synonyms any?/present?/exists? or their negations none?/blank?/empty?. Surely it doesn't matter which method you choose, right? Just pick the one that sounds the most natural when read aloud? Nope.
+
+What SQL queries do you think the following code will execute? Assume `@comments` is an ActiveRecord::Relation.
 
 ```
-- if @lonely_repos.present?
-  section.help-triage.content-section
-    | If you delete your account these CodeTriage repos will have no subscribers and will be removed as well.
-    ul.bullets
-      - @lonely_repos.each do |repo|
-        li= link_to repo.full_name, repo_path(repo)
+- if @comments.any?
+  h2 Comments on this Post
+  - @comments.each do |comment|
 ```
 
-The answer is *two*. One will be an existence check, triggered by `@lonely_repos.present?` (`SELECT  1 AS one FROM ... LIMIT 1`), then the `@lonely_repos.each` line will trigger a loading of the entire relation (`SELECT "repos".* FROM "repos" WHERE ...`).
+The answer is *two*. One will be an existence check, triggered by `@comments.any?` (`SELECT  1 AS one FROM ... LIMIT 1`), then the `@comments.each` line will trigger a loading of the entire relation (`SELECT "comments".* FROM "comments" WHERE ...`).
 
-Why? I think you know the drill by now. [Here's the implementation of `empty?` on ActiveRecord::Relation](https://github.com/rails/rails/blob/94b5cd3a20edadd6f6b8cf0bdf1a4d4919df86cb/activerecord/lib/active_record/relation.rb#L215) (Remember: objects are `present?` if they are not `blank?`, and objects are not `blank?` if they are not `empty?`):
-
-```ruby
-def empty?
-  return @records.empty? if loaded?
-  !exists?
-end
-```
-
-This reminds me of the implementation of `size` - if the records are `loaded?` do a very simple method call on a basic Array, if they're not loaded, *always run a SQL query*. `exists?` has no caching or memoization built in, just like ActiveRecord::Calculations. This means that `exists?`, which is another method people like to write in these circumstances, is actually even worse than `present?`. This code would execute two queries (first a full load of the relation, than a SELECT 1 exists check) where `present?` wouldn't:
+What about this?
 
 ```
-- @lonely_repos.each do |repo|
-  li= link_to repo.full_name, repo_path(repo)
-- if @lonely_repos.exists?
-  Some text here.
+- unless @comments.empty?
+  h2 Comments on this Post
+  - @comments.each do |comment|
 ```
 
-I think it should already be obvious as to how to rewrite this to eliminate the SQL existence check:
+This one only executes one query - `@comments.empty?` loads the entire relation right away with `SELECT "comments".* FROM "comments" WHERE ...`.
+
+And this one?
 
 ```
-- if @lonely_repos.load.present?
-  section.help-triage.content-section
-    | If you delete your account these CodeTriage repos will have no subscribers and will be removed as well.
-    ul.bullets
-      - @lonely_repos.each do |repo|
-        li= link_to repo.full_name, repo_path(repo)
+- if @comments.exists?
+  This post has
+  = @comments.size
+  comments
+- if @comments.exists?
+  h2 Comments on this Post
+  - @comments.each do |comment|
 ```
 
-Boom! Now we'll load the records right away, `present?` will not trigger a SQL query, and neither will `@lonely_repos.each`, because the relation has already been loaded.
-
-Any method on ActiveRecord::Relation which calls `empty?` can trigger these unnecessary existence checks. These methods are `any?`, `empty?`, `none?`, and of course `present?` and `blank?`.
-
-Of course, this all assumes that you're actually loading the *entire Relation* after the existence check. If you're *not*, the existence check is saving you time and memory, and that's great. Keep it! An example might be something like:
+Four! `exists?` doesn't memoize itself and it doesn't load the relation. `exists?` here triggers a `SELECT 1 ...`, `.size` triggers a `COUNT` because the relation hasn't been loaded yet, and then the next `exists?` triggers ANOTHER `SELECT 1 ...` and finally `@comments` loads the entire relation! Yay! Isn't this fun? You could reduce this down to just 1 query with the following:
 
 ```
-- if @posts.none?
-  This user has no posts.
-- # @posts is never called again in the rest of the view
+- if @comments.load.any?
+  This post has
+  = @comments.size
+  comments
+- if @comments.any?
+  h2 Comments on this Post
+  - @comments.each do |comment|
 ```
+
+And it just gets better - this behavior changes depending if you're on Rails 4.2, Rails 5.0 or Rails 5.1+.
+
+Here's how it works in Rails 5.1+:
+
+| method   | SQL generated                        | memoized?          | implementation             | Runs query if `loaded?` |
+|----------|--------------------------------------|--------------------|----------------------------|-------------------------|
+| present? | SELECT "users".* FROM "users"        | yes (`load`)       | Object (!blank?)           | no                      |
+| blank?   | SELECT "users".* FROM "users"        | yes (`load`)       | `load`; `blank?`           | no                      |
+| any?     | SELECT,1 AS one FROM "users" LIMIT 1 | no unless `loaded` | `!empty?`                  | no                      |
+| empty?   | SELECT,1 AS one FROM "users" LIMIT 1 | no unless `loaded` | `exists?` if !`loaded?`    | no                      |
+| none?    | SELECT,1 AS one FROM "users" LIMIT 1 | no unless `loaded` | `empty?`                   | no                      |
+| exists?  | SELECT,1 AS one FROM "users" LIMIT 1 | no                 | ActiveRecord::Calculations | yes                     |
+
+Here's how it works in Rails 5.0:
+
+| method | SQL generated                | memoized?          | implementation  | Runs query if `loaded?` |
+|--------|------------------------------|--------------------|-----------------|-------------------------|
+| present? | SELECT "users".* FROM "users"        | yes (`load`)       | Object (!blank?)          | no                      |
+| blank?   | SELECT "users".* FROM "users"        | yes (`load`)       | `load`; `blank?`           | no                      |
+| any?   | SELECT COUNT(*) FROM "users" | no unless `loaded` | `!empty?`       | no                      |
+| empty? | SELECT COUNT(*) FROM "users" | no unless `loaded` | count(:all) > 0 | no                      |
+| none?  | SELECT COUNT(*) FROM "users" | no unless `loaded` | `empty?`        | no                      |
+| exists?  | SELECT,1 AS one FROM "users" LIMIT 1 | no                 | ActiveRecord::Calculations | yes                     |
+
+Here's how it works in Rails 4.2:
+
+| method   | SQL generated                 | memoized?           | implementation  | Runs query if `loaded?` |
+|----------|-------------------------------|---------------------|-----------------|-------------------------|
+| present? | SELECT "users".* FROM "users" | yes                 | Object (!blank?)| no                      |
+| blank?   | SELECT "users".* FROM "users" | yes                 | to_a.blank?     | no                      |
+| any?     | SELECT COUNT(*) FROM "users"  | no unless `loaded`  | `!empty?`       | no                      |
+| empty?   | SELECT COUNT(*) FROM "users"  | no unless `loaded`  | count(:all) > 0 | no                      |
+| none?    | SELECT "users".* FROM "users" | yes (`load` called) | Array           | no                      |
+| exists?  | SELECT,1 AS one FROM "users" LIMIT 1 | no                 | ActiveRecord::Calculations | yes                     |
+
+`any?`, `empty?` and `none?` remind me of the implementation of `size` - if the records are `loaded?` do a simple method call on a basic Array, if they're not loaded, *always run a SQL query*. `exists?` has no caching or memoization built in, just like other ActiveRecord::Calculations. This means that `exists?`, which is another method people like to write in these circumstances, is actually much worse than `present?` in some cases!
+
+**These six predicate methods, which are English-language synonyms all asking the same question, have completely different implementations and performance implications, and these consequences depend on which version of Rails you are using.** So, let me distill all of the above into some concrete advice:
+
+* `present?` and `blank?` should not be used if the ActiveRecord::Relation will never be used in its entirety after you call `present?` or `blank?`. For example, `@my_relation.present?; @my_relation.first(3).each`.
+* `any?`, `none?` and `empty?` should probably be replaced with `present?` or `blank?` unless you will only take a section of the ActiveRecord::Relation using `first` or `last`. They will generate an extra existence SQL check if you're just going to use the entire relation if it exists. In essence, change `@users.any?; @users.each...` to `@users.present?; @users.each...` or `@users.load.any?; @users.each...`, but `@users.any?; @users.first(3).each` is fine.
+* `exists?` is a lot like `count` - it is never memoized, and always executes a SQL query. Most people probably do not actually want this behavior, and would be better off using `present?` or `blank?`
 
 ## Conclusion
 
