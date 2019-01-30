@@ -345,10 +345,10 @@ Here's how it works in Rails 5.1+:
 |----------|--------------------------------------|--------------------|----------------------------|-------------------------|
 | present? | SELECT "users".* FROM "users"        | yes (`load`)       | Object (!blank?)           | no                      |
 | blank?   | SELECT "users".* FROM "users"        | yes (`load`)       | `load`; `blank?`           | no                      |
-| any?     | SELECT,1 AS one FROM "users" LIMIT 1 | no unless `loaded` | `!empty?`                  | no                      |
-| empty?   | SELECT,1 AS one FROM "users" LIMIT 1 | no unless `loaded` | `exists?` if !`loaded?`    | no                      |
-| none?    | SELECT,1 AS one FROM "users" LIMIT 1 | no unless `loaded` | `empty?`                   | no                      |
-| exists?  | SELECT,1 AS one FROM "users" LIMIT 1 | no                 | ActiveRecord::Calculations | yes                     |
+| any?     | SELECT 1 AS one FROM "users" LIMIT 1 | no unless `loaded` | `!empty?`                  | no                      |
+| empty?   | SELECT 1 AS one FROM "users" LIMIT 1 | no unless `loaded` | `exists?` if !`loaded?`    | no                      |
+| none?    | SELECT 1 AS one FROM "users" LIMIT 1 | no unless `loaded` | `empty?`                   | no                      |
+| exists?  | SELECT 1 AS one FROM "users" LIMIT 1 | no                 | ActiveRecord::Calculations | yes                     |
 
 Here's how it works in Rails 5.0:
 
@@ -359,7 +359,7 @@ Here's how it works in Rails 5.0:
 | any?   | SELECT COUNT(*) FROM "users" | no unless `loaded` | `!empty?`       | no                      |
 | empty? | SELECT COUNT(*) FROM "users" | no unless `loaded` | count(:all) > 0 | no                      |
 | none?  | SELECT COUNT(*) FROM "users" | no unless `loaded` | `empty?`        | no                      |
-| exists?  | SELECT,1 AS one FROM "users" LIMIT 1 | no                 | ActiveRecord::Calculations | yes                     |
+| exists?  | SELECT 1 AS one FROM "users" LIMIT 1 | no                 | ActiveRecord::Calculations | yes                     |
 
 Here's how it works in Rails 4.2:
 
@@ -370,7 +370,7 @@ Here's how it works in Rails 4.2:
 | any?     | SELECT COUNT(*) FROM "users"  | no unless `loaded`  | `!empty?`       | no                      |
 | empty?   | SELECT COUNT(*) FROM "users"  | no unless `loaded`  | count(:all) > 0 | no                      |
 | none?    | SELECT "users".* FROM "users" | yes (`load` called) | Array           | no                      |
-| exists?  | SELECT,1 AS one FROM "users" LIMIT 1 | no                 | ActiveRecord::Calculations | yes                     |
+| exists?  | SELECT 1 AS one FROM "users" LIMIT 1 | no                 | ActiveRecord::Calculations | yes                     |
 
 `any?`, `empty?` and `none?` remind me of the implementation of `size` - if the records are `loaded?` do a simple method call on a basic Array, if they're not loaded, *always run a SQL query*. `exists?` has no caching or memoization built in, just like other ActiveRecord::Calculations. This means that `exists?`, which is another method people like to write in these circumstances, is actually much worse than `present?` in some cases!
 
