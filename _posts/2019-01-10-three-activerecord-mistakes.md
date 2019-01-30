@@ -306,12 +306,12 @@ The answer is *two*. One will be an existence check, triggered by `@comments.any
 What about this?
 
 ```
-- unless @comments.empty?
+- unless @comments.load.empty?
   h2 Comments on this Post
   - @comments.each do |comment|
 ```
 
-This one only executes one query - `@comments.empty?` loads the entire relation right away with `SELECT "comments".* FROM "comments" WHERE ...`.
+This one only executes one query - `@comments.load` loads the entire relation right away with `SELECT "comments".* FROM "comments" WHERE ...`.
 
 And this one?
 
