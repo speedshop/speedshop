@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "jekyll", "3.6.0"
+gem "jekyll", "3.6.3"
 gem "sass"
 gem "jekyll-assets"
 gem "foreman"

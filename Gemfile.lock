@@ -33,7 +33,7 @@ GEM
       image_optim (~> 0.19)
     image_size (2.0.1)
     in_threads (1.5.1)
-    jekyll (3.6.0)
+    jekyll (3.6.3)
       addressable (~> 2.4)
       colorator (~> 1.0)
       jekyll-sass-converter (~> 1.0)
@@ -106,7 +106,7 @@ DEPENDENCIES
   foreman
   image_optim
   image_optim_pack
-  jekyll (= 3.6.0)
+  jekyll (= 3.6.3)
   jekyll-assets
   sass
 
