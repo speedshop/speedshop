@@ -52,7 +52,7 @@
 
       el = document.getElementById("innocuous-close");
       el.addEventListener("click", function() {
-        el.style.display = "none";
+        document.getElementById("innocuous").style.display = "none";
         document.cookie = "nateberkopecShowSignup=true; expires=Fri, 31 Dec 9999 23:59:59 GMT";
       });
     });
