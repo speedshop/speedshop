@@ -15,35 +15,13 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function(event) {
-        var ROOT = (function () {
-          var html = document.documentElement;
-          var htmlScrollTop = html.scrollTop++;
-          var root = html.scrollTop == htmlScrollTop + 1 ? html : document.body;
-          html.scrollTop = htmlScrollTop;
-          return root;
-      })();
+      var cookieRegex = /(?:(?:^|.*;\s*)nateberkopecShowSignup\s*\=\s*([^;]*).*$)|^.*$/
 
-      // may be recalculated on resize
-      var limit = (document.body.scrollHeight - window.innerHeight) * 0.5;
-      var last = +new Date;
-      var didScroll = false;
-
-      if (document.cookie.replace(/(?:(?:^|.*;\s*)nateberkopecShowSignup\s*\=\s*([^;]*).*$)|^.*$/, "$1") !== "true") {
-        window.addEventListener("scroll", function() {
-          didScroll = true;
-        });
-
-        setInterval(function(){
-          if(didScroll){
-            didScroll = false;
-            if (ROOT.scrollTop > limit) {
-              if (document.cookie.replace(/(?:(?:^|.*;\s*)nateberkopecShowSignup\s*\=\s*([^;]*).*$)|^.*$/, "$1") !== "true") {
-               showSignup();
-             }
-            }
-          }
-        }, 30);
-      }
+      setTimeout(function(){ 
+        if (document.cookie.match(cookieRegex, "$1")[1] !== "true") {
+          showSignup();
+        }
+      }, 60000);
 
       function showSignup(){
         el = document.getElementById("innocuous");
