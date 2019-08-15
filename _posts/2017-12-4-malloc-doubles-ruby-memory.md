@@ -37,7 +37,7 @@ In particular, Ruby cannot *move* objects in memory. Doing so would potentially 
 
 **However, fragmentation can sometimes cause Ruby programs to *twice* as much memory as they would otherwise, sometimes as much as four times more!**
 
-Ruby programmers aren't used to thinking about memory, especially not at the level of `malloc`. And that's OK: the entire language is designed to abstract memory away from the programmer. It's right in the manpage. But while Ruby can guarantee memory *safety*, it cannot provide perfect memory *abstraction*. One cannot be completely ignorant of memory. Because Ruby programmers are so naive and inexperienced with how computer memory works, when problems occur, they often have no idea where to even start with debugging it, and may dismiss it as an intrinsic feature of a dynamic, interpreted language like Ruby.
+Ruby programmers aren't used to thinking about memory, especially not at the level of `malloc`. And that's OK: the entire language is designed to abstract memory away from the programmer. It's right in the manpage. But while Ruby can guarantee memory *safety*, it cannot provide perfect memory *abstraction*. One cannot be completely ignorant of memory. Because Ruby programmers are often inexperienced with how computer memory works, when problems occur, they often have no idea where to even start with debugging it, and may dismiss it as an intrinsic feature of a dynamic, interpreted language like Ruby.
 
 {% marginnote_lazy princess.jpg|"And underneath 4 layers of memory abstraction, she noticed some fragmentation!"|true %}
 
