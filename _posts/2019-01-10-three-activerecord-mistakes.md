@@ -4,6 +4,7 @@ title:  "3 ActiveRecord Mistakes That Slow Down Rails Apps: Count, Where and Pre
 date:   2019-01-10 7:00:00
 summary: "Many Rails developers don't understand what causes ActiveRecord to actually execute a SQL query. Let's look at three common cases: misuse of the count method, using where to select subsets, and the present? predicate. You may be causing extra queries and N+1s through the abuse of these three methods."
 readtime: 2778 words / 12 minutes
+wordcount: 2778
 image: threebadshare.jpg
 ---
 

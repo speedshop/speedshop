@@ -17,7 +17,7 @@
     document.addEventListener("DOMContentLoaded", function(event) {
       var cookieRegex = /(?:(?:^|.*;\s*)nateberkopecShowSignup\s*\=\s*([^;]*).*$)|^.*$/
 
-      setTimeout(function(){ 
+      setTimeout(function(){
         if (document.cookie.match(cookieRegex, "$1")[1] !== "true") {
           showSignup();
         }
@@ -37,4 +37,5 @@
   </script>
   {% include twitter.html %}
   {% include opengraph.html %}
+  {% include structured_data.html %}
 </head>

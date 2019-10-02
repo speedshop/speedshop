@@ -1,0 +1,41 @@
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  {% if page.summary %}
+    "@type": "TechArticle",
+    "dependencies": "Ruby on Rails",
+    "proficiencyLevel": "Expert",
+    "wordcount": {{ page.wordcount }},
+  {% endif %}
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ page.url | absolute_url }}"
+  },
+  {% if page.title %}
+    "headline": "{{ page.title }}",
+  {% endif %}
+  {% if page.image %}
+    "image": ["{{ page.image | absolute_url }}"],
+  {% endif %}
+  {% if page.date %}
+    "datePublished": "{{ page.date }}",
+  {% endif %}
+  "author": {
+    "@type": "Person",
+    "name": "Nate Berkopec"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Speedshop",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://speedshop.co/assets/img/speedshop_s_big.png",
+      "width": 497,
+      "height": 497
+    }
+  },
+  {% if page.summary %}
+    "description": "{{ page.summary }}"
+  {% endif %}
+}
+</script>
