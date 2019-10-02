@@ -1,11 +1,26 @@
 <script type="application/ld+json">
 {
   "@context": "http://schema.org",
-  {% if page.summary %}
+  {% if page.readtime %}
     "@type": "TechArticle",
     "dependencies": "Ruby on Rails",
     "proficiencyLevel": "Expert",
     "wordcount": {{ page.wordcount }},
+  {% elsif page.price %}
+    "@type": "Product",
+    "name": "{{ page.productName }}",
+    "offers": {
+      "@type": "Offer",
+      "price": {{ page.price }},
+      "priceCurrency": "USD",
+      "seller": {
+        "@type": "Organization",
+        "name": "Speedshop"
+      }
+    },
+    "brand": "The Speedshop",
+  {% else %}
+    "@type": "WebPage",
   {% endif %}
   "mainEntityOfPage": {
     "@type": "WebPage",
@@ -21,7 +36,7 @@
     "datePublished": "{{ page.date }}",
   {% endif %}
   {% if page.summary %}
-    "description": "{{ page.summary }}"
+    "description": "{{ page.summary | strip_html | normalize_whitespace | truncate: 160 | escape }}",
   {% endif %}
   "publisher": {
     "@type": "Organization",
