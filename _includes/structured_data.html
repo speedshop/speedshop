@@ -20,10 +20,9 @@
   {% if page.date %}
     "datePublished": "{{ page.date }}",
   {% endif %}
-  "author": {
-    "@type": "Person",
-    "name": "Nate Berkopec"
-  },
+  {% if page.summary %}
+    "description": "{{ page.summary }}"
+  {% endif %}
   "publisher": {
     "@type": "Organization",
     "name": "Speedshop",
@@ -34,8 +33,9 @@
       "height": 497
     }
   },
-  {% if page.summary %}
-    "description": "{{ page.summary }}"
-  {% endif %}
+  "author": {
+    "@type": "Person",
+    "name": "Nate Berkopec"
+  }
 }
 </script>
