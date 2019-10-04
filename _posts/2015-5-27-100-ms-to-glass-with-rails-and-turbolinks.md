@@ -4,6 +4,7 @@ title:  "100ms to Glass with Rails and Turbolinks"
 date:   2015-05-27 12:00:00
 summary: Is Rails dead? Can the old Ruby web framework no longer keep up in this age of "native-like" performance? Turbolinks provides one solution.
 readtime: 3030 words/15 minutes
+wordcount: 3030
 ---
 
 A perceived benefit of a client-side JS framework is the responsiveness of its interface - updates to the UI are instantaneous. A large amount of application logic (and, usually, state) lives on the client, instead of on the server. The client-side application can perform most tasks without running back to the server for a round-trip. As a result, in the post-V8 era, many developers think traditional server-side languages and frameworks (Ruby, Python, even Java) are simply too slow for modern web applications, which are now supposed to behave like native applications, with instantaneous responses.

@@ -4,7 +4,7 @@ title:  "A New Ruby Application Server: NGINX Unit"
 date:   2018-03-28 7:00:00
 summary: "NGINX Inc. has just released Ruby support for their new multi-language application server, NGINX Unit. What does this mean for Ruby web applications? Should you be paying attention to NGINX Unit?"
 readtime: 2057 words/10 minutes
-wordcot: 2057
+wordcount: 2057
 image: nginxunit-share.jpg
 ---
 

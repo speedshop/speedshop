@@ -4,6 +4,7 @@ title:  "Ludicrously Fast Page Loads - A Guide for Full-Stack Devs"
 date:   2015-10-07 8:00:00
 summary: Your website is slow, but the backend is fast. How do you diagnose performance issues on the frontend of your site? We'll discuss everything involved in constructing a webpage and how to profile it at sub-millisecond resolution with Chrome Timeline, Google's flamegraph-for-the-browser.
 readtime: 4428 words/22 minutes
+wordcount: 4428
 ---
 
 Server response times, while easy to track and instrument, are ultimately a meaningless performance metric from an end-user perspective. {% marginnote_lazy https://i.imgur.com/u5soMkT.gif|Actual end-user response to the word 'microservices'|true %} End-users don't care how fast your super-turbocharged bare-metal Node.js server is - they care about the page being completely loaded as fast as possible. Your boss is breathing down your neck about the site being slow - but your Elixir-based microservices architecture has average server response times of 10 nanoseconds!  What's going on?

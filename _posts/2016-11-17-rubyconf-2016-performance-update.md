@@ -4,6 +4,7 @@ title:  "Rubyconf 2016: The Performance Update"
 date:   2016-11-17 7:00:00
 summary: "What happened at RubyConf 2016 this year? A heck of a lot of stuff related to Ruby performance, that's what."
 readtime: 1734 words/8 minutes
+wordcount: 1734
 image: rubyconf.jpg
 ---
 

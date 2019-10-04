@@ -4,6 +4,7 @@ title:  "How to Measure Ruby App Performance with New Relic"
 date:   2015-10-15 7:00:00
 summary: New Relic is a great tool for getting the overview of the performance bottlenecks of a Ruby application. But it's pretty extensive - where do you start? What's the most important part to pay attention to?
 readtime: 3493 words/17 minutes
+wordcount: 3493
 ---
 
 It's 12pm on a Monday. Your boss walks by: "The site feels...slow. I don't know, it just does." Hmmm. You riposte with the classic developer reply: "Well, it's fast on my local machine." Boom! Boss averted! {% marginnote_lazy https://i.imgur.com/D20c1vk.gif||true %}

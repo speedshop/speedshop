@@ -4,6 +4,7 @@ title:  "Hacking Your Webpage's Head Tags for Speed and Profit"
 date:   2015-10-21 7:00:00
 summary: One of the most important parts of any webpage's performance is the content and organization of the head element. We'll take a deep dive on some easy optimizations that can be applied to any site.
 readtime: 2754 words/13 minutes
+wordcount: 2754
 ---
 
 {% marginnote_lazy https://i.imgur.com/2K3eIZI.gif|<i>\"What's that? The site takes 15 seconds to load on mobile? <br>Sorry, but Marketing says I gotta put Mixpanel in here first.\"</i>|true %} Most of us developers settle for page load times somewhere between 3 and 7 seconds. We open up the graph in NewRelic or [webpagetest.org](http://webpagetest.org), sigh, and then go back to implementing that new feature that the marketing people *absolutely must have deployed yesterday*.

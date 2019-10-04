@@ -4,6 +4,7 @@ title:  "rack-mini-profiler - the Secret Weapon of Ruby and Rails Speed"
 date:   2015-08-05 11:30:00
 summary: rack-mini-profiler is a powerful Swiss army knife for Rack app performance. Measure SQL queries, memory allocation and CPU time.
 readtime: 3328 words/16 minutes
+wordcount: 3328
 ---
 
 `rack-mini-profiler` is a a performance tool for Rack applications, maintained by the talented [@samsaffron](https://twitter.com/samsaffron). [rack-mini-profiler](https://github.com/MiniProfiler/rack-mini-profiler) provides an entire suite of tools for measuring the performance of Rack-enabled web applications, including detailed drill downs on SQL queries, server response times (with a breakdown for each template and partial), incredibly detailed millisecond-by-millisecond breakdowns of execution times with the incredible `flamegraph` feature, and will even help you track down memory leaks with its excellent garbage collection features. **I wouldn't hesitate to say that `rack-mini-profiler` is my favorite and most important tool for developing fast Ruby webapps.** {% marginnote_lazy https://i.imgur.com/DgONqEH.gif||true %}

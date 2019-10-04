@@ -4,6 +4,7 @@ title:  "Is Ruby Too Slow For Web-Scale?"
 date:   2017-07-11 7:00:00
 summary: "Choosing a new web framework or programming language for the web and wondering which to pick? Should performance enter your decision, or not?"
 readtime: 3430 words/17 minutes
+wordcount: 3430
 image: webscale.jpg
 ---
 

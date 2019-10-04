@@ -4,6 +4,7 @@ title:  "Speed Up Your Rails App by 66% - The Complete Guide to Rails Caching"
 date:   2015-07-15 12:00:00
 summary: Caching in a Rails app is a little bit like that one friend you sometimes have around for dinner, but should really have around more often.
 readtime: 5989 words/30 minutes
+wordcount: 5989
 ---
 
 Caching in a Rails app is a little bit like that one friend you sometimes have around for dinner, but should really have around more often. Nearly every Rails app that's serious about performance could use more caching, but most Rails apps eschew it entirely! And yet, intelligent use of caching is usually the only path to achieving fast server response times in Rails - easily speeding up ~250ms response times to 50-100ms.

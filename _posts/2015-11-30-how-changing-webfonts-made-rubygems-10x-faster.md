@@ -4,6 +4,7 @@ title:  "How Changing WebFonts Made Rubygems.org 10x Faster"
 date:   2015-11-30 7:00:00
 summary: "WebFonts are awesome and here to stay. However, if used improperly, they can also impose a huge performance penalty. In this post, I explain how Rubygems.org painted 10x faster just by making a few changes to its WebFonts."
 readtime: 3671 words/18 minutes
+wordcount: 3671
 ---
 
 {% marginnote_lazy https://imgur.com/nzECFNz.jpg ||true %}

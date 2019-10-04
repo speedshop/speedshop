@@ -4,6 +4,7 @@ title:  "Action Cable - Friend or Foe?"
 date:   2015-09-30 11:00:00
 summary: Action Cable will be one of the main features of Rails 5, to be released sometime this winter. But what can Action Cable do for Rails developers? Are WebSockets really as useful as everyone says?
 readtime: 4205 words/21 minutes
+wordcount: 4205
 ---
 
 One of the marquee features of Rails 5 (likely releasing sometime Q1/Q2 2016) is Action Cable, Rails' new framework for dealing with WebSockets. Action Cable has generated a lot of interest, though perhaps for the wrong reasons. "WebSockets are those cool things the Node people get to use, right?" and "I heard WebSockets are The Future™" seem to be the prevailing attitudes, resulting in a lot of confusion and uncertainty about Action Cable's purpose and promise. It doesn't help that current online conversation around WebSockets is thick with overly fancy buzzwords like "realtime" and "full-duplex". {% marginnote_lazy https://i.imgur.com/U7vo0Hs.gif|Full-duplex? That's twice as good as half-duplex right? |true %}  In addition, some claim that a WebSockets-based application is somehow more scalable than traditional implementations. What's a Rails application developer to make of all of this?

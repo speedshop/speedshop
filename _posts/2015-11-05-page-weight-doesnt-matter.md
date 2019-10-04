@@ -5,6 +5,7 @@ date:   2015-11-05 7:00:00
 summary: "The total size of a webpage, measured in bytes, has little to do with
 its load time. Instead, increase network utilization: make your site preloader-friendly, minimize parser blocking, and start downloading resources ASAP with Resource Hints."
 readtime: 4697 words/23 minutes
+wordcount: 4697
 ---
 
 There's one universal law of front-end performance - **less is more**. Simple pages are fast pages. We all know this - it isn't controversial. Complexity is the enemy.

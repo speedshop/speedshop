@@ -4,6 +4,7 @@ title:  "What HTTP/2 Means for Ruby Developers"
 date:   2016-1-7 7:00:00
 summary: "Full HTTP/2 support for Ruby web frameworks is a long way off - but that doesn't mean you can't benefit from HTTP/2 today!"
 readtime: 2112 words/11 minutes
+wordcount: 2112
 image: https://i.imgur.com/7ep6bdy.jpg
 ---
 

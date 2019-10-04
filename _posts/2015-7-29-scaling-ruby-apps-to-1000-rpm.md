@@ -4,6 +4,7 @@ title:  "Scaling Ruby Apps to 1000 Requests per Minute - A Beginner's Guide"
 date:   2015-07-29 11:00:00
 summary: Most "scaling" resources for Ruby apps are written by companies with hundreds of requests per second. What about scaling for the rest of us?
 readtime: 5289 words/26 minutes
+wordcount: 5289
 ---
 
 Scaling is an intimidating topic. Most blog posts and internet resources around scaling Ruby apps are about scaling Ruby to *tens of thousands of requests per minute*. That's Twitter and Shopify scale. These are interesting - it's good to know the ceiling, how much Ruby can achieve - but not very useful for the majority of us out there that have apps bigger than 1 server but less than 100 servers. Where's the "beginner's guide" to scaling? {% sidenote 1 "I think the problem is that most people aren't comfortable writing about how big they are until they're <i>huge</i>." %}
