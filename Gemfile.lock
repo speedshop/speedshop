@@ -72,6 +72,8 @@ GEM
       sprockets (>= 3.3, < 4.1.beta)
     jekyll-sass-converter (1.5.2)
       sass (~> 3.4)
+    jekyll-sitemap (1.4.0)
+      jekyll (>= 3.7, < 5.0)
     jekyll-watch (2.2.1)
       listen (~> 3.0)
     kramdown (2.1.0)
@@ -124,6 +126,7 @@ DEPENDENCIES
   jekyll (= 4.0.0.pre.beta1)
   jekyll-assets
   jekyll-sanity!
+  jekyll-sitemap
   sass
 
 BUNDLED WITH
