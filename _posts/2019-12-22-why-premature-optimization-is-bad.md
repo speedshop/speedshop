@@ -1,11 +1,11 @@
 ---
 layout: post
 title:  "The World Follows Power Laws: Why Premature Optimization is Bad"
-date:   2019-12-23 7:00:00
+date:   2019-12-22 7:00:00
 summary: "Programmers vaguely realize that 'premature optimization is bad'. But what is premature optimization? I'll argue that any optimization that does not come from observed measurement, usually in production, is premature, and that this fact stems from natural facts about our world. By applying an empirical mindset to performance, we can avoid this trap."
 readtime: 2704 words / 12 minutes
 wordcount: 2704
-image:
+image: premature-opt.jpg
 ---
 
 {% sidenote "This post is a sample of the content available in the [Complete Guide to Rails Performance](https://railsspeed.com). It's actually the first lesson - there are 30+ more lessons and 18 hours of video in the course itself." %}
