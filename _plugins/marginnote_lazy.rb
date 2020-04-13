@@ -10,8 +10,7 @@ module Jekyll
       caption = @params[1]
       klass = @params[2] == "true" ? "no-mobile" : ""
       output =  "<span class='marginnote #{klass}'>"
-      output += "<img src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' data-src='#{img_src}' class='b-lazy'>"
-      output += "<noscript><img src='#{img_src}'></noscript>"
+      output += "<img src='#{img_src}' loading='lazy'>"
       output += "<br>#{caption}"
       output += "</span>"
       output
