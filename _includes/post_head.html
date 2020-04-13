@@ -10,7 +10,9 @@
   {% asset posts @inline %}
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: full_base_url }}">
   <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | prepend: full_base_url }}">
-  {% include icons.html %}
+
+
+  <script src="/assets/js/instant.js" type="module" defer></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", function(event) {
@@ -34,6 +36,8 @@
       });
     });
   </script>
+
+  {% include icons.html %}
   {% include twitter.html %}
   {% include opengraph.html %}
   {% include structured_data.html %}
