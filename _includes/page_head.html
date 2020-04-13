@@ -4,7 +4,7 @@
 
   <title>{% if page.title %}{{ page.title | escape }}{% else %}{{ site.title | escape }}{% endif %}</title>
   <meta name="description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
-  <style>{% asset page @inline %}</style>
+  <link rel="stylesheet" href="/assets/css/page.css">
   <link rel="canonical" href="{{ page.url | prepend: site.url }}">
   <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | prepend: site.url }}">
 

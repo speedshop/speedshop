@@ -1,32 +1,15 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that. If you find
-# yourself editing these this file very often, consider using Jekyll's data files
-# feature for the data you need to update frequently.
-#
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'jekyll serve'. If you change this file, please restart the server process.
-
-# Site settings
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
 title: Speedshop - Ruby on Rails performance consulting
-email: nate.berkopec@gmail.com
-description: > # this means to ignore newlines until "baseurl:"
+email: nate.berkopec@speedshop.co
+description: >
   Speedshop is a one-man Ruby on Rails performance consultancy that
   optimizes the full stack - frontend, backend and environment - to generate
   revenue and cut scaling costs for businesses on Rails. Fast sites are
   profitable sites. Speed is a feature.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://www.speedshop.co" # the base hostname & protocol for your site
+baseurl: ""
+url: "https://www.speedshop.co"
 permalink: /:year/:month/:day/:title.html
 plugins:
-  - jekyll-assets
   - jekyll-sitemap
-# Build settings
 markdown: kramdown
 kramdown:
   auto_ids: true
@@ -37,22 +20,3 @@ exclude:
    - wercker.yml
    - Gemfile
    - Gemfile.lock
-
-assets:
-  prefix: "/assets"
-  assets:
-    - "*.png"
-    - "*.jpg"
-    - "*.svg"
-    - "*.webm"
-    - "*.mp4"
-    - "posts.css"
-    - "home.css"
-    - "*.js"
-  sources:
-    - "assets"
-    - "assets/css"
-    - "assets/img"
-    - "assets/js"
-    - "assets/posts/img"
-    - "_sass"

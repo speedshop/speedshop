@@ -7,10 +7,9 @@
 
   {% assign custom_url = site.url | append: site.baseurl %}
   {% assign full_base_url = custom_url %}
-  {% asset posts @inline %}
+  <link rel="stylesheet" href="/assets/css/posts.css">
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: full_base_url }}">
   <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | prepend: full_base_url }}">
-
 
   <script src="/assets/js/instant.js" type="module" defer></script>
 

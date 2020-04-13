@@ -28,7 +28,7 @@ I have a rule of thumb to judge whether or not any particular SQL query is unnec
 
 The number of SQL queries per table can be easily seen on NewRelic, for example, if you have that installed.
 
-{% asset "nplusoneposts.png" %}
+<img src="/assets/post/img/nplusoneposts.png" loading="lazy">
 
 {% marginnote_lazy washeyes.jpg|I keep an eyewash station next to my desk for really bad N+1s|true %}
 
@@ -135,7 +135,7 @@ When *doesn't* `count` trigger a query? Only if the result has been cached by `A
 
 So, when do you actually want to use `count`? Use it when you won't actually *ever* be loading the full association that you're `count`ing. For example, take this view on Rubygems.org, which displays a single gem:
 
-{% asset "rspecview.png" %}
+<img src="/assets/posts/img/rspecview.png" loading="lazy">
 
 In the "versions" list, the view does a `count` to get the total number of releases (versions) of this gem.
 
