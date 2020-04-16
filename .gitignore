@@ -3,3 +3,6 @@ _site
 .jekyll-metadata
 .asset-cache
 .jekyll-cache
+
+*.tfvars
+.terraform
