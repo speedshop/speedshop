@@ -5,3 +5,13 @@ publish = "_site"
   for = "/*"
   [headers.values]
 	  cache-control = "max-age=86400"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+	  link = "</assets/css/app.css>; rel=preload; as=style"
+
+[[headers]]
+  for = "/blog/*.html"
+  [headers.values]
+	  link = "</assets/css/app.css>; rel=preload; as=style"
