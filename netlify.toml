@@ -1,0 +1,7 @@
+command = "jekyll build"
+publish = "_site"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+	  cache-control = "max-age=86400"
