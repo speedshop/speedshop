@@ -13,10 +13,14 @@ window.signup = function() {
   }
 
   el = document.getElementById("innocuous-close");
-  el.addEventListener("click", function() {
-    document.getElementById("innocuous").style.display = "none";
-    document.cookie = "nateberkopecShowSignup=true; expires=Fri, 31 Dec 9999 23:59:59 GMT";
-  });
+  if(el === null) {
+    return 
+  } else {
+    el.addEventListener("click", function() {
+      document.getElementById("innocuous").style.display = "none";
+      document.cookie = "nateberkopecShowSignup=true; expires=Fri, 31 Dec 9999 23:59:59 GMT";
+    });
+  }
 };
 
 signup();
