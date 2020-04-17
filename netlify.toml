@@ -12,6 +12,16 @@ publish = "_site"
 	  link = "</assets/css/app.css>; rel=preload; as=style"
 
 [[headers]]
+  for = "/"
+  [headers.values]
+	  link = "</assets/css/app.css>; rel=preload; as=style"
+
+[[headers]]
+  for = "/blog"
+  [headers.values]
+	  link = "</assets/css/app.css>; rel=preload; as=style"
+
+[[headers]]
   for = "/blog/*.html"
   [headers.values]
 	  link = "</assets/css/app.css>; rel=preload; as=style"
