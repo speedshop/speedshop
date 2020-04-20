@@ -144,7 +144,7 @@ You may have a few non-`async` script tags remaining at this point. Webfont load
 
 ```html
    <head>
-     <link rel="stylesheet" media="screen" href="/assets/application.css">
+     <link rel="stylesheet" media="screen" href="assets/application.css">
      <script src="//use.typekit.net/abcde.js" type="text/javascript"></script>
 ```
 
