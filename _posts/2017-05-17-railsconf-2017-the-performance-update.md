@@ -155,7 +155,7 @@ On the last day of the conference, Sam Saffron hosted a panel on performance wit
 
 Attenddee Savannah made this cool mind-mappy-thing:
 
-<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr">the penultimate talk: a panel on performance with <a href="https://twitter.com/nateberkopec">@nateberkopec</a> <a href="https://twitter.com/rafaelfranca">@rafaelfranca</a> <a href="https://twitter.com/samsaffron">@samsaffron</a> <a href="https://twitter.com/schneems">@schneems</a> <a href="https://twitter.com/eileencodes">@eileencodes</a> <a href="https://twitter.com/hashtag/railsconf?src=hash">#railsconf</a> <a href="https://t.co/srRe4ebPSW">pic.twitter.com/srRe4ebPSW</a></p>&mdash; savannah💜 (@Savannahdworth) <a href="https://twitter.com/Savannahdworth/status/857735502274768896">April 27, 2017</a></blockquote>
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr">the penultimate talk: a panel on performance with <a href="https://twitter.com/nateberkopec">@nateberkopec</a> <a href="https://twitter.com/rafaelfranca">@rafaelfranca</a> <a href="https://twitter.com/samsaffron">@samsaffron</a> <a href="https://twitter.com/schneems">@schneems</a> <a href="https://twitter.com/eileencodes">@eileencodes</a> <a href="https://twitter.com/hashtag/railsconf?src=hash">#railsconf</a> <a href="https://t.co/srRe4ebPSW">pic.twitter.com/srRe4ebPSW</a></p>&mdash; savannah (@Savannahdworth) <a href="https://twitter.com/Savannahdworth/status/857735502274768896">April 27, 2017</a></blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ## More Performance Talks
