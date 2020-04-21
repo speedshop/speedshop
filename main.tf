@@ -7,6 +7,8 @@ provider "aws" {
   region = local.region
 }
 
+provider "cloudflare" {}
+
 terraform {
   backend "s3" {
     bucket = "speedshop-terraform"
@@ -38,4 +40,8 @@ resource "aws_s3_bucket" "website" {
     index_document = "index.html"
     error_document = "error.html"
   }
+}
+
+resource "cloudflare_zone" "cdn" {
+  zone = "speedshop.co"
 }
