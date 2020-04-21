@@ -66,7 +66,7 @@ You may also see two "Send Request" events (they're really small) beneath the "P
 In addition, the Javascript file in this app is marked with an `async` attribute:
 
 ```html
-<script src="assets/application-0b54454ea478523c05eca86602b42d6542063387c4ee7e6d28b0ce20f5e2c86c.js" async="async" data-turbolinks-track="true"></script>
+<script src="/assets/application-0b54454ea478523c05eca86602b42d6542063387c4ee7e6d28b0ce20f5e2c86c.js" async="async" data-turbolinks-track="true"></script>
 ```
 
 Normally, when a browser sees a Javascript tag like this in the head, it *stops completely* until it has finished downloading and evaluating the script. If the script is remote, we have to wait while the script downloads. This can take *a lot* of time - even more than a whole second, when you include network latency and the time required to evaluate the script. The reason browsers do this is because Javascript can modify the DOM - any time there's a script tag, the browser has to execute it because it could change the DOM or layout. For more about Javascript blocking page rendering, [Google does a great explanation here](https://developers.google.com/speed/docs/insights/BlockingJS).

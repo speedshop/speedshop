@@ -6,7 +6,7 @@ module Jekyll
     end
 
     def render(context)
-      img_src = @params[0].match(/http/) ? @params[0] : "assets/posts/img/#{@params[0]}"
+      img_src = @params[0].match(/http/) ? @params[0] : "#{context.registers[:site].config["url"]}/assets/posts/img/#{@params[0]}"
       caption = @params[1]
       klass = @params[2] == "true" ? "no-mobile" : ""
       output =  "<span class='marginnote #{klass}'>"
