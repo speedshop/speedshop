@@ -1,5 +1,5 @@
 source "https://rubygems.org"
 
 gem "jekyll", github: "jekyll/jekyll"
-gem "sassc", github: "sass/sassc-ruby"
+gem "sassc", ">= 2.3.0"
 gem "jekyll-sitemap"
