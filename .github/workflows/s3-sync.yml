@@ -28,6 +28,8 @@ jobs:
         bundle install --jobs 4 --retry 3
     - name: build jekyll 
       run: bundle exec jekyll build
+    - name: pandoc
+      run: bundle exec ruby _pandoc/pandoc.rb
     - uses: jakejarvis/s3-sync-action@master
       with:
         args: --acl public-read --follow-symlinks --delete
