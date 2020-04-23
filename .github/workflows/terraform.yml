@@ -1,6 +1,5 @@
 name: 'Terraform GitHub Actions'
-on:
-  - pull_request
+on: [push, pull_request]
 env:
   tf_version: 'latest'
   tf_working_dir: '.'
@@ -20,6 +19,9 @@ jobs:
           tf_actions_comment: true
         env:
           GITHUB_TOKEN: ${{ env.TERRAFORM_GH_TOKEN }}
+          AWS_S3_BUCKET: speedshop-dotcom
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  
       - name: 'Terraform Init'
         uses: hashicorp/terraform-github-actions@master
         with:
@@ -29,6 +31,9 @@ jobs:
           tf_actions_comment: true
         env:
           GITHUB_TOKEN: ${{ env.TERRAFORM_GH_TOKEN }}
+          AWS_S3_BUCKET: speedshop-dotcom
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  
       - name: 'Terraform Validate'
         uses: hashicorp/terraform-github-actions@master
         with:
@@ -38,6 +43,9 @@ jobs:
           tf_actions_comment: true
         env:
           GITHUB_TOKEN: ${{ env.TERRAFORM_GH_TOKEN }}
+          AWS_S3_BUCKET: speedshop-dotcom
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  
       - name: 'Terraform Plan'
         uses: hashicorp/terraform-github-actions@master
         with:
@@ -47,3 +55,6 @@ jobs:
           tf_actions_comment: true
         env:
           GITHUB_TOKEN: ${{ env.TERRAFORM_GH_TOKEN }}
+          AWS_S3_BUCKET: speedshop-dotcom
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  
