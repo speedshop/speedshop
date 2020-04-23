@@ -93,20 +93,19 @@ layout: default
       <p>
         You can contact Speedshop via <a href="mailto:nate.berkopec@speedshop.co">email</a>.
       </p>
+
+      <p>
+        Logo visualization by <a href="http://luis.net/">Luis Gonzalez.</a>
+      </p>
     </div>
   </div>
 </div>
 <div id="big-black-bar" class="visible-desktop">
+  <canvas height=1000px width=1000px id="sslogocanvas" style="position: relative"></canvas>
 
-
-    <video height="640" width="720" class="fader" id="logo-vid" autoplay="autoplay" muted="muted" loop="loop">
-      <source src="/assets/img/output.webm" type="video/webm"></source>
-      <source src="/assets/img/output.mp4" type="video/mp4"></source>
-    </video>
-
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920px" height="1080px" preserveAspectRatio="xMidYMid slice">
+  <svg style="position: absolute; top:0; left: 0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920px" height="1080px" preserveAspectRatio="xMidYMid slice">
     <defs>
-      <style type="text/css"><![CDATA[
+      <style type="text/css">
         svg mask rect {
           fill: rgba(255, 255, 255, 1);
         }
@@ -116,14 +115,27 @@ layout: default
           -webkit-mask: url(#mask);
           mask: url(#mask);
         }
-      ]]></style>
+      </style>
       <mask id="mask" x="0" y="0" width="1920" height="1080" >
         <rect x="0" y="0" width="1920" height="1080"/>
-          <path transform="scale(0.2)translate(100,700)" d="M432.82 936.54c8.66-6.23 26.27-20.04 37.37-32.5 32.73-37.1 32.5-76.64-200.85-394.57-77.72-106.03-106.97-168.72-106.97-231 17.2-155.47 144.9-146 218.96-146 65-.8 149.36 0 215.3 0l-20.04 14.2c-38.32 26.4-65 54.18-50.9 97.78C536 275.2 611 388.67 707.12 518.67c107.4 144.9 139.5 205.55 143.56 272.7 2.15 120.8-114.16 156.14-181.2 156.28H417.66z" />
-          <circle  transform="scale(0.2)translate(100, 700)" r="171.02" cy="777.98" cx="185.56" />
-          <circle  transform="scale(0.2)translate(100, 700)" cx="825.23" cy="302.02" r="171.02" />
+          <path transform="scale(0.35)translate(100,350)" d="M432.82 936.54c8.66-6.23 26.27-20.04 37.37-32.5 32.73-37.1 32.5-76.64-200.85-394.57-77.72-106.03-106.97-168.72-106.97-231 17.2-155.47 144.9-146 218.96-146 65-.8 149.36 0 215.3 0l-20.04 14.2c-38.32 26.4-65 54.18-50.9 97.78C536 275.2 611 388.67 707.12 518.67c107.4 144.9 139.5 205.55 143.56 272.7 2.15 120.8-114.16 156.14-181.2 156.28H417.66z" />
+          <circle  transform="scale(0.35)translate(100, 350)" r="171.02" cy="777.98" cx="185.56" />
+          <circle  transform="scale(0.35)translate(100, 350)" cx="825.23" cy="302.02" r="171.02" />
       </mask>
     </defs>
     <rect x="0" y="0" width="1920" height="1080"/>
   </svg>
 </div>
+
+<script>
+  canvas = document.getElementById("sslogocanvas");
+  window.a = canvas;
+  window.b = document.getElementById("big-black-bar");;
+  window.c = canvas.getContext('2d');
+</script>
+
+<script>
+  c=window.a;c.height=c.width=w=b=255;t=r=0;G=c.getContext('2d');m=[];s=G.getImageData(0,0,w,w);p=s.data;
+  function e(){k=0;with(Math)for(j=0;j<w;j++)for(i=0;i<w;i++){y=-1+2*j/w;x=-1+2*i/w;d=sqrt(x*x+y*y);a=atan2(y,x);eval('u='+['cos(a)/d;v=sin(a)/d','cos(a+cos(3*d))/(pow(d,.2));v=sin(a+cos(3*d))/(pow(d,.2))','a*3/PI;v=2/(6*d + 3*x)','.5+.5*a/PI;v=(-.4/d)+.1*sin(8*a)','(.02*y+.03)*cos(a*3)/d;v=(.02*y+.03)*sin(a*3)/d','1/(d+0.5+0.5*sin(5*a));v=a*3/PI','.1*x/(.11+d*.5);v=.1*y/(.11+d*.5)','x/abs(y);v=1/abs(y)','.5*(a)/PI;v=sin(2*d)','(1*a/PI)+d;v=pow(d,0.1)','y*(3-sqrt(4-5*d*d))/(d*d+1);v=x*(3-sqrt(4-5*d*d))/(d*d+1)'][r%
+  11]);m[k++]=b*v&b;m[k++]=b*u&b}r++}onmouseup=e;e();setInterval("i=0;t++;c.style.width='100%';c.style.height=innerHeight+'px';for(g=0;g<w*w;g++){f=m[o=g*2]+t&b^m[o+1]+t&b;p[i++]=r&7?f:0;p[i++]=r&4?0:f;p[i++]=r&1?f:0;p[i++]=b}G.putImageData(s,0,0);",25)
+</script>
