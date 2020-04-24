@@ -1,12 +1,9 @@
-name: Build and sync to S3
+name: Build and (if master) sync to S3
 
-on:
-  push:
-    branches:
-    - master
+on: [push, pull_request]
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -22,6 +19,9 @@ jobs:
         key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-gems-
+    - uses: bahmutov/npm-install@v1
+    - name: Install purgecss
+      run: npm install purgecss
     - name: Bundle install
       run: |
         bundle config path vendor/bundle
@@ -30,6 +30,13 @@ jobs:
       run: bundle exec jekyll build
     - name: pandoc
       run: bundle exec ruby _pandoc/pandoc.rb
+    - name: purgecss 
+      run: make purge
+  deploy:
+    if: github.ref == 'master'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
     - uses: jakejarvis/s3-sync-action@master
       with:
         args: --acl public-read --follow-symlinks --delete
