@@ -6,3 +6,4 @@ _site
 
 *.tfvars
 .terraform
+node_modules
