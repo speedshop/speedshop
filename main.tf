@@ -1,5 +1,5 @@
 locals {
-  infra_name = "speedshop-dotcom"
+  infra_name = "www.speedshop.co"
   region     = "us-east-1"
 }
 
@@ -42,6 +42,7 @@ resource "aws_s3_bucket" "website" {
   }
 }
 
+# Someday I will do a complete cloudflare import
 resource "cloudflare_zone" "cdn" {
   zone = "speedshop.co"
 }
