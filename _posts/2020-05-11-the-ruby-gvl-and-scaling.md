@@ -225,7 +225,7 @@ If adding threads to a CRuby process can increase latency, why is it still usefu
 
 **Adding more threads to a Ruby process helps us to improve CPU utilization at less memory cost than an entire additional process.** Adding 1 process might use 512MB of memory, but adding 1 thread will probably cause less than 64MB of additional memory usage. With 2 threads instead of 1, when the first thread releases the GVL and listens on I/O, our 2nd thread can either pick up new work to do, increasing throughput and utilization of our server.
 
-GitLab switched from Unicorn (single-thread model) to Puma (multi-thread model) and [saw a 30% decrease in memory usage across their fleet.](https://gitlab.com/gitlab-com/gl-infra/infrastructure/-/issues/7455#note_239070865). If you're memory-constrainted on your host, this allows you to run 30% more throughput for the same money. That's awesome.
+GitLab switched from Unicorn (single-thread model) to Puma (multi-thread model) and [saw a 30% decrease in memory usage across their fleet.](https://gitlab.com/gitlab-com/gl-infra/infrastructure/-/issues/7455#note_239070865) If you're memory-constrained on your host, this allows you to run 30% more throughput for the same money. That's awesome.
 
 ## The Future 
 
