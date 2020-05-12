@@ -13,7 +13,7 @@ The Global Virtual Machine Lock confuses many Rubyists. Most Rubyists I've met h
 {% sidenote "'CRuby' refers to the mainline Ruby implementation, written in C. Sometimes people call this 'MRI'." %}
 The GVL (formerly known as GIL, as you're about to learn) is a unique feature to CRuby, and doesn't exist in JRuby or TruffleRuby. 
 
-JavaScript's popular V8 virtual machine also has a VM lock? And that CPython also has a _global_ VM lock? That's three of the most popular dynamic languages in the world! VM locks in dynamic languages are very common.
+JavaScript's popular V8 virtual machine also has a VM lock. CPython also has a _global_ VM lock. That's three of the most popular dynamic languages in the world! VM locks in dynamic languages are very common.
 
 {% sidenote "Instead of removing the GVL, Ruby core has signaled that it will take an approach similar to V8 Isolates with inspiration from the Actor concurrency model (discussed at the end)." %}
 
