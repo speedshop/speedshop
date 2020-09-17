@@ -10,6 +10,13 @@ provider "aws" {
 provider "cloudflare" {}
 
 terraform {
+  required_providers {
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = ">= 1.0"
+    }
+  } 
+  
   backend "s3" {
     bucket = "speedshop-terraform"
     key    = "#{local.infra_name}-prod.tfstate"
