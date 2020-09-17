@@ -15,8 +15,11 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = ">= 1.0"
     }
-  } 
-  
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+
   backend "s3" {
     bucket = "speedshop-terraform"
     key    = "#{local.infra_name}-prod.tfstate"
