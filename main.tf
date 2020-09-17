@@ -41,7 +41,6 @@ data "aws_iam_policy_document" "bucket_policy" {
 
 resource "aws_s3_bucket" "website" {
   bucket        = local.infra_name
-  region        = local.region
   acl           = "public-read"
   policy        = data.aws_iam_policy_document.bucket_policy.json
   force_destroy = true
