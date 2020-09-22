@@ -11,18 +11,15 @@ window.signup = function() {
     el = document.getElementById("innocuous");
     el.style.display = "block";
   }
-
-  el = document.getElementById("innocuous-close");
-  if(el === null) {
-    return 
-  } else {
-    el.addEventListener("click", function() {
-      document.getElementById("innocuous").style.display = "none";
-      document.cookie = "nateberkopecShowSignup=true; expires=Fri, 31 Dec 9999 23:59:59 GMT";
-    });
-  }
 };
 
 signup();
 
 document.addEventListener('pjax:complete', function () {signup()});
+
+document.querySelectorAll("html")[0].addEventListener('click', function (event) {
+    if (event.target.id === "innocuous-close") {
+      document.getElementById("innocuous").style.display = "none";
+      document.cookie = "nateberkopecShowSignup=true; expires=Fri, 31 Dec 9999 23:59:59 GMT;SameSite=Strict";
+    }
+  });
