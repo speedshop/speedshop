@@ -1,6 +1,9 @@
-name: Build and (if master) sync to S3
+name: Build and sync to S3
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
