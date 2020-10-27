@@ -1,2 +1,4 @@
 User-agent: *
-Allow: /
+Disallow: /rails-performance-workshop-beta.html
+Disallow: /rpw_checkout_success.html 
+Disallow: /rpw_contact_success.html

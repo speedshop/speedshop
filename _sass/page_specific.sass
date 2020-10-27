@@ -15,3 +15,36 @@ main
   background-color: #DDD
   margin: 2em -100em
   padding: 2em 100em
+
+// Simple button spinner 
+
+button 
+  &.loading 
+    background-color: #CCC 
+    padding-right: 40px
+    border-color: #CCC
+    &:after 
+      content: "" 
+      position: relative
+      display: inline-block
+      border-radius: 100% 
+      left: 20px 
+      top: 3px 
+      width: 0px 
+      height: 0px 
+      margin-top: -2px 
+      border: 2px solid rgba(255,255,255,0.5) 
+      border-left-color: #FFF 
+      border-top-color: #FFF 
+      animation: spin .6s infinite linear, grow .3s forwards ease-out 
+
+@keyframes spin 
+  to 
+    transform: rotate(359deg) 
+
+@keyframes grow 
+  to 
+    width: 14px 
+    height: 14px 
+    margin-top: -8px 
+    right: 13px 
