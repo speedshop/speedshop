@@ -197,7 +197,7 @@ summary: "Make your Rails application faster and more scalable with this interac
         </div>
         <div class="row">
           <div class="column">
-            <form action="http://rpw-licensor.speedshop.co/rpw-contact" method="POST" class="contact-form">
+            <form action="https://rpw-licensor.speedshop.co/rpw-contact" method="POST" class="contact-form">
               <label for="quantity">Name</label>
               <input type="text" id="name" name="name" required size="20" placeholder="Ada Lovelace">
               <label for="quantity">Email Address</label>
@@ -227,7 +227,7 @@ summary: "Make your Rails application faster and more scalable with this interac
               checkoutButton.addEventListener('click', function() {
                 checkoutButton.className = checkoutButton.className + ' loading';
                 // fetch('https://checkout.speedshop.co/rpw-checkout', {
-                fetch('http://localhost:5000/rpw-checkout?quantity=' + quantity, {
+                fetch('https://rpw-licensor.speedshop.co/rpw-checkout?quantity=' + quantity, {
                   method: 'POST'
                 })
                 .then(function(response) {
