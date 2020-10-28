@@ -222,12 +222,11 @@ summary: "Make your Rails application faster and more scalable with this interac
             <script type="text/javascript">
               var stripe = Stripe('pk_test_ysWQBjecUuQdXa8TNIYBkDxf');
               var checkoutButton = document.getElementById('checkout-button');
-              var quantity = document.getElementById('quantity').value;
 
               checkoutButton.addEventListener('click', function() {
                 checkoutButton.className = checkoutButton.className + ' loading';
                 // fetch('https://checkout.speedshop.co/rpw-checkout', {
-                fetch('https://rpw-licensor.speedshop.co/rpw-checkout?quantity=' + quantity, {
+                fetch('https://rpw-licensor.speedshop.co/rpw-checkout?quantity=' + document.getElementById('quantity').value, {
                   method: 'POST'
                 })
                 .then(function(response) {
