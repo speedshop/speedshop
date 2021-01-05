@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Secrets to Speedy Ruby Apps On Heroku"
-date:   2015-07-22 11:00:00
+title:  "Make your Ruby or Rails App Faster on Heroku"
+date:   2021-01-04 12:00:00
 summary: Ruby apps in the memory-restrictive and randomly-routed Heroku environment don't have to be slow. Achieve <100ms server response times with the tips laid out below.
 readtime: 3706 words/18 minutes
 wordcount: 3706

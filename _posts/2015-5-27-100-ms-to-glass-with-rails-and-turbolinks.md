@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "100ms to Glass with Rails and Turbolinks"
-date:   2015-05-27 12:00:00
+title:  "How To Use Turbolinks to Make Fast Rails Apps"
+date:   2021-01-04 12:00:00
 summary: Is Rails dead? Can the old Ruby web framework no longer keep up in this age of "native-like" performance? Turbolinks provides one solution.
 readtime: 3030 words/15 minutes
 wordcount: 3030
@@ -11,7 +11,7 @@ A perceived benefit of a client-side JS framework is the responsiveness of its i
 
 Is Rails dead? Can the old Ruby web framework no longer keep up in this age of "native-like" performance?
 
-A few days ago (May 21, 2015), Shopify IPO'd. Shopify (an e-commerce provider that lets you set up your own online shop) had [over 150,000 customers](http://www.sec.gov/Archives/edgar/data/1594805/000119312515129273/d863202df1.htm) and is a [Top 1000](http://www.alexa.com/siteinfo/shopify.com) site on Alexa.{% marginnote_lazy https://i.imgur.com/F49D9La.png %} In addition, Shopify hosts their customers' sites, with an average of 100ms response times for over 300 million monthly page views. Now that's Web Scale. And they did it all on Rails.
+Shopify (an e-commerce provider that lets you set up your own online shop) has [over 150,000 customers](http://www.sec.gov/Archives/edgar/data/1594805/000119312515129273/d863202df1.htm) and is a [Top 1000](http://www.alexa.com/siteinfo/shopify.com) site on Alexa.{% marginnote_lazy https://i.imgur.com/F49D9La.png %} In addition, Shopify hosts their customers' sites, with an average of 100ms response times for over 300 million monthly page views. Now that's Web Scale. And they did it all on Rails.
 
 They're not the only ones doing huge deployments with blazing fast response times on Rails. [DHH claims Basecamp's average server response time is 27ms](https://www.youtube.com/watch?v=yhseQP52yIY). [Github averages about 60ms](https://status.github.com/).
 
@@ -86,12 +86,6 @@ When you're aiming for a sub-100ms-to-glass Turbolinks app, every ms counts. So 
 
 This bad boy shows you, in flamegraph format, exactly where each of your 100ms goes. Read up on Google's documentation on exactly how to use this tool, and exactly what means what, but it'll give you a great idea of which parts of your Javascript are slowing down your page.
 
-### Rethinking Turbolinks 3's progress bar
-
-Turbolinks 3 introduces a progress bar to the top of the page (you can see it in action at this demo here). When building my TodoMVC implementation, I noticed that this progress bar actually *increased* perceived load times in sub-200 ms interactions. I'm not sure what it is about it - perhaps my brain is just wired to think that an interaction is slow whenever it sees a progress bar or a spinner.
-
-[Turbolinks exposes a public API for the progress bar](https://github.com/rails/turbolinks#progress-bar) - hopefully, someone will hack together a way to hide the progress bar until a preset amount of time has passed - say, 250ms.
-
 ### Non-RESTful redirects
 
 100ms-to-glass is *not* a lot of time. In most cases, you may not even have time to redirect. Consider this typical bit of Rails controller logic:
@@ -109,7 +103,7 @@ Unfortunately, you've just doubled the number of round-trips to the server - one
 
 Partials in Rails have always been slow-ish. They're fast enough if you're aiming for 300ms responses, but in the 100ms-to-glass world, we can't really afford any less than a 50ms server response time. Be wary of using partials, cache them if you can, and always benchmark when adding a new partial.
 
-### Response time goals and Apache bench
+### Response time goals and Apache Bench
 
 Another key tool for keeping your Turbolinks-enabled Rails app below 100ms-to-glass is to keep your server response times ridiculously fast - 50ms should be your goal. Apache Bench{% marginnote_lazy https://i.imgur.com/nsSgaBj.png %} is a great tool for doing this, but siege is another popular tool that does the same thing - slams your web server as fast as it can to get an idea of your max requests/second.
 
@@ -117,37 +111,21 @@ Be sure to load up your rails server in production mode when benchmarking with t
 
 In addition, be sure to test with production (or extremely production-like) data. If queries return 100 rows in development but return 1000 rows in production, you're going to see very different performance. We want our development environment to be as similar to production as possible.
 
-### Gzip all the things!
-
-Slap Rack::Deflater [on the very tippy-top of your middleware stack](https://github.com/nateberkopec/todomvc-turbolinks/blob/master/config.ru) to gzip any asset responses, along with any HTML.
-
-### Things that don't work
-
-I tried using JRuby, and the speed impact was negligible. Even when testing with a big concurrent load, multi-process MRI servers like Unicorn or Puma performed better. Your app may be different, but don't expect a huge speed boost here.
-
-Turbo-React is an interesting project. It combines Turbolinks with React's virtual DOM and dom-diffing tools, meaning that Turbolinks does the least amount of work possible when changing the current document to the new one that came down the wire (by default, Turbolinks just swaps out the entire document). I gave it a shot, though, and didn't notice any meaningful speed differences. It does, however, let you do cool things like CSS transitions.
-
-I noticed I was spending 30-40ms in scripting on each Turbolinks request. As a hunch, I tried swapping JQuery out with Zepto, to see if my choice of framework was making a difference. No luck. Zepto's just as slow as JQuery when working with Turbolinks. Also unfortunately, I can't forgo JQuery either, since to stay under 100ms I'm forced to use remote forms, which requires a javascript framework of some kind (either JQuery to use jquery-ujs, or zepto to use rails-behaviors).
-
 ### Common mistakes
 
 * **Be absolutely certain that a page load that you *think* is Turbolinks enabled, is actually Turbolinks enabled.** Click a link with the Developer console open - if the console says something like "Navigated to http://www.whatever.com/foo", that link wasn't Turbolinks-enabled.
-* **Don't render erb responses that do things like append items to the current page.** Instead, a Turbolinks-enabled action should return a full HTML page. Let Turbolinks do the work of swapping out the document, instead of writing your own, manual "$("#todo-list").append("<%= j(render(@todo)) %>");" calls. For an example, [check out my TodoMVC implementation](https://github.com/nateberkopec/todomvc-turbolinks/blob/master/app/views/todos/index.html.erb), which only uses an index template. Keep state (elements having certain classes, for example) in the template, rather than allowing too much DOM state to leak into your Javascript. It's just unnecessary work that Turbolinks frees us from doing.
+* **Don't render responses that do things like append items to the current page.** Instead, a Turbolinks-enabled action should return a full HTML page. Let Turbolinks do the work of swapping out the document, instead of writing your own, manual "$("#todo-list").append("<%= j(render(@todo)) %>");" calls. For an example, [check out my TodoMVC implementation](https://github.com/nateberkopec/todomvc-turbolinks/blob/master/app/views/todos/index.html.erb), which only uses an index template. Keep state (elements having certain classes, for example) in the template, rather than allowing too much DOM state to leak into your Javascript. It's just unnecessary work that Turbolinks frees us from doing.
 
 ### Limitations and caveats
 
-I'm not sure how Turbolinks will fare in more complex UI interactions - the TodoMVC example is very simple. Caching *will* be required when scaling, which some people think is too complex. I think that with smart key-based expiration, and completely avoiding manual cache expiration or "sweepers", it isn't too bad.
+Turbolinks may not fare well in more complex UI interactions - the TodoMVC example is very simple. Caching *will* be required when scaling, which some people think is too complex. I think that with smart key-based expiration, and completely avoiding manual cache expiration or "sweepers", it isn't too bad.
 
 Turbolinks doesn't play great with client side JS frameworks, due to the transition cache and the lack of the `load` event. Be wary of multiple instances of your app being generated, and be careful of Turbolinks' transition cache.
 
 Integration testing is still a pain. Capybara and selenium-webdriver, though widely used, remain difficult to configure properly and, seemingly no matter what, are not deterministic and occasionally experience random failures.
 
-### On mobile
-
-First, if you're interested in fast mobile sites, Ilya Grigorik's 1000ms to glass talk is required viewing. Ilya reveals that for mobile, you're going to be spending at least 300-700ms just waiting for the network. That means that, unfortunately, a Turbolinks enabled approach cannot get you to a 0.1ms instantaneous UI on mobile.
-
-And, this goes without saying, but "view-over-the-wire" applications don't work offline, while client side JS applications (in theory) can.
-
 ### Conclusion: "View-over-the-wire" is better than it got credit for
 
 Overall, I quite enjoyed the Turbolinks development experience, and mostly, as a user, I'm extremely impressed with the user experience it produces. Getting serious about Rails performance and using a "view-over-the-wire" technology means that Rails apps will deliver top-shelf experiences on par with any clientside framework.
+
+UPdate

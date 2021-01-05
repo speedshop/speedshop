@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Speed Up Your Rails App by 66% - The Complete Guide to Rails Caching"
-date:   2015-07-15 12:00:00
+title:  "The Complete Guide to Rails Caching"
+date:   2021-01-04 12:00:00
 summary: Caching in a Rails app is a little bit like that one friend you sometimes have around for dinner, but should really have around more often.
 readtime: 5989 words/30 minutes
 wordcount: 5989
@@ -15,7 +15,7 @@ A quick note on definitions - this post will only cover "application"-layer cach
 
 Developers, by our nature, are very different from end-users. We understand a lot about what happens behind the scenes in software and web applications. We know that when a typical webpage loads, a lot of code is run, database queries executed, and sometimes services pinged over HTTP. That takes time. We're used to the idea that when you interact with a computer, it takes a little while for the computer to come back with an answer.
 
-End-users are completely different. Your web application is a magical box. End-users have no idea what happens inside of that box.{% marginnote_lazy https://i.imgur.com/X17puIB.gif|Developer perception of end-users.|true %} Especially these days, **end-users expect near-instantaneous response from our magical boxes**. Most end-users wanted whatever they're trying to get out of your web-app *yesterday*.
+End-users are completely different. Your web application is a magical box. End-users have no idea what happens inside of that box.{% marginnote_lazy https://i.imgur.com/X17puIB.gif | Developer perception of end-users.|true %} Especially these days, **end-users expect near-instantaneous response from our magical boxes**. Most end-users wanted whatever they're trying to get out of your web-app *yesterday*.
 
 This rings of a truism. Yet, we never set hard performance requirements in our user stories and product specifications. Even though server response time is easy to measure and target, and we know users want fast webpages, we fail to ever say for a particular site or feature: "This page should return a response within 100ms." As a result, performance often gets thrown to the wayside in favor of the next user story, the next great big feature. Performance debt, like technical debt, mounts quickly. **Performance never really becomes a priority until the app is basically in flames** every time someone makes a new request.
 
@@ -25,7 +25,7 @@ To make matters worse, **caching best practices seem to be frequently changing**
 
 ### Benefits of Caching
 
-So why cache? The answer is simple. Speed. With Ruby, we don't get speed for free because our language isn't very fast to begin with {% marginnote_lazy https://i.imgur.com/UDkHBEc.png|Ruby performance in the <a href='http://benchmarksgame.alioth.debian.org/u32/compare.php?lang=yarv&lang2=v8'>Benchmarks Game</a> vs Javascript. %} . We have to get speed from *executing less Ruby on each request*. The easiest way to do that is with caching. Do the work once, cache the result, serve the cached result in the future.
+So why cache? The answer is simple. Speed. With Ruby, we don't get speed for free because our language isn't very fast to begin with {% marginnote_lazy https://i.imgur.com/UDkHBEc.png|Ruby performance in the Benchmarks Game vs Javascript. %} . We have to get speed from *executing less Ruby on each request*. The easiest way to do that is with caching. Do the work once, cache the result, serve the cached result in the future.
 
 But how fast do we need to be, really?
 
@@ -101,10 +101,10 @@ This is where benchmarking tools like `wrk` and `Apache Bench` come in. `Apache 
 Start your server in production mode, as described earlier. Then fire up Apache Bench with the following settings:
 
 ```
-ab -t 10 -c 10 http://localhost:3000/
+ab -t 10 http://localhost:3000/
 ```
 
-Obviously, you'll need to change that URL out as appropriate. The -t option controls how long we're going to benchmark for (in seconds), and -c controls the number of requests that we'll try at the same time. Set the -c option based on your production load - if you have more than an average of 1 request per second (per server), it would be good to increase the -c option approximately according to the formula of (Production requests per minute / production servers or dynes) * 2. I usually test with at least -c 2 to flush out any weird threading/concurrency errors I might have accidentally committed.
+Obviously, you'll need to change that URL out as appropriate. The -t option controls how long we're going to benchmark for (in seconds).
 
 Here's some example output from Apache Bench, abridged for clarity:
 
