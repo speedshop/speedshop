@@ -1,7 +1,6 @@
 ---
 layout: post
 title:  "How To Use Turbolinks to Make Fast Rails Apps"
-date:   2021-01-04 12:00:00
 summary: Is Rails dead? Can the old Ruby web framework no longer keep up in this age of "native-like" performance? Turbolinks provides one solution.
 readtime: 3030 words/15 minutes
 wordcount: 3030

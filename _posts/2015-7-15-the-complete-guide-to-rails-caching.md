@@ -1,7 +1,6 @@
 ---
 layout: post
 title:  "The Complete Guide to Rails Caching"
-date:   2021-01-04 12:00:00
 summary: Caching in a Rails app is a little bit like that one friend you sometimes have around for dinner, but should really have around more often.
 readtime: 5989 words/30 minutes
 wordcount: 5989
