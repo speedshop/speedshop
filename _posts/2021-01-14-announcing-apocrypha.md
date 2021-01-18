@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Annoucing the Rails Performance Apocrypha"
+title: "Announcing the Rails Performance Apocrypha"
 date: 2021-01-14 0:00:00
 summary: "I've written a new book, compiled from 4 years of my email newsletter."
 readtime: 499 words / 3 minutes
