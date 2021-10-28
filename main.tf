@@ -1,3 +1,22 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
+    }
+    cloudflare = {
+      source = "cloudflare/cloudflare"
+      version = "~> 3.0"
+    }
+  }
+
+  backend "s3" {
+    bucket = "speedshop-terraform"
+    key    = "#{local.infra_name}-prod.tfstate"
+    region = "us-east-1"
+  }
+}
+
 locals {
   infra_name = "www.speedshop.co"
   region     = "us-east-1"
@@ -8,24 +27,6 @@ provider "aws" {
 }
 
 provider "cloudflare" {}
-
-terraform {
-  required_providers {
-    cloudflare = {
-      source  = "cloudflare/cloudflare"
-      version = ">= 1.0"
-    }
-    aws = {
-      source = "hashicorp/aws"
-    }
-  }
-
-  backend "s3" {
-    bucket = "speedshop-terraform"
-    key    = "#{local.infra_name}-prod.tfstate"
-    region = "us-east-1"
-  }
-}
 
 data "aws_iam_policy_document" "bucket_policy" {
   statement {

@@ -40,5 +40,6 @@ in mkShell {
     gcc
     bundix
     h2o
+    terraform
   ];
 }
