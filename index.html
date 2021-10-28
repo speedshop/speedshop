@@ -26,11 +26,19 @@ layout: default
           an in-depth 370 page reference manual on making Rails apps faster.
         </li>
         <li>
+          <a href="https://nateberk.gumroad.com/l/sidekiqinpractice"><b>Sidekiq in Practice</b></a>,
+          a workshop for teaching you how to scale Sidekiq from 0 to 10,000 jobs per second.
+        </li>
+        <li>
+          <a href="https://nateberk.gumroad.com/l/apocrypha"><b>The Ruby on Rails Performance Apocrypha</b></a>,
+          a short book about the ins and outs of scaling Rails
+        </li>
+        <li>
           <a href="/blog/"><b>Speedshop Blog</b></a>,
           the number one Ruby on Rails performance blog on the 'net.
         </li>
         <li>
-          <a href="https://eepurl.com/cr4fDj"><b>The Speedshop Newsletter</b></a>, 
+          <a href="https://eepurl.com/cr4fDj"><b>The Speedshop Newsletter</b></a>,
           a weekly email newsletter that talks about issues surrounding optimizing and scaling Ruby web applications.
         </li>
       </ul>
@@ -135,7 +143,7 @@ layout: default
   window.a = canvas;
   window.b = document.getElementById("big-black-bar");;
   window.c = canvas.getContext('2d');
-  
+
   c=window.a;c.height=c.width=w=b=255;t=r=0;G=c.getContext('2d');m=[];s=G.getImageData(0,0,w,w);p=s.data;
   function e(){k=0;with(Math)for(j=0;j<w;j++)for(i=0;i<w;i++){y=-1+2*j/w;x=-1+2*i/w;d=sqrt(x*x+y*y);a=atan2(y,x);eval('u='+['cos(a)/d;v=sin(a)/d','cos(a+cos(3*d))/(pow(d,.2));v=sin(a+cos(3*d))/(pow(d,.2))','a*3/PI;v=2/(6*d + 3*x)','.5+.5*a/PI;v=(-.4/d)+.1*sin(8*a)','(.02*y+.03)*cos(a*3)/d;v=(.02*y+.03)*sin(a*3)/d','1/(d+0.5+0.5*sin(5*a));v=a*3/PI','.1*x/(.11+d*.5);v=.1*y/(.11+d*.5)','x/abs(y);v=1/abs(y)','.5*(a)/PI;v=sin(2*d)','(1*a/PI)+d;v=pow(d,0.1)','y*(3-sqrt(4-5*d*d))/(d*d+1);v=x*(3-sqrt(4-5*d*d))/(d*d+1)'][r%
   11]);m[k++]=b*v&b;m[k++]=b*u&b}r++}onmouseup=e;e();setInterval("i=0;t++;c.style.width='100%';c.style.height=innerHeight+'px';for(g=0;g<w*w;g++){f=m[o=g*2]+t&b^m[o+1]+t&b;p[i++]=r&7?f:0;p[i++]=r&4?0:f;p[i++]=r&1?f:0;p[i++]=b}G.putImageData(s,0,0);",25)
