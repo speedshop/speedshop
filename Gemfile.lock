@@ -30,6 +30,7 @@ GEM
       http_parser.rb (~> 0.6.0)
     eventmachine (1.2.7)
     ffi (1.13.1)
+    foreman (0.87.2)
     forwardable-extended (2.6.0)
     http_parser.rb (0.6.0)
     i18n (1.8.5)
@@ -68,9 +69,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  foreman
   jekyll!
   jekyll-sitemap
   sassc (>= 2.3.0)
 
 BUNDLED WITH
-   2.1.2
+   2.2.22
