@@ -10,7 +10,7 @@ jobs:
     - uses: ruby/setup-ruby@master
       with:
         ruby-version: '3.1'
-    - uses: r-lib/actions/setup-pandoc@master
+    - uses: r-lib/actions/setup-pandoc@v2
       with:
         pandoc-version: '2.9.2.1' # The pandoc version to download (if necessary) and use.
     - uses: actions/cache@master
