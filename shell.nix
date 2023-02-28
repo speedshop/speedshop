@@ -1,11 +1,6 @@
 with import <nixpkgs> {};
 
 let
-  gems = bundlerEnv {
-    name = "gems-speedshopweb";
-    gemdir = ./.;
-    ruby = ruby_3_0;
-  };
   h2o = stdenv.mkDerivation rec {
     pname   = "h2o";
     version = "2.3.0-beta2";
@@ -32,14 +27,13 @@ let
   };
 
 in mkShell {
-  buildInputs = [
-    gems
-    gems.wrappedRuby
-    ruby_3_0
+  packages = [
+    ruby_3_1
     git
     gcc
     bundix
     h2o
     terraform
+    openssl
   ];
 }

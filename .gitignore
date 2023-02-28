@@ -3,7 +3,7 @@ _site
 .jekyll-metadata
 .asset-cache
 .jekyll-cache
-
+vendor/
 *.tfvars
 .terraform
 node_modules
