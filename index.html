@@ -114,9 +114,9 @@ layout: default
 <div id="big-black-bar" class="visible-desktop">
   <canvas height=1000px width=1000px id="sslogocanvas" style="position: relative"></canvas>
 
-  <svg style="position: absolute; top:0; left: 0"
-          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"
-          width="2800px" height="1327px" preserveAspectRatio="xMidYMid slice">
+  <svg style="position: absolute; top:0; left: 0; overflow: visible"
+          xmlns="http://www.w3.org/2000/svg"
+           preserveAspectRatio="xMidYMid slice">
     <defs>
       <style type="text/css">
         svg mask rect {
@@ -130,13 +130,13 @@ layout: default
         }
       </style>
       <mask id="mask" x="0" y="0" width="1920" height="1080" >
-        <rect x="0" y="0" width="1920" height="1080"/>
+        <rect x="0" y="0" width="9999" height="9999"/>
           <path transform="scale(0.35)translate(100,450)" d="M432.82 936.54c8.66-6.23 26.27-20.04 37.37-32.5 32.73-37.1 32.5-76.64-200.85-394.57-77.72-106.03-106.97-168.72-106.97-231 17.2-155.47 144.9-146 218.96-146 65-.8 149.36 0 215.3 0l-20.04 14.2c-38.32 26.4-65 54.18-50.9 97.78C536 275.2 611 388.67 707.12 518.67c107.4 144.9 139.5 205.55 143.56 272.7 2.15 120.8-114.16 156.14-181.2 156.28H417.66z" />
           <circle  transform="scale(0.35)translate(100, 450)" r="171.02" cy="777.98" cx="185.56" />
           <circle  transform="scale(0.35)translate(100, 450)" cx="825.23" cy="302.02" r="171.02" />
       </mask>
     </defs>
-    <rect x="0" y="0" width="1920" height="1080"/>
+    <rect x="0" y="0" width="9999" height="9999"/>
   </svg>
 </div>
 
