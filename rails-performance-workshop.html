@@ -235,39 +235,11 @@ summary: "Make your Rails application faster and more scalable with this interac
             <div class="column column-50 column-offset-25">
               <label for="quantity">Number of participants:</label>
               <input type="text" id="quantity" name="quantity" required maxlength="3" size="5" value="1">
-              <button id="checkout-button" class="button button-workshop">
+              <a href="https://buy.stripe.com/00gg0Q2WS5M77E48ww" id="checkout-button" class="button button-workshop">
                 Buy Now 
               </a>
             </div>
           </div>
-          <script type="text/javascript">
-            var stripe = Stripe('pk_live_nIACLPSsjmzZ8Zlo5r2A1cD3');
-            var checkoutButton = document.getElementById('checkout-button');
-
-            checkoutButton.addEventListener('click', function() {
-              checkoutButton.className = checkoutButton.className + ' loading';
-              fetch('https://rpw-licensor.speedshop.co/rpw-checkout?quantity=' + document.getElementById('quantity').value, {
-                method: 'POST'
-              })
-              .then(function(response) {
-                return response.json();
-              })
-              .then(function(session) {
-                return stripe.redirectToCheckout({ sessionId: session.id });
-              })
-              .then(function(result) {
-                // If `redirectToCheckout` fails due to a browser or network
-                // error, you should display the localized error message to your
-                // customer using `error.message`.
-                if (result.error) {
-                  alert(result.error.message);
-                }
-              })
-              .catch(function(error) {
-                console.error('Error:', error);
-              });
-            });
-          </script>
           <div class="row">
             <div class="column">
               <h3>Add-Ons for Large Teams</h3>
