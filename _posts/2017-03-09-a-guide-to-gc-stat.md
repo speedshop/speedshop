@@ -120,7 +120,7 @@ ObjectSpace.define_finalizer(self, self.class.method(:finalize).to_proc)
 
 `heap_marked_slots` are pretty much the count of *old objects* (objects that have survived more than 3 GC cycles) plus *write barrier unprotected objects*, which we're going to get to a minute.
 
-As for practical use of the slot counts in `GC.stat`, I'd suggest monitoring `heap_free_slots` if you're having memory bloat issues. Large numbers of free slots (like more than 300,000) usually indicates that you have a few controller actions which are allocating large numbers of objects and then freeing them, which can permanently bloat the size of your Ruby process. For more about fixing that, [check out my Rubyconf talk of memory issues in Ruby.](http://confreaks.tv/videos/rubyconf2016-halve-your-memory-usage-with-these-12-weird-tricks)
+As for practical use of the slot counts in `GC.stat`, I'd suggest monitoring `heap_free_slots` if you're having memory bloat issues. Large numbers of free slots (like more than 300,000) usually indicates that you have a few controller actions which are allocating large numbers of objects and then freeing them, which can permanently bloat the size of your Ruby process. For more about fixing that, [check out my Rubyconf talk of memory issues in Ruby.](https://www.youtube.com/watch?v=kZcqyuPeDao)
 
 {% marginnote_lazy tales-from-the-crypt.jpg|WELCOME TO THE TOMB PAGES|true %}
 Now we've got `tomb_pages` and `eden_pages`. Eden pages are heap pages which contain *at least one* live object in them. Tomb pages *contain no live objects*, and so have completely free slots. The Ruby runtime can *only release tomb pages back to the operating system*, eden pages can never be freed.
