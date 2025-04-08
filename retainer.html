@@ -8,7 +8,96 @@ summary: "Would you like a staff-level Ruby performance engineer on your team? L
 
 <div class="container">
   <div class="row" style="margin-top: 3rem">
-    <div class="column" style="text-align: center">
+    <style>
+      .hero-container {
+        position: relative;
+        overflow: hidden;
+        min-height: 400px;
+      }
+      #viz {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        padding: 4rem;
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 8px;
+        margin: 2rem auto;
+        max-width: 800px;
+        text-align: center;
+        z-index: 99;
+        min-height: 400px;
+      }
+    </style>
+
+    <div id="viz">
+      <canvas id="demo" style="width: 100%; height: 400px; background: #fff;"></canvas>
+      <script>
+      (() => {
+          const c = document.getElementById('demo');
+          const x = c.getContext('2d');
+          c.width = c.offsetWidth;
+          c.height = c.offsetHeight;
+          let t = 0;
+
+          function draw() {
+              t += 0.001; // Reduced from 0.01 to 0.001 (10x slower)
+              x.fillStyle = "#fff";
+              x.fillRect(0, 0, c.width, c.height);
+
+              const w = c.width,
+                  h = c.height;
+              const cx = w / 2,
+                  cy = h / 2;
+
+              // 3D rotation matrices
+              const s = Math.sin(t),
+                  co = Math.cos(t);
+              const s2 = Math.sin(t * 0.7),
+                  co2 = Math.cos(t * 0.7);
+
+              for (let i = 0; i < 5000; i++) {
+                  let px = (i % 15) * 60 - 450;
+                  let py = Math.floor(i / 15) % 15 * 60 - 450;
+                  let pz = Math.floor(i / 225) * 40 - 500;
+
+                  // 3D rotation
+                  let rx = px * co - pz * s;
+                  let ry = py * co2 - (px * s + pz * co) * s2;
+                  let rz = (px * s + pz * co) * co2 + py * s2;
+
+                  // Perspective projection
+                  let d = 600 / (rz + 600);
+                  let x1 = cx + rx * d;
+                  let y1 = cy + ry * d;
+
+                  // Fractal pattern based on coordinates
+                  if ((Math.floor(px / 20) & Math.floor(py / 20) & Math.floor(pz / 20)) === 0) {
+                      const size = 2 + 3 * d;
+                      x.fillStyle = `rgba(0,0,0,${0.3*d})`;
+                      x.fillRect(x1 - size / 2, y1 - size / 2, size, size);
+                  }
+              }
+
+              requestAnimationFrame(draw);
+          }
+
+          window.addEventListener('resize', () => {
+              c.width = c.offsetWidth;
+              c.height = c.offsetHeight;
+          });
+
+          draw();
+      })();
+      </script>
+    </div>
+    <div class="hero-content">
       <img src="/assets/icons/speedshop_s.svg" >
       <h2>
         Performance monitoring, roadmapping, and support.<br>100% managed by Speedshop.
@@ -22,7 +111,7 @@ summary: "Would you like a staff-level Ruby performance engineer on your team? L
         Do you ever stare at your APM dashboard and wonder: what the hell did I install this for? You don't understand 90% of the numbers, and if you were asked to find important metrics such as time spent waiting on GC, time spent waiting on I/O, the 95th percentile latency of your external services, or others, you wouldn't have any idea where to even start.
       </p>
 
-      <h3>Does it feel like you don't know where to start?</h3>
+      <h3>Slow site, but you don't know where to start?</h3>
 
       <p>
         You know you want to improve the performance of your Ruby web application. Perhaps <b>customers are complaining, or churning out</b> because they feel like they're "too big" for your platform these days. You've got a solid product engineering team, but maybe you don't feel like your operational chops are quite there yet. In any case, you'd rather that your current engineers focus on delivering features, and only spend the minimal amount of time on perf work required to put out the fires and move on.
@@ -42,6 +131,8 @@ summary: "Would you like a staff-level Ruby performance engineer on your team? L
         From 2022 to 2024, <a href="https://medium.com/gusto-engineering/how-we-made-gusto-page-loads-40-faster-245cea3d090e">Speedshop was able to reduce page load times at Gusto by over 40% across the entire application.</a> That's a massive improvement for a multi-billion dollar business with hundreds of Rails engineers. For businesses of any size, we can take the relevant parts of that proven process and bring it to your organization.
       </p>
 
+      <p>A dozen businesses have already joined this program since it's creation in 2024, and seen similar results. We'll work with you to identify what key metrics are important to your business, and then make that our goal to improve over the 6 month contract period.</p>
+
       <p>There are three critical components to any successful performance effort:</p>
 
       <ol>
@@ -50,7 +141,7 @@ summary: "Would you like a staff-level Ruby performance engineer on your team? L
         <li><b>Clear technical direction.</b> Metrics are good, but you need to turn them into concrete work: stories, tickets, or whatever your existing system is, we'll turn performance metrics into work that needs to be done, and provide context on priority and difficulty of implentation.</li>
       </ol>
 
-      <p><b>This service provides all three.</b></p>
+      <p><b>This service provides all three.</b> And, it's all customized to your specific situation. Scalability got you down but page latency looks ok? Sounds good, we'll focus on that. Sidekiq a dumpster fire but the web process looking fine? Let's fix your background jobs!</p>
 
       <h3>What does the service entail?</h3>
 
@@ -70,10 +161,7 @@ summary: "Would you like a staff-level Ruby performance engineer on your team? L
         <li>Setup of <b>automated alerts and dashboards.</b></li>
         <li><b>Monthly reporting</b> with comments from Nate.</li>
         <li>
-            Performance <b>fixes for small issues.</b>
-            This covers things that would take us
-            a day of work or less, like fixing a particular N+1. Larger projects can be
-            done on an hourly basis, beyond the retainer fee.
+          <b>Biweekly office hours</b> for synchronous discussion with Nate.
         </li>
         <li>
             <b>Unlimited pull request review</b> for perf-related work.
@@ -97,7 +185,7 @@ summary: "Would you like a staff-level Ruby performance engineer on your team? L
       <h3>Who's this?</h3>
       <div class="row">
         <div class="column column-75">
-          <p>My name is Nate Berkopec. I'm a software developer and author of the <a href="https://railsspeed.com">Complete Guide to Rails Performance</a>. I've previously worked for people like Gusto, Getty Images, Intercom.io, ClickFunnels and more 500Startups and YCombinator startups than I can count. I was on Shark Tank once.</p>
+          <p>My name is Nate Berkopec. I'm a software developer and author of the <a href="https://railsspeed.com">Complete Guide to Rails Performance</a>. I've previously worked for people like Gusto, Intercom.io, and more YCombinator startups than I can count. I was on Shark Tank once.</p>
         </div>
         <div class="column column-25">
           <img src="/assets/img/nate.jpg" height="auto">
