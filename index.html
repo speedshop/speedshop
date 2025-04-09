@@ -165,13 +165,13 @@ layout: default
       </p>
 
       <p>
-        Logo visualization by <a href="http://luis.net/">Luis Gonzalez.</a>
+        Logo visualization is a remix of work by <a href="https://www.dwitter.net/d/33522">DazeWare.</a>
       </p>
     </div>
   </div>
 </div>
 <div id="big-black-bar" class="visible-desktop">
-  <canvas height=1000px width=1000px id="sslogocanvas" style="position: relative"></canvas>
+  <canvas height="800" width="500" id="sslogocanvas" style="position: relative"></canvas>
 
   <svg style="position: absolute; top:0; left: 0; overflow: visible"
           xmlns="http://www.w3.org/2000/svg"
@@ -199,13 +199,62 @@ layout: default
   </svg>
 </div>
 
-<script async="">
-  canvas = document.getElementById("sslogocanvas");
-  window.a = canvas;
-  window.b = document.getElementById("big-black-bar");;
-  window.c = canvas.getContext('2d');
+<script type="module" async="">
+        // Set up canvas
+        const canvas = document.getElementById('sslogocanvas');
+        const x = canvas.getContext('2d');
 
-  c=window.a;c.height=c.width=w=b=255;t=r=0;G=c.getContext('2d');m=[];s=G.getImageData(0,0,w,w);p=s.data;
-  function e(){k=0;with(Math)for(j=0;j<w;j++)for(i=0;i<w;i++){y=-1+2*j/w;x=-1+2*i/w;d=sqrt(x*x+y*y);a=atan2(y,x);eval('u='+['cos(a)/d;v=sin(a)/d','cos(a+cos(3*d))/(pow(d,.2));v=sin(a+cos(3*d))/(pow(d,.2))','a*3/PI;v=2/(6*d + 3*x)','.5+.5*a/PI;v=(-.4/d)+.1*sin(8*a)','(.02*y+.03)*cos(a*3)/d;v=(.02*y+.03)*sin(a*3)/d','1/(d+0.5+0.5*sin(5*a));v=a*3/PI','.1*x/(.11+d*.5);v=.1*y/(.11+d*.5)','x/abs(y);v=1/abs(y)','.5*(a)/PI;v=sin(2*d)','(1*a/PI)+d;v=pow(d,0.1)','y*(3-sqrt(4-5*d*d))/(d*d+1);v=x*(3-sqrt(4-5*d*d))/(d*d+1)'][r%
-  11]);m[k++]=b*v&b;m[k++]=b*u&b}r++}onmouseup=e;e();setInterval("i=0;t++;c.style.width='100%';c.style.height=innerHeight+'px';for(g=0;g<w*w;g++){f=m[o=g*2]+t&b^m[o+1]+t&b;p[i++]=r&7?f:0;p[i++]=r&4?0:f;p[i++]=r&1?f:0;p[i++]=b}G.putImageData(s,0,0);",25)
-</script>
+        // Define S as Math.sin (this is what the original code uses)
+        const S = Math.sin;
+
+        // Animation variables
+        let t = 0;
+
+        // Calculate scaling factor for different screen sizes
+        const baseWidth = 700;
+        const scale = Math.min(canvas.width / baseWidth, 1);
+
+        // Animation function
+        function animate() {
+            // Fill canvas with black
+            x.fillStyle = 'black';
+            x.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Center the animation on the canvas
+            x.save();
+            x.translate((canvas.width - baseWidth * scale) / 2 - 400, 0);
+            x.scale(scale, scale);
+
+            // Now we'll modify the algorithm to draw colored particles instead of clearing rectangles
+            let k = 4736;
+            let i, j;
+
+            // Instead of using clearRect, we'll draw colored rectangles
+            for (k = 4736; j = --k >> 7;) {
+                i = k % 128;
+
+                // Calculate position using the original formula
+                const xPos = 384 + i * t - j * 8 + i * j / 9;
+                const yPos = 150 + j * 20 + 99 * S(i / 19 + j / 5 + t * 3);
+
+                // Calculate a rainbow color based on position and time
+                const hue = (i * 2 + j * 3 + t * 50) % 360;
+                x.fillStyle = `hsl(${hue}, 100%, 50%)`;
+
+                // Draw the particle
+                x.fillRect(xPos, yPos, 9, 9);
+            }
+
+            // Restore canvas state
+            x.restore();
+
+            // Increment time
+            t += 0.01;
+
+            // Continue animation
+            requestAnimationFrame(animate);
+        }
+
+        // Start animation
+        animate();
+    </script>
