@@ -138,7 +138,7 @@ This sounds good in theory, but given the tiny size of caches, I'm not sure if i
 
 Consider the alternative - bundling JQuery into your application's concatenated "application.js" file (Rails' default behavior).
 
-In the best case, the user already has the 3rd-party CDN-hosted JQuery downloaded and cached. The request to go and get your application.js doesn't take *quite* as long because it's ~20kb smaller now that it doesn't include JQuery. But remember what we said above - bandwidth is hardly the issue for most connections (saving 20kb is really saving <100ms, even on a 2MB/s DSL connection).
+In the best case, the user already has the 3rd-party CDN-hosted JQuery downloaded and cached. The request to go and get your application.js doesn't take *quite* as long because it's ~20kb smaller now that it doesn't include JQuery. But remember what we said above - bandwidth is hardly the issue for most connections (saving 20kb is really saving less than 100ms, even on a 2MB/s DSL connection).
 
 But consider the worst case scenario - the user doesn't have our 3rd-party JS downloaded already. Now, compared to the "stock" application.js scenario, you have to make an additional new connection to a new domain, likely requiring SSL/TLS negotiation. Without even downloading the script, you've been hit with 1-300ms of network latency. Bummer.
 

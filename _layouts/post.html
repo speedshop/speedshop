@@ -4,7 +4,6 @@
   {% include head.html %}
 
   <body>
-    <script>0</script>
     <main aria-label="Content">
       <div class="container">
         <div class="post">
@@ -49,23 +48,23 @@
             </div>
           </div>
 
+          {% assign counter = 0 %}
           {% for post in site.posts %}
-            {% if post.title != page.title %}
-              {% cycle 'add row' : '<div class="row">', '' %}
-                <div class="column column-50 column-collapsible">
-                  <h3>
-                    <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-                  </h3>
-                  <p>
-                    {{ post.summary | strip_html | truncatewords: 50 }}
-                  </p>
-                  <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
+            {% if post.title != page.title and counter < 4 %}
+              {% if counter == 0 or counter == 2 %}
+                <div class="row">
+              {% endif %}
+              <div class="column column-50 column-collapsible">
+                <h3><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h3>
+                <p>{{ post.summary | strip_html | truncatewords: 50 }}</p>
+                <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
+              </div>
+              {% if counter == 1 or counter == 3 %}
                 </div>
-              {% cycle 'end row' : '', '</div>' %}
+              {% endif %}
+              {% assign counter = counter | plus: 1 %}
             {% endif %}
-
           {% endfor %}
-          {% cycle 'end row' : nil, '</div>' %}
         </div>
         <div id="innocuous" class="fader-fast innocuous">
           <a id="innocuous-close" class="innocuous-close">Close</a>

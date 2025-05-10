@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Make your Ruby or Rails App Faster on Heroku"
-summary: Ruby apps in the memory-restrictive and randomly-routed Heroku environment don't have to be slow. Achieve <100ms server response times with the tips laid out below.
+summary: Ruby apps in the memory-restrictive and randomly-routed Heroku environment don't have to be slow. Achieve under 100ms server response times with the tips laid out below.
 readtime: 3706 words/18 minutes
 wordcount: 3706
 ---
@@ -114,9 +114,9 @@ Tools like [bullet](https://github.com/flyerhzm/bullet) are somewhat useful, but
 
 {% marginnote_lazy https://i.imgur.com/Y82ScT5.gif|You can do it. Make your response time dreams come true|true %}
 
-If your server response times are still greater than 250ms after you’ve knocked down the usual suspects of N+1 queries and memory usage, you need to start caching. If you’re already caching, cache more than you do already. Rails apps can be fast - Shopify, Github, and Basecamp all achieve <100ms server response times with millions more requests per hour than you have. You can do it - cache more!
+If your server response times are still greater than 250ms after you’ve knocked down the usual suspects of N+1 queries and memory usage, you need to start caching. If you’re already caching, cache more than you do already. Rails apps can be fast - Shopify, Github, and Basecamp all achieve less than 100ms server response times with millions more requests per hour than you have. You can do it - cache more!
 
-Most Ruby developers ignore the cache and then complain about how slow their site is. Ruby is a beautiful language, but it isn’t a fast one. To have a fast site, you need to minimize the amount of Ruby you run on each request and never do the same work twice. The only way to accomplish that is with smart caching. Huge Rails sites like Shopify, Github and Basecamp achieve <100ms average response times through smart use of caches. You can too!
+Most Ruby developers ignore the cache and then complain about how slow their site is. Ruby is a beautiful language, but it isn’t a fast one. To have a fast site, you need to minimize the amount of Ruby you run on each request and never do the same work twice. The only way to accomplish that is with smart caching. Huge Rails sites like Shopify, Github and Basecamp achieve less than 100ms average response times through smart use of caches. You can too!
 
 By default, Rails uses the filesystem for your cache store. That’s super slow on Heroku. Instead, use a networked cache store like Memcache or Redis. I prefer Redis - it’s under more active development and performs better on benchmarks than Memcache.
 
