@@ -10,11 +10,11 @@ image: slowappsshare.jpg
 
 {% marginnote_lazy setofskills.jpg|"What I do have is a particular set of skills, a set of skills which makes me a nightmare for slow Rails applications like you."|true %}
 
-For the last 4 years, I've been working on making Rails applications faster and more scalable. I [teach workshops](https://speedshop.co/workshops.html), I [sell a course](https://www.railsspeed.com/), and I [consult](https://speedshop.co/tune.html). If you do anything for a long period of time, you start to see patterns. I've noticed four different factors that prevent software organizations from improving the performance of their Rails applications, and I'd like to share them here.
+For the last 4 years, I've been working on making Rails applications faster and more scalable. I teach workshops, I [sell a course](https://www.railsspeed.com/), and I [consult](https://speedshop.co/tune.html). If you do anything for a long period of time, you start to see patterns. I've noticed four different factors that prevent software organizations from improving the performance of their Rails applications, and I'd like to share them here.
 
 ## Performance becomes a luxury good, especially when no one is watching
 
-Often times at my [Rails Performance Workshop](https://speedshop.co/workshops.html), I discover that an attendee simply has no visiblity into what their application is doing in production - they either don't understand their dashboards, they don't have them, or they're not allowed to even access them ("DevOps team only").
+Often times at my workshops, I discover that an attendee simply has no visiblity into what their application is doing in production - they either don't understand their dashboards, they don't have them, or they're not allowed to even access them ("DevOps team only").
 
 Performance metrics are often just not tracked. No one is aware if the app is over or underscaled, no one knows if the app is "slow" or "fast". Is it any wonder, then, that no one spends any time working on it?
 
@@ -112,8 +112,6 @@ Server response times simply make up a minority part of the actual user experien
 Not to mention: if Ruby on Rails, frequently maligned "as too slow" or "can't scale", can run several of the top 1000 websites in the world by traffic, including that little fly-by-night outfit called GitHub, then it's a fine choice for whatever your application is. Rails is just an example here - there are many comparable frameworks in comparable languages that you could substitute like Python and Django. There are some web applications for which 100 milliseconds of latency is an unacceptable eon (advertising is the most common case), but for the vast majority of us delivering HTML or JSON to a client, that's zippy quick.
 
 ## Whither Rails Today?
-
-{% marginnote_lazy course.jpg|I'm doing a [Rails Perf workshop tour](https://speedshop.co/workshops.html) this summer in the US of A.|true %}
 
 One of the questions I ask in my post-workshop survey is "How do you feel writing Ruby on Rails? Would you like to keep doing it?".
 
