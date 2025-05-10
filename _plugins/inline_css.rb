@@ -6,18 +6,18 @@ Jekyll::Hooks.register :site, :post_write do |site|
     return
   end
 
-  puts "🧹 Running PurgeCSS..."
-  purge_cmd = <<~CMD
-    npx purgecss \
-      --css #{css_path} \
-      --content #{site.dest}/**/*.html #{site.dest}/*.html \
-      -o #{File.dirname(css_path)}
-  CMD
+  # puts "🧹 Running PurgeCSS..."
+  # purge_cmd = <<~CMD
+  #   npx purgecss \
+  #     --css #{css_path} \
+  #     --content #{site.dest}/**/*.html #{site.dest}/*.html \
+  #     -o #{File.dirname(css_path)}
+  # CMD
 
-  unless system(purge_cmd)
-    puts "❌ PurgeCSS failed"
-    return
-  end
+  # unless system(purge_cmd)
+  #   puts "❌ PurgeCSS failed"
+  #   return
+  # end
 
   css = File.read(css_path)
   Dir.glob(File.join(site.dest, '**', '*.html')).each do |html_path|
