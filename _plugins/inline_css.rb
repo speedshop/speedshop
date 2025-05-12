@@ -5,13 +5,15 @@ Jekyll::Hooks.register :site, :post_write do |site|
     puts "⚠️ Could not inline CSS: CSS file not found at #{css_path}"
     return
   end
+  puts site.dest
 
   # puts "🧹 Running PurgeCSS..."
   # purge_cmd = <<~CMD
   #   npx purgecss \
   #     --css #{css_path} \
-  #     --content #{site.dest}/**/*.html #{site.dest}/*.html \
-  #     -o #{File.dirname(css_path)}
+  #     --content #{site.dest}/**/*.html \
+  #     --rejected \
+  #     -o #{css_path}
   # CMD
 
   # unless system(purge_cmd)
