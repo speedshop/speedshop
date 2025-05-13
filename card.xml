@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<businessCard>
+  <name>
+    <first>Nate</first>
+    <last>Berkopec</last>
+  </name>
+  <title>Rails Performance Consultant</title>
+  <organization>Speedshop</organization>
+  <email>nate@speedshop.co</email>
+  <website>https://speedshop.co</website>
+  <address>
+    <street>1-1-30-1 Hamatake</street>
+    <city>Chigasaki</city>
+    <postalCode>253-0021</postalCode>
+    <country>Japan</country>
+  </address>
+  <note>Helping Rails apps go fast.</note>
+</businessCard>
