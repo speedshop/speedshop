@@ -15,7 +15,7 @@ const FORMATS = {
   xml:     { key: "card.xml",   type: "application/xml" },
   yaml:    { key: "card.yaml",  type: "application/x-yaml" },
   qrcode:  { key: "card.svg",   type: "image/svg+xml" },
-  jpeg:    { key: "card.jpg",   type: "image/jpeg" },
+  jpeg:    { key: "card.jpeg",  type: "image/jpeg" },
   wav:     { key: "card.wav",   type: "audio/wav" },
   help:    { key: null,         type: "text/plain" },
   default: { key: "card.txt",   type: "text/plain" }
