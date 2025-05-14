@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <title>Nate Berkopec | Rails Performance Consultant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
   <meta property="og:title" content="Nate Berkopec | Rails Performance Consultant">
   <meta property="og:description" content="Rails applications made fast.">
@@ -23,43 +24,119 @@
   <link rel="alternate" type="application/yaml" href="https://speedshop.co/card.yaml" title="YAML format">
 
   <style>
+    :root {
+      --safe-area-inset-top: env(safe-area-inset-top, 0px);
+      --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
     body {
-      font-family: sans-serif;
-      padding: 2rem;
-      max-width: 600px;
-      margin: auto;
+      font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+      font-weight: normal;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(1rem + var(--safe-area-inset-top)) 1rem calc(1rem + var(--safe-area-inset-bottom));
       background: #f9f9f9;
       color: #222;
+      min-height: 100%;
+      margin: 0;
     }
+
     h1 {
-      font-size: 2rem;
+      font-size: clamp(1.5rem, 5vw, 2rem);
       margin-bottom: 0.5rem;
+      line-height: 1.2;
     }
+
+    p {
+      margin-bottom: 0.75rem;
+      font-size: clamp(1rem, 4vw, 1.1rem);
+      line-height: 1.4;
+    }
+
     a {
       color: #007acc;
       text-decoration: none;
+      display: inline-block;
+      word-break: break-word;
     }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
     .card {
       background: #fff;
-      padding: 1.5rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      padding: clamp(1.25rem, 5vw, 2rem);
+      border-radius: 1rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      width: min(100%, 600px);
+      margin: auto;
     }
+
     .meta {
-      font-size: 0.95rem;
+      font-size: clamp(0.9rem, 3.5vw, 1rem);
       color: #666;
+      margin-top: 1rem;
+      border-top: 1px solid #eee;
+      padding-top: 1rem;
     }
-    h1 {
-      margin: 0
+
+    @media (orientation: landscape) and (max-height: 500px) {
+      .card {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        align-items: center;
+      }
+
+      .meta {
+        grid-column: 1 / -1;
+        margin-top: 0.5rem;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #1a1a1a;
+        color: #fff;
+      }
+
+      .card {
+        background: #2d2d2d;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      }
+
+      .meta {
+        color: #aaa;
+        border-top-color: #444;
+      }
+
+      a {
+        color: #66b3ff;
+      }
     }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>Nate Berkopec</h1>
-    <p>Rails Performance Consultant</p>
-    <p><a href="https://speedshop.co">https://speedshop.co</a></p>
-    <p>Email: <a href="mailto:nate@speedshop.co">nate@speedshop.co</a></p>
+    <div>
+      <p>Rails Performance Consultant</p>
+      <p><a href="https://speedshop.co">https://speedshop.co</a></p>
+      <p><a href="mailto:nate@speedshop.co">nate@speedshop.co</a></p>
+    </div>
     <div class="meta">Rails applications made fast.</div>
   </div>
 </body>
