@@ -9,7 +9,9 @@ window.signup = function() {
 
   function showSignup(){
     el = document.getElementById("innocuous");
-    el.style.display = "block";
+    if (el) {
+      el.style.display = "block";
+    }
   }
 };
 
