@@ -13,6 +13,10 @@ jobs:
     - uses: r-lib/actions/setup-pandoc@v2
       with:
         pandoc-version: '2.9.2.1' # The pandoc version to download (if necessary) and use.
+    - name: Install PDF dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y texlive-latex-base texlive-fonts-recommended librsvg2-bin
     - uses: actions/cache@master
       with:
         path: vendor/bundle
