@@ -70,6 +70,9 @@ jobs:
           --exclude "*" --include "*.md" --recursive \
           --content-type "text/markdown; charset=utf-8" \
           --metadata-directive REPLACE
+        aws s3 cp s3://www.speedshop.co/holidays.ics s3://www.speedshop.co/holidays.ics \
+          --content-type "text/calendar; charset=utf-8" \
+          --metadata-directive REPLACE
     - name: Cloudflare Purge Cache
       uses: jakejarvis/cloudflare-purge-action@v0.3.0
       if: contains(github.ref, 'master')
