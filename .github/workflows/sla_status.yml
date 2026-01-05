@@ -13,7 +13,7 @@ jobs:
 
     - uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.1'
+        ruby-version: '4.0'
 
     - name: Clone client_notes repo
       env:
@@ -21,13 +21,14 @@ jobs:
       run: |
         git clone https://${CLIENT_NOTES_PAT}@github.com/speedshop/client_notes.git /tmp/client_notes
 
-    - name: Generate SLA status
+    - name: Generate SLA status and availability
       run: |
         cd /tmp/client_notes
         bundle install
         mkdir -p ${{ github.workspace }}/_data
         bundle exec rake sla:generate_json[${{ github.workspace }}/_data/sla_status.json]
         bundle exec rake sla:generate_holidays_ics[${{ github.workspace }}/holidays.ics]
+        bundle exec rake availability:generate_json[${{ github.workspace }}/_data/availability.json]
 
     - uses: r-lib/actions/setup-pandoc@v2
       with:
