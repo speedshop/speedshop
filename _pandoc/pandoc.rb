@@ -1,15 +1,15 @@
-Dir.mkdir "_site/pandoc" rescue nil
 post_paths = Dir["_site/**/*"].select { |p| p.end_with?(".html") }
 
-threads = post_paths.map do |pp|
-  Thread.new do 
-    path = "_site/pandoc/" + pp.split(".").first.split("/").last
-    # `pandoc --lua-filter _pandoc/url_filter.lua -s -o #{path + ".pdf"} #{pp}`
-    `pandoc --lua-filter _pandoc/url_filter.lua -o #{path + ".epub"} #{pp}`
-    printf "."
-  end
+PANDOC_OPTS = "--lua-filter _pandoc/url_filter.lua --resource-path=_site"
+
+threads = post_paths.flat_map do |pp|
+  base_path = pp.sub(/\.html$/, "")
+
+  [
+    Thread.new { `pandoc #{PANDOC_OPTS} -o #{base_path}.epub #{pp}` },
+    Thread.new { `pandoc #{PANDOC_OPTS} -o #{base_path}.md #{pp}` },
+    Thread.new { `pandoc #{PANDOC_OPTS} -o #{base_path}.pdf #{pp}` }
+  ].each { printf "." }
 end
 
 threads.map(&:join)
-
-# `pandoc -s -o _site/pandoc/speedshop_blog.pdf #{post_paths.join(" ")}`

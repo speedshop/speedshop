@@ -28,7 +28,7 @@ I have a rule of thumb to judge whether or not any particular SQL query is unnec
 
 The number of SQL queries per table can be easily seen on NewRelic, for example, if you have that installed.
 
-<img src="/assets/post/img/nplusoneposts.png" loading="lazy">
+<img src="/assets/posts/img/nplusoneposts.png" loading="lazy">
 
 {% marginnote_lazy washeyes.jpg|I keep an eyewash station next to my desk for really bad N+1s|true %}
 
