@@ -10,6 +10,13 @@ ol
 ul
   list-style: square outside
 
+@media (max-width: $mini-breakpoint)
+  ol, ul
+    list-style-position: inside
+    li
+      text-indent: -1.5em
+      padding-left: 1.5em
+
 code
   margin: 0
 
