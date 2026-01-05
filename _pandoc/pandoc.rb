@@ -1,6 +1,6 @@
 post_paths = Dir["_site/**/*"].select { |p| p.end_with?(".html") }
 
-PANDOC_OPTS = "--lua-filter _pandoc/url_filter.lua --resource-path=_site"
+PANDOC_OPTS = "--lua-filter _pandoc/url_filter.lua --resource-path=_site --pdf-engine=xelatex"
 
 errors = []
 mutex = Mutex.new

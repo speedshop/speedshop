@@ -6,7 +6,18 @@ module Jekyll
     end
 
     def render(context)
-      img_src = @params[0].match(/http/) ? @params[0] : "#{context.registers[:site].config["url"]}/assets/posts/img/#{@params[0]}"
+      raw_path = @params[0]
+      # Determine the full image source URL
+      img_src = if raw_path.match(/^https?:/)
+        # Already a full URL
+        raw_path
+      elsif raw_path.start_with?("/")
+        # Already an absolute path, use site URL + path
+        "#{context.registers[:site].config["url"]}#{raw_path}"
+      else
+        # Relative path, prepend the assets/posts/img directory
+        "#{context.registers[:site].config["url"]}/assets/posts/img/#{raw_path}"
+      end
       caption = @params[1]
       klass = @params[2] == "true" ? "no-mobile" : ""
       output =  "<span class='marginnote #{klass}'>"
