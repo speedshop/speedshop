@@ -1,0 +1,123 @@
+---
+layout: default
+title: SLA Status
+summary: Response time SLA status for Speedshop consulting services.
+sitemap: false
+---
+
+<div class="container status-page">
+  <div class="row" style="margin-top: 3.5rem">
+    <div class="column">
+      <h1>Response Time Status</h1>
+      <p>Starting in 2026, Speedshop clients receive guaranteed responses to inquiries according to our Service Level Agreement (SLA). This page displays our historical performance in meeting those SLAs.</p>
+      <p><b>Policy: </b>{{ site.data.sla_status.sla_policy }}</p>
+
+      <div class="performance-stats">
+        <div class="stat">
+          <span class="stat-value{% if site.data.sla_status.performance.last_30_days < 99 %} stat-bad{% endif %}">{{ site.data.sla_status.performance.last_30_days }}%</span>
+          <span class="stat-label">Last 30 days</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value{% if site.data.sla_status.performance.last_90_days < 99 %} stat-bad{% endif %}">{{ site.data.sla_status.performance.last_90_days }}%</span>
+          <span class="stat-label">Last 90 days</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value{% if site.data.sla_status.performance.last_6_months < 99 %} stat-bad{% endif %}">{{ site.data.sla_status.performance.last_6_months }}%</span>
+          <span class="stat-label">Last 6 months</span>
+        </div>
+      </div>
+
+      <div class="status-legend">
+        <span class="legend-item"><span class="status-cell green"></span> SLA Met</span>
+        <span class="legend-item"><span class="status-cell red"></span> SLA Missed</span>
+        <span class="legend-item"><span class="status-cell holiday"></span> Holiday</span>
+        <span class="legend-item"><span class="status-cell weekend"></span> Weekend</span>
+        <span class="legend-item"><span class="status-cell future"></span> Future</span>
+      </div>
+
+      <div class="status-calendar" id="status-calendar"></div>
+
+      <p class="status-updated">Last updated: {{ site.data.sla_status.generated_at }}</p>
+
+      <div class="status-section">
+        <h3>Japanese Holiday Calendar</h3>
+        <p>For your convenience, you may use this .ics calendar to get add Japanese holidays to your calendar app.</p>
+        <p><a href="/holidays.ics" class="button">Download ICS Calendar</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var statusData = {{ site.data.sla_status.days | jsonify }};
+  var startDate = new Date('{{ site.data.sla_status.start_date }}');
+  var endDate = new Date('{{ site.data.sla_status.end_date }}');
+
+  function getMonthsInRange(start, end) {
+    var months = [];
+    var current = new Date(start.getFullYear(), start.getMonth(), 1);
+    while (current <= end) {
+      months.push(new Date(current));
+      current.setMonth(current.getMonth() + 1);
+    }
+    return months;
+  }
+
+  function formatDate(date) {
+    var year = date.getFullYear();
+    var month = String(date.getMonth() + 1).padStart(2, '0');
+    var day = String(date.getDate()).padStart(2, '0');
+    return year + '-' + month + '-' + day;
+  }
+
+  function renderCalendar() {
+    var container = document.getElementById('status-calendar');
+    var months = getMonthsInRange(startDate, endDate);
+
+    months.forEach(function(month) {
+      var monthDiv = document.createElement('div');
+      monthDiv.className = 'calendar-month';
+
+      var header = document.createElement('h4');
+      header.textContent = month.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      monthDiv.appendChild(header);
+
+      var grid = document.createElement('div');
+      grid.className = 'calendar-grid';
+
+      var dayHeaders = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+      dayHeaders.forEach(function(day) {
+        var cell = document.createElement('div');
+        cell.className = 'day-header';
+        cell.textContent = day;
+        grid.appendChild(cell);
+      });
+
+      var firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
+      for (var i = 0; i < firstDay.getDay(); i++) {
+        grid.appendChild(document.createElement('div'));
+      }
+
+      var daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+      for (var day = 1; day <= daysInMonth; day++) {
+        var date = new Date(month.getFullYear(), month.getMonth(), day);
+        var dateStr = formatDate(date);
+        var status = statusData[dateStr] || 'unknown';
+
+        var cell = document.createElement('div');
+        cell.className = 'status-cell ' + status;
+        cell.title = dateStr + ': ' + status;
+        grid.appendChild(cell);
+      }
+
+      monthDiv.appendChild(grid);
+      container.appendChild(monthDiv);
+    });
+  }
+
+  if (statusData) {
+    renderCalendar();
+  }
+})();
+</script>

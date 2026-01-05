@@ -8,3 +8,7 @@ vendor/
 .terraform
 node_modules
 .DS_Store
+
+# Generated SLA status files
+_data/sla_status.json
+holidays.ics
