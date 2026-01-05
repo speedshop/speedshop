@@ -4,7 +4,7 @@ require "date"
 SITE_URL = "https://www.speedshop.co"
 SITE_DIR = "_site"
 
-# Collect blog posts with metadata from source files
+# Collect blog posts with metadata and content from source files
 posts = Dir["_posts/*.md"].map do |post_path|
   content = File.read(post_path)
   front_matter = content.match(/\A---\n(.+?)\n---/m)
@@ -23,11 +23,15 @@ posts = Dir["_posts/*.md"].map do |post_path|
     next
   end
 
+  # Extract markdown body (everything after front matter)
+  body = content.sub(/\A---\n.+?\n---\n*/m, "")
+
   {
     title: meta["title"],
     summary: meta["summary"],
     url_path: url_path,
-    date: date
+    date: date,
+    body: body
   }
 end.compact.sort_by { |p| p[:date] || Date.new(1970, 1, 1) }.reverse
 
@@ -50,7 +54,7 @@ end
 File.write("#{SITE_DIR}/llms.txt", llms_txt)
 puts "Generated llms.txt"
 
-# Generate llms-full.txt by concatenating all markdown files
+# Generate llms-full.txt by concatenating original markdown from _posts
 llms_full = <<~HEADER
 # Speedshop - Full Content
 
@@ -59,15 +63,11 @@ llms_full = <<~HEADER
 HEADER
 
 posts.each do |post|
-  md_path = "#{SITE_DIR}#{post[:url_path]}.md"
-  if File.exist?(md_path)
-    content = File.read(md_path)
-    llms_full << "\n---\n\n"
-    llms_full << "## #{post[:title]}\n\n"
-    llms_full << "URL: #{SITE_URL}#{post[:url_path]}.md\n\n"
-    llms_full << content
-    llms_full << "\n"
-  end
+  llms_full << "\n---\n\n"
+  llms_full << "## #{post[:title]}\n\n"
+  llms_full << "URL: #{SITE_URL}#{post[:url_path]}.html\n\n"
+  llms_full << post[:body]
+  llms_full << "\n"
 end
 
 File.write("#{SITE_DIR}/llms-full.txt", llms_full)
