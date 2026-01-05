@@ -1,4 +1,4 @@
-name: Build SLA Status Page
+name: Update SLA, Availability
 
 on:
   schedule:
