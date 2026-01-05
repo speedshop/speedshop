@@ -24,6 +24,19 @@ jobs:
       run: |
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
+    - name: Clone client_notes repo
+      env:
+        CLIENT_NOTES_PAT: ${{ secrets.CLIENT_NOTES_PAT }}
+      run: |
+        git clone https://${CLIENT_NOTES_PAT}@github.com/speedshop/client_notes.git /tmp/client_notes
+    - name: Generate SLA status and availability
+      run: |
+        cd /tmp/client_notes
+        bundle install
+        mkdir -p ${{ github.workspace }}/_data
+        bundle exec rake sla:generate_json[${{ github.workspace }}/_data/sla_status.json]
+        bundle exec rake sla:generate_holidays_ics[${{ github.workspace }}/holidays.ics]
+        bundle exec rake availability:generate_json[${{ github.workspace }}/_data/availability.json]
     - name: make site 
       run: make
     - name: deploy to S3
