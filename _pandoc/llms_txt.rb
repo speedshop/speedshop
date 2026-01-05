@@ -6,7 +6,7 @@ SITE_DIR = "_site"
 
 # Collect blog posts with metadata and content from source files
 posts = Dir["_posts/*.md"].map do |post_path|
-  content = File.read(post_path)
+  content = File.read(post_path, encoding: "UTF-8")
   front_matter = content.match(/\A---\n(.+?)\n---/m)
   next unless front_matter
 
@@ -51,7 +51,7 @@ posts.each do |post|
   llms_txt << "- [#{post[:title]}](#{SITE_URL}#{post[:url_path]}.md)#{desc}\n"
 end
 
-File.write("#{SITE_DIR}/llms.txt", llms_txt)
+File.write("#{SITE_DIR}/llms.txt", llms_txt, encoding: "UTF-8")
 puts "Generated llms.txt"
 
 # Generate llms-full.txt by concatenating original markdown from _posts
@@ -70,5 +70,5 @@ posts.each do |post|
   llms_full << "\n"
 end
 
-File.write("#{SITE_DIR}/llms-full.txt", llms_full)
+File.write("#{SITE_DIR}/llms-full.txt", llms_full, encoding: "UTF-8")
 puts "Generated llms-full.txt"
