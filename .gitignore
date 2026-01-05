@@ -11,4 +11,5 @@ node_modules
 
 # Generated SLA status files
 _data/sla_status.json
+_data/availability.json
 holidays.ics

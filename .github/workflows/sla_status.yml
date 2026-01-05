@@ -19,7 +19,7 @@ jobs:
       env:
         CLIENT_NOTES_PAT: ${{ secrets.CLIENT_NOTES_PAT }}
       run: |
-        git clone https://${CLIENT_NOTES_PAT}@github.com/nateberkopec/client_notes.git /tmp/client_notes
+        git clone https://${CLIENT_NOTES_PAT}@github.com/speedshop/client_notes.git /tmp/client_notes
 
     - name: Generate SLA status
       run: |
