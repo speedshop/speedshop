@@ -1,0 +1,11 @@
+# MIME type overrides for S3 deployment
+# These patterns are matched against files in _site/
+# and uploaded with the specified Content-Type header.
+
+content_types:
+  - pattern: "*.txt"
+    content_type: "text/plain; charset=utf-8"
+  - pattern: "*.md"
+    content_type: "text/markdown; charset=utf-8"
+  - pattern: "*.ics"
+    content_type: "text/calendar; charset=utf-8"

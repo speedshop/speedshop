@@ -43,36 +43,14 @@ jobs:
         bundle exec rake availability:generate_json[${{ github.workspace }}/_data/availability.json]
     - name: make site 
       run: make
-    - name: deploy to S3
-      uses: jakejarvis/s3-sync-action@master
-      if: contains(github.ref, 'master')
-      with:
-        args: --acl public-read --follow-symlinks --delete
-      env:
-        AWS_S3_BUCKET: 'www.speedshop.co'
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: 'us-east-1'
-        SOURCE_DIR: '_site'   
-    - name: Fix content-type for text files in S3
+    - name: Deploy to S3
       if: contains(github.ref, 'master')
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: 'us-east-1'
-      run: |
-        for file in llms.txt llms-full.txt; do
-          aws s3 cp s3://www.speedshop.co/$file s3://www.speedshop.co/$file \
-            --content-type "text/plain; charset=utf-8" \
-            --metadata-directive REPLACE
-        done
-        aws s3 cp s3://www.speedshop.co/ s3://www.speedshop.co/ \
-          --exclude "*" --include "*.md" --recursive \
-          --content-type "text/markdown; charset=utf-8" \
-          --metadata-directive REPLACE
-        aws s3 cp s3://www.speedshop.co/holidays.ics s3://www.speedshop.co/holidays.ics \
-          --content-type "text/calendar; charset=utf-8" \
-          --metadata-directive REPLACE
+        S3_BUCKET: 'www.speedshop.co'
+      run: bundle exec ruby _scripts/s3_deploy.rb
     - name: Cloudflare Purge Cache
       uses: jakejarvis/cloudflare-purge-action@v0.3.0
       if: contains(github.ref, 'master')

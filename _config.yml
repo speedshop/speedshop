@@ -16,6 +16,7 @@ kramdown:
 encoding: utf-8
 exclude:
    - _h2o
+   - _scripts
    - Procfile
    - wercker.yml
    - Gemfile
