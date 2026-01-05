@@ -16,7 +16,7 @@ jobs:
     - name: Install PDF dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended librsvg2-bin
+        sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-xetex librsvg2-bin
     - uses: actions/cache@master
       with:
         path: vendor/bundle
