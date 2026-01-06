@@ -10,8 +10,8 @@
           <div class="row">
             <div class="column column-67 column-collapsible">
               <article>
-                <h1 style="margin-bottom: 1rem;">{{ page.title | titleize }}</h1>
-                <div style="margin: 0rem 0 2rem 0">
+                <h1>{{ page.title | titleize }}</h1>
+                <div class="post-byline">
                   by <b>Nate Berkopec</b>
                   (<a target="_blank" href="http://twitter.com/nateberkopec">@nateberkopec</a>)
                   of <a target="_blank" href="/" style="display: inline-block;width: 9rem;position: relative;top: 0.3rem;">
@@ -33,7 +33,6 @@
                 {{ content | header_anchors }}
 
                 {% include social-bar.html %}
-                <div style="height: 3rem"></div>
               </article>
             </div>
           </div>
@@ -42,29 +41,27 @@
 
           {% include cgrp.html %}
 
-          <div class="row">
-            <div class="column">
-              <h2>More Posts</h2>
-            </div>
-          </div>
+          <div class="more-posts">
+            <h2>More Posts</h2>
 
-          {% assign counter = 0 %}
-          {% for post in site.posts %}
-            {% if post.title != page.title and counter < 4 %}
-              {% if counter == 0 or counter == 2 %}
-                <div class="row">
-              {% endif %}
-              <div class="column column-50 column-collapsible">
-                <h3><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h3>
-                <p>{{ post.summary | strip_html | truncatewords: 50 }}</p>
-                <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
-              </div>
-              {% if counter == 1 or counter == 3 %}
+            {% assign counter = 0 %}
+            {% for post in site.posts %}
+              {% if post.title != page.title and counter < 4 %}
+                {% if counter == 0 or counter == 2 %}
+                  <div class="row">
+                {% endif %}
+                <div class="column column-50 column-collapsible">
+                  <h3><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h3>
+                  <p>{{ post.summary | strip_html | truncatewords: 50 }}</p>
+                  <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
                 </div>
+                {% if counter == 1 or counter == 3 %}
+                  </div>
+                {% endif %}
+                {% assign counter = counter | plus: 1 %}
               {% endif %}
-              {% assign counter = counter | plus: 1 %}
-            {% endif %}
-          {% endfor %}
+            {% endfor %}
+          </div>
         </div>
         <div id="innocuous" class="fader-fast innocuous">
           <a id="innocuous-close" class="innocuous-close">Close</a>

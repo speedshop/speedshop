@@ -10,6 +10,11 @@
 
   h1
     line-height: 1.32   // 5.0rem * 1.32 = 6.6rem (2 rhythm units)
+    margin-bottom: $rhythm-main
+
+  .post-byline
+    margin-bottom: $rhythm-main
+    font-family: 'Helvetica Neue', Inter, Roboto, 'Arial Nova', 'Nimbus Sans', Arial, sans-serif
 
   h2
     background: black
@@ -20,7 +25,7 @@
     line-height: 1.571  // 4.2rem * 1.571 = 6.6rem (2 rhythm units)
 
   h3
-    margin-top: ($rhythm-main * 2)
+    margin-top: ($rhythm-main)
     margin-bottom: $rhythm-main
     line-height: 1.833  // 3.6rem * 1.833 = 6.6rem (2 rhythm units)
 
@@ -56,12 +61,16 @@
 
   .highlight code
     font-size: 1.4rem
+    line-height: $rhythm-main  // 3.3rem = 33px (full baseline)
+
+  pre > code
+    padding: 0 $rhythm-side  // No vertical padding needed - line-height provides spacing
 
   p,pre,ul,ol,dl,blockquote
     margin-bottom: $rhythm-main
 
   li
-    margin-bottom: ($rhythm-main / 2)
+    margin-bottom: 0
 
   @media screen and (max-width: $mini-breakpoint)
     dl,
@@ -80,11 +89,19 @@
 
     .highlight code
       font-size: 1.1rem
+      line-height: $rhythm-mobile  // 2.1rem = 21px (full mobile baseline)
+
+    pre > code
+      padding: 0 ($rhythm-mobile / 2)
 
     // Mobile header sizes with rhythm-aligned line-heights
     h1
       font-size: 2.8rem
       line-height: 1.5     // 2.8rem * 1.5 = 4.2rem (2 rhythm units)
+      margin-bottom: $rhythm-mobile
+
+    .post-byline
+      margin-bottom: $rhythm-mobile
 
     h2
       font-size: 2.4rem
@@ -120,7 +137,7 @@
       margin-bottom: $rhythm-mobile
 
     li
-      margin-bottom: ($rhythm-mobile / 2)
+      margin-bottom: 0
 
     .summary
       padding: $rhythm-mobile
@@ -199,6 +216,34 @@
 
       &:hover
         text-decoration: underline
+
+  .more-posts
+    margin-top: $rhythm-main
+
+    h2
+      background: none
+      color: inherit
+      padding: 0
+      margin-left: 0
+      margin-bottom: $rhythm-main
+
+    h3
+      margin-top: 0
+      margin-bottom: $rhythm-main
+      font-size: 2.4rem
+      line-height: ($rhythm-main * 2)  // 66px = 2 rhythm units
+
+    p
+      margin-bottom: $rhythm-main
+
+    @media screen and (max-width: $mini-breakpoint)
+      h3
+        font-size: 1.9rem
+        line-height: ($rhythm-mobile * 2)
+        margin-bottom: $rhythm-mobile
+
+      p
+        margin-bottom: $rhythm-mobile
 
 .mailchimp
   .email
