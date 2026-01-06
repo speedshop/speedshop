@@ -1,0 +1,318 @@
+---
+layout: null
+title: Vertical Rhythm Debug
+sitemap: false
+---
+{% if jekyll.environment != 'production' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Vertical Rhythm Debug - Typographic Specimen</title>
+  <link rel="stylesheet" href="{{ '/assets/css/app.css' | relative_url }}">
+  <style>
+    :root {
+      --baseline: 33px;
+      --baseline-mobile: 21px;
+      --grid-color: rgba(255, 0, 0, 0.15);
+      --grid-color-strong: rgba(255, 0, 0, 0.4);
+    }
+
+    body {
+      position: relative;
+    }
+
+    .baseline-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      min-height: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        var(--grid-color-strong) 0px,
+        var(--grid-color-strong) 1px,
+        var(--grid-color) 1px,
+        var(--grid-color) var(--baseline)
+      );
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    html, body {
+      position: relative;
+      min-height: 100%;
+    }
+
+    .baseline-grid.visible {
+      opacity: 1;
+    }
+
+    .debug-controls {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 10000;
+      background: #333;
+      color: #fff;
+      padding: 1rem;
+      border-radius: 4px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .debug-controls label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      margin-bottom: 0.5rem;
+    }
+
+    .debug-controls input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+
+    .debug-controls .info {
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid #555;
+      color: #aaa;
+    }
+
+    .specimen-section {
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 3.3rem;
+      margin-bottom: 3.3rem;
+    }
+
+    .specimen-section:last-child {
+      border-bottom: none;
+    }
+
+    .section-label {
+      font-family: monospace;
+      font-size: 11px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1.65rem;
+    }
+
+    .metrics {
+      font-family: monospace;
+      font-size: 11px;
+      color: #666;
+      background: #f5f5f5;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      border-radius: 2px;
+    }
+
+    @media (max-width: 544px) {
+      .baseline-grid {
+        background-image: repeating-linear-gradient(
+          to bottom,
+          var(--grid-color-strong) 0px,
+          var(--grid-color-strong) 1px,
+          var(--grid-color) 1px,
+          var(--grid-color) var(--baseline-mobile)
+        );
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="baseline-grid" id="grid"></div>
+
+  <div class="debug-controls">
+    <label>
+      <input type="checkbox" id="toggle-grid" checked>
+      Show baseline grid
+    </label>
+    <label>
+      <input type="checkbox" id="toggle-metrics">
+      Show metrics
+    </label>
+    <div class="info">
+      Desktop: 33px baseline<br>
+      Mobile: 21px baseline
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="post">
+      <div class="row">
+        <div class="column">
+
+          <div class="specimen-section">
+            <div class="section-label">Page Title (h1)</div>
+            <h1>The Quick Brown Fox Jumps Over the Lazy Dog</h1>
+            <div class="post-byline">
+              by <b>Nate Berkopec</b>
+              (<a href="#">@nateberkopec</a>)
+              of <b>Speedshop</b>, a Rails performance consultancy.
+            </div>
+          </div>
+
+          <div class="specimen-section">
+            <div class="section-label">Summary Box</div>
+            <div class="summary">
+              <b>Summary:</b> This is a summary box demonstrating the vertical rhythm alignment. It should have consistent padding and margins that align to the baseline grid. <i>(499 words / 3 minutes)</i>
+            </div>
+          </div>
+
+          <div class="specimen-section">
+            <div class="section-label">Body Paragraphs</div>
+            <p>This is a standard paragraph with body text. The font size is 2.2rem (22px) with a line-height of 1.5, giving us 33px per line. The margin-bottom is also 33px (3.3rem), ensuring each paragraph sits on the baseline grid.</p>
+            <p>Here's a second paragraph to demonstrate the spacing between paragraphs. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+          </div>
+
+          <div class="specimen-section">
+            <div class="section-label">Headings (h2-h6)</div>
+            <h2>Heading Level 2</h2>
+            <p>Text following an h2. The h2 has a black background with 33px padding top and bottom.</p>
+
+            <h3>Heading Level 3</h3>
+            <p>Text following an h3. Has 66px margin-top and 33px margin-bottom.</p>
+
+            <h4>Heading Level 4</h4>
+            <p>Text following an h4. Has 33px margin-top and 16.5px margin-bottom.</p>
+
+            <h5>Heading Level 5</h5>
+            <p>Text following an h5.</p>
+
+            <h6>Heading Level 6</h6>
+            <p>Text following an h6.</p>
+          </div>
+
+          <div class="specimen-section">
+            <div class="section-label">Unordered List</div>
+            <p>An introductory paragraph before the list:</p>
+            <ul>
+              <li>First list item with single line</li>
+              <li>Second list item that wraps to multiple lines to demonstrate how the line-height maintains rhythm across wrapped content</li>
+              <li>Third list item</li>
+              <li>Fourth list item</li>
+            </ul>
+            <p>A paragraph following the list.</p>
+          </div>
+
+          <div class="specimen-section">
+            <div class="section-label">Ordered List</div>
+            <ol>
+              <li>First ordered item</li>
+              <li>Second ordered item with longer text that might wrap depending on viewport width</li>
+              <li>Third ordered item</li>
+            </ol>
+          </div>
+
+          <div class="specimen-section">
+            <div class="section-label">Code Blocks</div>
+            <p>Inline <code>code</code> within a paragraph.</p>
+            <p>A code block with 2 lines (should be 66px + margins):</p>
+<pre class="highlight"><code>def hello
+  puts "Hello, World!"
+end</code></pre>
+            <p>A code block with 5 lines:</p>
+<pre class="highlight"><code>class VerticalRhythm
+  BASELINE = 33
+
+  def initialize(font_size:, line_height:)
+    @font_size = font_size
+    @line_height = line_height
+  end
+end</code></pre>
+          </div>
+
+          <div class="specimen-section">
+            <div class="section-label">Blockquote</div>
+            <blockquote>
+              <p>This is a blockquote. It should maintain the same vertical rhythm as body text while being visually distinct. The margins should align to the baseline grid.</p>
+            </blockquote>
+            <p>Paragraph after blockquote.</p>
+          </div>
+
+          <div class="specimen-section">
+            <div class="section-label">Mixed Content</div>
+            <h3>A Heading Before Mixed Content</h3>
+            <p>This section tests the rhythm when mixing different elements. Here's a paragraph followed by a list:</p>
+            <ul>
+              <li>List item one</li>
+              <li>List item two</li>
+            </ul>
+            <p>Then a code block:</p>
+<pre class="highlight"><code>puts "Testing rhythm"</code></pre>
+            <p>And finally another paragraph to close out the section. The goal is for every element to sit properly on the baseline grid.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="more-posts">
+        <h2>More Posts Section</h2>
+        <div class="row">
+          <div class="column column-50">
+            <h3><a href="#">Example Post Title One</a></h3>
+            <p>This is a summary of the first post. It demonstrates how the More Posts section maintains vertical rhythm with its own styling.</p>
+            <p><a href="#">Read more</a></p>
+          </div>
+          <div class="column column-50">
+            <h3><a href="#">Example Post Title Two Is Longer</a></h3>
+            <p>This is a summary of the second post. When titles wrap to multiple lines, the rhythm should still be maintained.</p>
+            <p><a href="#">Read more</a></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const grid = document.getElementById('grid');
+    const toggleGrid = document.getElementById('toggle-grid');
+    const toggleMetrics = document.getElementById('toggle-metrics');
+
+    // Initialize grid visibility
+    grid.classList.add('visible');
+
+    toggleGrid.addEventListener('change', () => {
+      grid.classList.toggle('visible', toggleGrid.checked);
+    });
+
+    toggleMetrics.addEventListener('change', () => {
+      const existing = document.querySelectorAll('.metrics');
+      if (toggleMetrics.checked) {
+        document.querySelectorAll('.post h1, .post h2, .post h3, .post h4, .post h5, .post h6, .post p, .post li, .post pre, .post blockquote, .summary').forEach(el => {
+          const style = window.getComputedStyle(el);
+          const rect = el.getBoundingClientRect();
+          const metrics = document.createElement('div');
+          metrics.className = 'metrics';
+          metrics.textContent = `font: ${style.fontSize} | lh: ${style.lineHeight} | mt: ${style.marginTop} | mb: ${style.marginBottom} | h: ${rect.height.toFixed(1)}px`;
+          el.parentNode.insertBefore(metrics, el.nextSibling);
+        });
+      } else {
+        existing.forEach(el => el.remove());
+      }
+    });
+
+    // Keyboard shortcut: 'g' to toggle grid
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'g' && !e.metaKey && !e.ctrlKey) {
+        toggleGrid.checked = !toggleGrid.checked;
+        grid.classList.toggle('visible', toggleGrid.checked);
+      }
+    });
+  </script>
+</body>
+</html>
+{% else %}
+<!-- This page is only available in development mode -->
+{% endif %}
