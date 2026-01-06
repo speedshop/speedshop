@@ -109,7 +109,7 @@ These queries look like the view was probably looking up the `current_user` (or 
 * Find a way to either eliminate this query or cache the result in the view
 * Add an `includes` call to the original query so that the profile is loaded along with the User, reducing my query count by 1.
 
-I follow this process for every query on the page - see if I can remove it or cache the result. [For my full guide on Rails caching, check this post out](/2015/07/15/the-complete-guide-to-rails-caching.html).
+I follow this process for every query on the page - see if I can remove it or cache the result. [For my full guide on Rails caching, check this post out](/blog/the-complete-guide-to-rails-caching/).
 
 ## The Flamegraph
 

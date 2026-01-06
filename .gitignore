@@ -5,9 +5,13 @@ _site
 .jekyll-cache
 vendor/
 *.tfvars
+*.tfstate
+*.tfstate.*
 .terraform
 node_modules
 .DS_Store
+.terraform.lock.hcl
+.env
 
 # Generated SLA status files
 _data/sla_status.json

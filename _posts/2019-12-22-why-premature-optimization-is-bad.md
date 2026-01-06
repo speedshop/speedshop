@@ -289,7 +289,7 @@ simple "Hello World" response. Benchmarks put the competing alternatives on
 exactly equal footing by coming up with a contrived, simple, non-real-world
 example.
 
-{% marginnote_lazy rails-sucks.png|[I wrote a v v long post once about why this benchmark doesn't mean much for Rails](https://www.speedshop.co/2017/07/11/is-ruby-too-slow-for-web-scale.html)|true %}
+{% marginnote_lazy rails-sucks.png|[I wrote a v v long post once about why this benchmark doesn't mean much for Rails](/blog/is-ruby-too-slow-for-web-scale/)|true %}
 
 
 It's usually too difficult to benchmark real-world code because the

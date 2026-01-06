@@ -6,7 +6,7 @@ terraform {
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "~> 3.0"
+      version = "~> 4.27.0"
     }
   }
 
@@ -52,7 +52,34 @@ resource "aws_s3_bucket" "website" {
   }
 }
 
-# Someday I will do a complete cloudflare import
-resource "cloudflare_zone" "cdn" {
-  zone = "speedshop.co"
+resource "cloudflare_ruleset" "blog_legacy_redirects" {
+  kind    = "zone"
+  name    = "default"
+  phase   = "http_request_dynamic_redirect"
+  zone_id = var.cloudflare_zone_id
+
+  rules {
+    action      = "redirect"
+    description = "Legacy blog URLs to /blog/:slug/"
+    enabled     = true
+    expression  = <<-EOT
+      (http.request.full_uri wildcard r"https://www.speedshop.co/blog/*/*/*/*.html")
+    EOT
+
+    action_parameters {
+      from_value {
+        preserve_query_string = true
+        status_code           = 301
+        target_url {
+          expression = <<-EOT
+            wildcard_replace(
+              http.request.full_uri,
+              r"https://www.speedshop.co/blog/*/*/*/*.html",
+              r"https://www.speedshop.co/blog/$${4}/"
+            )
+          EOT
+        }
+      }
+    }
+  }
 }

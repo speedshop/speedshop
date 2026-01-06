@@ -221,7 +221,7 @@ In any case, context switching on modern machines and operating systems is prett
 
 If adding threads to a CRuby process can increase latency, why is it still useful?
 
-{% sidenote "Shouldn't adding an additonal thread only increase memory usage by 8MB, which is the size of the thread's stack allocation? Ah, if only memory usage was that simple. [Learn more about the complexities of RSS and thread-induced fragmentation here.](/2017/12/04/malloc-doubles-ruby-memory.html)" %}
+{% sidenote "Shouldn't adding an additonal thread only increase memory usage by 8MB, which is the size of the thread's stack allocation? Ah, if only memory usage was that simple. [Learn more about the complexities of RSS and thread-induced fragmentation here.](/blog/malloc-doubles-ruby-memory/)" %}
 
 **Adding more threads to a Ruby process helps us to improve CPU utilization at less memory cost than an entire additional process.** Adding 1 process might use 512MB of memory, but adding 1 thread will probably cause less than 64MB of additional memory usage. With 2 threads instead of 1, when the first thread releases the GVL and listens on I/O, our 2nd thread can either pick up new work to do, increasing throughput and utilization of our server.
 

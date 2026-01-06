@@ -100,7 +100,7 @@ There are other problems with this pattern (it blocks page rendering until it's 
 <script src="//somebozoadservice.com/ad-tracker.js" async defer></script>
 ```
 
-Kaboom! There are some other advantages to `async` that I get into in [this other post here](/2015/10/21/hacking-head-tags-for-speed-and-profit.html), but be aware that one of them is that the browser preloader can get started downloading this script before the parser even gets there.
+Kaboom! There are some other advantages to `async` that I get into in [this other post here](/blog/hacking-head-tags-for-speed-and-profit/), but be aware that one of them is that the browser preloader can get started downloading this script before the parser even gets there.
 
 Here's a list of other things that generally don't work with browser preloaders:
 

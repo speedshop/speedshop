@@ -34,7 +34,7 @@ If any of the features turn out to be particularly beneficial, we may make them 
 
 This feature was contributed to Puma by Gitlab. Turn it on by adding `wait_for_less_busy_worker` to your Puma config.
 
-When a request comes in to a Puma cluster, the operating system randomly selects a listening, free Puma worker process to pick up the request. "Listening" and "free" being the key words - a Puma process will only listen to the socket (and pick up more requests) if it has nothing else to do. However, when running Puma with multiple threads, Puma will also listen on the socket when all of its busy threads are waiting on I/O or have otherwise released [the Global VM Lock](/2020/05/11/the-ruby-gvl-and-scaling.html).
+When a request comes in to a Puma cluster, the operating system randomly selects a listening, free Puma worker process to pick up the request. "Listening" and "free" being the key words - a Puma process will only listen to the socket (and pick up more requests) if it has nothing else to do. However, when running Puma with multiple threads, Puma will also listen on the socket when all of its busy threads are waiting on I/O or have otherwise released [the Global VM Lock](/blog/the-ruby-gvl-and-scaling/).
 
 When Gitlab investigated switching from Unicorn to Puma, they encountered an issue with this behavior. Under high load with moderate thread settings (a max pool size of 5 in their case), average request latency increased. Why?
 

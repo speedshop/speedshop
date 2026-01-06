@@ -24,7 +24,7 @@ I decided to dig in to the frontend performance of Rubygems.org for these reason
 
 ## Diagnosing with Chrome Timeline
 
-{% marginnote_lazy https://i.imgur.com/5fnVtiy.png|For more about Chrome Timeline, [see my guide.](/2015/10/07/frontend-performance-chrome-timeline.html) %} When diagnosing a website's performance, I do two things straight off the bat:
+{% marginnote_lazy https://i.imgur.com/5fnVtiy.png|For more about Chrome Timeline, [see my guide.](/blog/frontend-performance-chrome-timeline/) %} When diagnosing a website's performance, I do two things straight off the bat:
 
 * Open the site in Chrome. Open DevTools, and do a hard refresh while the Network tab is open.
 * Run a test on [webpagetest.org](http://www.webpagetest.org).
