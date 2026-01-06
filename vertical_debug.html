@@ -98,7 +98,12 @@ sitemap: false
       color: #999;
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 1.65rem;
+      margin-bottom: 3.3rem;
+      line-height: 3.3rem;
+    }
+
+    .half-spacer {
+      height: 1.65rem;
     }
 
     .metrics {
@@ -120,6 +125,20 @@ sitemap: false
           var(--grid-color) 1px,
           var(--grid-color) var(--baseline-mobile)
         );
+      }
+
+      .section-label {
+        margin-bottom: 2.1rem;
+        line-height: 2.1rem;
+      }
+
+      .half-spacer {
+        height: 1.05rem;
+      }
+
+      .specimen-section {
+        padding-bottom: 2.1rem;
+        margin-bottom: 2.1rem;
       }
     }
   </style>
@@ -176,7 +195,8 @@ sitemap: false
             <p>Text following an h2. The h2 has a black background with 33px padding top and bottom.</p>
 
             <h3>Heading Level 3</h3>
-            <p>Text following an h3. Has 66px margin-top and 33px margin-bottom.</p>
+            <p>Text following an h3. Has 49.5px margin-top, 0 margin-bottom.</p>
+            <div class="half-spacer"></div><!-- compensate for h3's 1.5 unit margin-top -->
 
             <h4>Heading Level 4</h4>
             <p>Text following an h4. Has 33px margin-top and 16.5px margin-bottom.</p>
@@ -186,6 +206,7 @@ sitemap: false
 
             <h6>Heading Level 6</h6>
             <p>Text following an h6.</p>
+            <div class="half-spacer"></div><!-- compensate for h6's 0.5 unit margin-top -->
           </div>
 
           <div class="specimen-section">
