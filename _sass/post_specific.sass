@@ -1,6 +1,9 @@
 .post
   font-family: "Palatino Linotype", Palatino, Palladio, "URW Palladio L", "Book Antiqua", Baskerville, "Bookman Old Style", "Bitstream Charter", "Nimbus Roman No9 L", Garamond, "Apple Garamond", "ITC Garamond Narrow", "New Century Schoolbook", "Century Schoolbook", "Century Schoolbook L", Georgia, serif
-  margin-top: 2rem
+  margin-top: $rhythm-main
+
+  @media screen and (max-width: $mini-breakpoint)
+    margin-top: $rhythm-mobile
 
   h1,h2,h3,h4,h5,h6
     font-family: "Helvetica Neue", Helvetica, Frutiger, "Frutiger Linotype", Univers, Calibri, "Gill Sans", "Gill Sans MT", "Myriad Pro", Myriad, "DejaVu Sans Condensed", "Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, Arial, sans-serif
@@ -8,8 +11,24 @@
   h2
     background: black
     color: white
-    padding: 3.5rem 1rem
+    padding: $rhythm-main 1rem
     margin-left: -1rem
+    margin-bottom: $rhythm-main
+
+  h3
+    margin-top: ($rhythm-main * 2)
+    margin-bottom: $rhythm-main
+
+  h4,h5,h6
+    margin-top: $rhythm-main
+    margin-bottom: ($rhythm-main / 2)
+
+  .header-anchor
+    color: inherit
+    text-decoration: underline
+    font-size: 0.5em
+    vertical-align: super
+    margin-left: 0.3em
 
   dl,
   ol,
@@ -17,23 +36,73 @@
   code,
   p
     font-size: 2.2rem
+    line-height: 1.5
 
   .highlight code
     font-size: 1.4rem
 
-  p,pre,ul
-    margin-bottom: 3.5rem
+  p,pre,ul,ol,dl,blockquote
+    margin-bottom: $rhythm-main
+
+  li
+    margin-bottom: ($rhythm-main / 2)
 
   @media screen and (max-width: $mini-breakpoint)
     dl,
     ol,
     ul,
     code,
-    p
-      font-size: 1.7rem
+    p,
+    .summary
+      font-size: 1.4rem
 
     p
       hyphens: auto
+
+    .toc
+      display: none
+
+    .highlight code
+      font-size: 1.1rem
+
+    // Mobile header sizes (proportionally scaled from desktop)
+    h1
+      font-size: 2.8rem
+
+    h2
+      font-size: 2.4rem
+      padding: $rhythm-mobile 1rem
+      margin-bottom: $rhythm-mobile
+
+    h3
+      font-size: 1.9rem
+      margin-top: ($rhythm-mobile * 2)
+      margin-bottom: $rhythm-mobile
+
+    h4
+      font-size: 1.6rem
+      margin-top: $rhythm-mobile
+      margin-bottom: ($rhythm-mobile / 2)
+
+    h5
+      font-size: 1.4rem
+      margin-top: $rhythm-mobile
+      margin-bottom: ($rhythm-mobile / 2)
+
+    h6
+      font-size: 1.3rem
+      margin-top: $rhythm-mobile
+      margin-bottom: ($rhythm-mobile / 2)
+
+    p, pre, ul, ol, dl, blockquote
+      margin-bottom: $rhythm-mobile
+
+    li
+      margin-bottom: ($rhythm-mobile / 2)
+
+    .summary
+      padding: $rhythm-mobile
+      margin-bottom: $rhythm-mobile
 
   img
     max-width: 100%
@@ -44,8 +113,9 @@
     margin-right: -50%
     width: 43%
     margin-top: 0rem
-    margin-bottom: 1.96rem
-    font-size: 0.65em
+    margin-bottom: $rhythm-side
+    font-size: 1.43rem
+    line-height: 1.155
     vertical-align: baseline
     position: relative
     text-indent: 0
@@ -77,6 +147,36 @@
   @media screen and (min-width: $hd-breakpoint)
     .sidenote img, .marginnote img
       max-width: 150%
+
+  .toc
+    background: #f8f8f8
+    padding: $rhythm-side
+    font-size: 1.43rem
+    line-height: 1.155
+
+    h4
+      font-size: 1.43rem
+      line-height: 1.155
+      margin: 0 0 $rhythm-side 0
+
+    ol, ul
+      margin: 0
+      margin-bottom: 0
+      padding-left: $rhythm-side
+      font-size: 1.43rem
+      line-height: 1.155
+
+    li
+      font-size: 1.43rem
+      line-height: 1.155
+      margin-bottom: ($rhythm-side / 2)
+
+    a
+      color: #333
+      text-decoration: none
+
+      &:hover
+        text-decoration: underline
 
 .mailchimp
   .email
@@ -155,6 +255,7 @@ div.innocuous input[type='submit']
 
 .summary
   background: rgb(221, 221, 221)
-  padding: 1rem
-  margin-bottom: 3.5rem
+  padding: $rhythm-main
+  margin-bottom: $rhythm-main
   font-size: 2.2rem
+  line-height: 1.5
