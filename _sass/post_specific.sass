@@ -115,27 +115,27 @@
 
     h3
       font-size: 1.9rem
-      line-height: 2.21    // 1.9rem * 2.21 = 4.2rem (2 rhythm units)
-      margin-top: ($rhythm-mobile * 2)
-      margin-bottom: $rhythm-mobile
+      line-height: 1.105   // 1.9rem * 1.105 = 2.1rem (1 rhythm unit)
+      margin-top: ($rhythm-mobile * 1.5)  // 1.5 units top
+      margin-bottom: ($rhythm-mobile / 2) // 0.5 units bottom = 3 units total
 
     h4
       font-size: 1.6rem
       line-height: 1.3125  // 1.6rem * 1.3125 = 2.1rem (1 rhythm unit)
-      margin-top: $rhythm-mobile
-      margin-bottom: ($rhythm-mobile / 2)
+      margin-top: ($rhythm-mobile * 1.5)  // 1.5 units top
+      margin-bottom: ($rhythm-mobile / 2) // 0.5 units bottom = 3 units total
 
     h5
       font-size: 1.4rem
       line-height: 1.5     // 1.4rem * 1.5 = 2.1rem (1 rhythm unit)
-      margin-top: $rhythm-mobile
-      margin-bottom: ($rhythm-mobile / 2)
+      margin-top: $rhythm-mobile          // 1 unit top
+      margin-bottom: 0                    // 0 bottom = 2 units total
 
     h6
       font-size: 1.3rem
       line-height: 1.615   // 1.3rem * 1.615 = 2.1rem (1 rhythm unit)
-      margin-top: ($rhythm-mobile / 2)
-      margin-bottom: ($rhythm-mobile / 2)
+      margin-top: $rhythm-mobile          // 1 unit top
+      margin-bottom: 0                    // 0 bottom = 2 units total
 
     p, pre, ul, ol, dl, blockquote
       margin-bottom: $rhythm-mobile
@@ -232,10 +232,11 @@
       margin-bottom: 0
 
     @media screen and (max-width: $mini-breakpoint)
-      h3
-        font-size: 1.9rem
-        line-height: ($rhythm-mobile * 2)
-        margin-bottom: $rhythm-mobile
+      h4
+        font-size: 1.6rem
+        line-height: 1.3125  // 1.6rem * 1.3125 = 2.1rem (1 rhythm unit)
+        margin-top: ($rhythm-mobile * 1.5)  // 1.5 units top
+        margin-bottom: ($rhythm-mobile / 2) // 0.5 units bottom = 3 units total
 
       p
         margin-bottom: $rhythm-mobile
