@@ -14,6 +14,8 @@ markdown: kramdown
 kramdown:
   auto_ids: true
 encoding: utf-8
+sass:
+  sourcemap: never
 exclude:
    - _h2o
    - _scripts
