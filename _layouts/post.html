@@ -49,7 +49,7 @@
                   <div class="row">
                 {% endif %}
                 <div class="column column-50 column-collapsible">
-                  <h3><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h3>
+                  <h4><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h4>
                   <p>{{ post.summary | strip_html | truncatewords: 50 }}</p>
                   <p><a href="{{ post.url | prepend: site.baseurl }}">Read more</a></p>
                 </div>
