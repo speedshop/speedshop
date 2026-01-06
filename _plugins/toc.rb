@@ -1,3 +1,5 @@
+require "nokogiri"
+
 module Jekyll
   module TocFilter
     def toc(content)
@@ -12,10 +14,16 @@ module Jekyll
     def header_anchors(content)
       return content if content.nil? || content.empty?
 
-      content.gsub(/<h([2-4])([^>]*)id="([^"]+)"([^>]*)>(.*?)<\/h\1>/mi) do
-        level, before_id, id, after_id, text = $1, $2, $3, $4, $5
-        %(<h#{level}#{before_id}id="#{id}"#{after_id}>#{text} <a href="##{id}" class="header-anchor">#</a></h#{level}>)
+      doc = Nokogiri::HTML.fragment(content)
+      doc.css('h2[id], h3[id], h4[id]').each do |header|
+        anchor = Nokogiri::XML::Node.new('a', doc)
+        anchor['href'] = "##{header['id']}"
+        anchor['class'] = 'header-anchor'
+        anchor.content = '#'
+        header.add_child(' ')
+        header.add_child(anchor)
       end
+      doc.to_html
     end
 
     private
