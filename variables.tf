@@ -1,4 +1,4 @@
-variable "cloudflare_zone_id" {
+variable "cloudflare_account_id" {
   type        = string
-  description = "Cloudflare zone ID for speedshop.co."
+  description = "Cloudflare account ID that owns speedshop.co."
 }

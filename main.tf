@@ -52,11 +52,16 @@ resource "aws_s3_bucket" "website" {
   }
 }
 
+resource "cloudflare_zone" "cdn" {
+  zone       = "speedshop.co"
+  account_id = var.cloudflare_account_id
+}
+
 resource "cloudflare_ruleset" "blog_legacy_redirects" {
   kind    = "zone"
   name    = "default"
   phase   = "http_request_dynamic_redirect"
-  zone_id = var.cloudflare_zone_id
+  zone_id = cloudflare_zone.cdn.id
 
   rules {
     action      = "redirect"
