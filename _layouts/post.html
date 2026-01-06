@@ -21,7 +21,7 @@
                 </div>
 
                 <div class="marginnote">
-                  {% include social-bar.html %}
+                  {{ content | toc }}
                 </div>
 
                 {% if page.summary %}
@@ -30,7 +30,7 @@
                   </div>
                 {% endif %}
 
-                {{ content }}
+                {{ content | header_anchors }}
 
                 {% include social-bar.html %}
                 <div style="height: 3rem"></div>
