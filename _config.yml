@@ -7,7 +7,9 @@ description: >
   profitable sites. Speed is a feature.
 baseurl: ""
 url: "https://www.speedshop.co"
-permalink: "blog/:title/"
+collections:
+  posts:
+    permalink: "blog/:title/"
 plugins:
   - jekyll-sitemap
 markdown: kramdown
