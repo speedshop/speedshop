@@ -76,9 +76,7 @@ resource "cloudflare_ruleset" "blog_legacy_redirects" {
         preserve_query_string = true
         status_code           = 301
         target_url {
-          expression = <<-EOT
-            "https://www.speedshop.co/retainer.html"
-          EOT
+          value = "https://www.speedshop.co/retainer.html"
         }
       }
     }
