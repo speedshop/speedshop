@@ -65,6 +65,27 @@ resource "cloudflare_ruleset" "blog_legacy_redirects" {
 
   rules {
     action      = "redirect"
+    description = "Tune page to retainer"
+    enabled     = true
+    expression  = <<-EOT
+      (http.request.uri.path eq "/tune.html")
+    EOT
+
+    action_parameters {
+      from_value {
+        preserve_query_string = true
+        status_code           = 301
+        target_url {
+          expression = <<-EOT
+            "https://www.speedshop.co/retainer.html"
+          EOT
+        }
+      }
+    }
+  }
+
+  rules {
+    action      = "redirect"
     description = "Legacy blog URLs to /blog/:slug/"
     enabled     = true
     expression  = <<-EOT
