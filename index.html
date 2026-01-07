@@ -197,6 +197,7 @@ layout: default
 
         // Animation variables
         let t = 0;
+        const RESTART_INTERVAL_MS = 30000;
 
         // Calculate scaling factor for different screen sizes
         const baseWidth = 700;
@@ -242,6 +243,11 @@ layout: default
             // Continue animation
             requestAnimationFrame(animate);
         }
+
+        // Restart the demo on an interval
+        setInterval(() => {
+            t = 0;
+        }, RESTART_INTERVAL_MS);
 
         // Start animation
         animate();
