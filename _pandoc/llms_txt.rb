@@ -37,12 +37,12 @@ end.compact.sort_by { |p| p[:date] || Date.new(1970, 1, 1) }.reverse
 
 # Generate llms.txt
 llms_txt = <<~HEADER
-# Speedshop
-
-> Speedshop is a Ruby on Rails performance consultancy. This site contains blog posts about Ruby and Rails performance, scaling, and optimization.
-
-## Blog Posts
-
+  # Speedshop
+  
+  > Speedshop is a Ruby on Rails performance consultancy. This site contains blog posts about Ruby and Rails performance, scaling, and optimization.
+  
+  ## Blog Posts
+  
 HEADER
 
 posts.each do |post|
@@ -56,10 +56,10 @@ puts "Generated llms.txt"
 
 # Generate llms-full.txt by concatenating original markdown from _posts
 llms_full = <<~HEADER
-# Speedshop - Full Content
-
-> This file contains the full markdown content of all blog posts from Speedshop, a Ruby on Rails performance consultancy.
-
+  # Speedshop - Full Content
+  
+  > This file contains the full markdown content of all blog posts from Speedshop, a Ruby on Rails performance consultancy.
+  
 HEADER
 
 posts.each do |post|

@@ -15,12 +15,12 @@ module Jekyll
       return content if content.nil? || content.empty?
 
       doc = Nokogiri::HTML.fragment(content)
-      doc.css('h2[id], h3[id], h4[id]').each do |header|
-        anchor = Nokogiri::XML::Node.new('a', doc)
-        anchor['href'] = "##{header['id']}"
-        anchor['class'] = 'header-anchor'
-        anchor.content = '#'
-        header.add_child(' ')
+      doc.css("h2[id], h3[id], h4[id]").each do |header|
+        anchor = Nokogiri::XML::Node.new("a", doc)
+        anchor["href"] = "##{header["id"]}"
+        anchor["class"] = "header-anchor"
+        anchor.content = "#"
+        header.add_child(" ")
         header.add_child(anchor)
       end
       doc.to_html
@@ -32,7 +32,7 @@ module Jekyll
       headers = []
       content.scan(/<h([2-4])[^>]*id="([^"]+)"[^>]*>(.*?)<\/h\1>/mi) do |level, id, text|
         clean_text = text.gsub(/<[^>]+>/, "").strip
-        headers << { level: level.to_i, id: id, text: clean_text }
+        headers << {level: level.to_i, id: id, text: clean_text}
       end
       headers
     end

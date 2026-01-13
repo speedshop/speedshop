@@ -8,7 +8,7 @@ module Jekyll
     def render(context)
       raw_path = @params[0]
       # Determine the full image source URL
-      img_src = if raw_path.match(/^https?:/)
+      img_src = if /^https?:/.match?(raw_path)
         # Already a full URL
         raw_path
       elsif raw_path.start_with?("/")
@@ -19,8 +19,8 @@ module Jekyll
         "#{context.registers[:site].config["url"]}/assets/posts/img/#{raw_path}"
       end
       caption = @params[1]
-      klass = @params[2] == "true" ? "no-mobile" : ""
-      output =  "<span class='marginnote #{klass}'>"
+      klass = (@params[2] == "true") ? "no-mobile" : ""
+      output = "<span class='marginnote #{klass}'>"
       output += "<img src='#{img_src}' loading='lazy'>"
       output += "<br>#{caption}"
       output += "</span>"
@@ -29,4 +29,4 @@ module Jekyll
   end
 end
 
-Liquid::Template.register_tag('marginnote_lazy', Jekyll::RenderMarginNoteTag)
+Liquid::Template.register_tag("marginnote_lazy", Jekyll::RenderMarginNoteTag)
