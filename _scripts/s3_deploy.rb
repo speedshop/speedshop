@@ -19,7 +19,9 @@ CACHE_CONTROL = {
 CACHE_RULES = [
   # Images - immutable (1 year)
   {patterns: %w[*.jpg *.jpeg *.png *.gif *.svg *.ico], cache: :immutable},
-  # JS/CSS - 1 day (no fingerprinting yet)
+  # Fingerprinted JS - immutable (pattern: name-hash.js where hash is 8 hex chars)
+  {patterns: %w[*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].js], cache: :immutable},
+  # Non-fingerprinted JS/CSS - 1 day
   {patterns: %w[*.js *.css], cache: :one_day},
   # Feeds/data - 1 hour
   {patterns: %w[*.xml *.json *.ics], cache: :one_hour}
