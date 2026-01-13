@@ -18,11 +18,11 @@ CACHE_CONTROL = {
 # File patterns and their cache control settings
 CACHE_RULES = [
   # Images - immutable (1 year)
-  { patterns: %w[*.jpg *.jpeg *.png *.gif *.svg *.ico], cache: :immutable },
+  {patterns: %w[*.jpg *.jpeg *.png *.gif *.svg *.ico], cache: :immutable},
   # JS/CSS - 1 day (no fingerprinting yet)
-  { patterns: %w[*.js *.css], cache: :one_day },
+  {patterns: %w[*.js *.css], cache: :one_day},
   # Feeds/data - 1 hour
-  { patterns: %w[*.xml *.json *.ics], cache: :one_hour }
+  {patterns: %w[*.xml *.json *.ics], cache: :one_hour}
   # Everything else gets :one_day as default
 ].freeze
 
