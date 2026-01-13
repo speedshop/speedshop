@@ -1,69 +1,49 @@
-name: Build and deploy
+name: Deploy
 
 on:
   push:
-  pull_request:
+    branches:
+      - master
   schedule:
     - cron: '0 0 * * *'  # Daily at midnight UTC
   workflow_dispatch:
 
 jobs:
-  lint:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - uses: ruby/setup-ruby@master
+    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      with:
+        repository: speedshop/client_notes
+        token: ${{ secrets.CLIENT_NOTES_PAT }}
+        path: client_notes
+    - uses: ruby/setup-ruby@e5517072e87f198d9533967ae13d97c11b604005 # v1.99.0
       with:
         ruby-version: '4.0'
-    - uses: actions/cache@master
-      with:
-        path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gems-
-    - name: Bundle install
-      run: |
-        bundle config path vendor/bundle
-        bundle install --jobs 4 --retry 3
-    - name: Run StandardRB
-      run: bundle exec standardrb
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '4.0'
-    - uses: r-lib/actions/setup-pandoc@v2
+    - uses: r-lib/actions/setup-pandoc@929c772977a3a13c8733b363bf5a2f685c25dd91 # v2.9.0
       with:
         pandoc-version: '2.9.2.1'
     - name: Install PDF dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-xetex librsvg2-bin
-    - uses: actions/cache@v4
+    - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       with:
         path: vendor/bundle
         key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-gems-
-    - uses: bahmutov/npm-install@v1
+    - uses: bahmutov/npm-install@cfc4184a518fdc2648e3734d6507ae8b9e0200e9 # v1.9.0
     - name: Bundle install
       run: |
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
-    - name: Clone client_notes repo
-      env:
-        CLIENT_NOTES_PAT: ${{ secrets.CLIENT_NOTES_PAT }}
-      run: |
-        git clone https://${CLIENT_NOTES_PAT}@github.com/speedshop/client_notes.git /tmp/client_notes
     - name: Build site
       env:
-        CLIENT_NOTES_PATH: /tmp/client_notes
+        CLIENT_NOTES_PATH: client_notes
       run: bundle exec jekyll build
     - name: Deploy to S3
-      if: github.ref == 'refs/heads/master'
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -71,8 +51,7 @@ jobs:
         S3_BUCKET: 'www.speedshop.co'
       run: bundle exec ruby _scripts/s3_deploy.rb
     - name: Cloudflare Purge Cache
-      uses: jakejarvis/cloudflare-purge-action@v0.3.0
-      if: github.ref == 'refs/heads/master'
+      uses: jakejarvis/cloudflare-purge-action@eee6dba0236093358f25bb1581bd615dc8b3d8e3 # v0.3.0
       env:
         CLOUDFLARE_ZONE: ${{ secrets.CLOUDFLARE_ZONE }}
         CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
