@@ -34,7 +34,13 @@ jobs:
       with:
         pandoc-version: '2.9.2.1'
 
+    - name: Install PDF dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-xetex librsvg2-bin
+
     - uses: actions/cache@v4
+
       with:
         path: vendor/bundle
         key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
