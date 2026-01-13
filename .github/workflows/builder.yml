@@ -61,7 +61,7 @@ jobs:
     - name: Build site
       env:
         CLIENT_NOTES_PATH: /tmp/client_notes
-      run: make
+      run: bundle exec jekyll build
     - name: Deploy to S3
       if: github.ref == 'refs/heads/master'
       env:
