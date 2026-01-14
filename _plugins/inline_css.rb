@@ -1,5 +1,14 @@
 Jekyll::Hooks.register :site, :post_write do |site|
-  css_path = File.join(site.dest, "assets/css/app.css")
+  # First, run PostCSS to build the CSS
+  puts '🔧 Building CSS with PostCSS...'
+  postcss_cmd = "npx postcss assets/css/app.css -o #{site.dest}/assets/css/app.css"
+
+  unless system(postcss_cmd)
+    puts '❌ PostCSS build failed'
+    next
+  end
+
+  css_path = File.join(site.dest, 'assets/css/app.css')
 
   unless File.exist?(css_path)
     puts "⚠️ Could not inline CSS: CSS file not found at #{css_path}"
@@ -22,11 +31,11 @@ Jekyll::Hooks.register :site, :post_write do |site|
   # end
 
   css = File.read(css_path)
-  Dir.glob(File.join(site.dest, "**", "*.html")).each do |html_path|
+  Dir.glob(File.join(site.dest, '**', '*.html')).each do |html_path|
     puts "✨ Inlining CSS into #{html_path}"
     html = File.read(html_path)
-    if html.include?("<!-- INLINE_CSS -->")
-      html.gsub!("<!-- INLINE_CSS -->", "<style>#{css}</style>")
+    if html.include?('<!-- INLINE_CSS -->')
+      html.gsub!('<!-- INLINE_CSS -->', "<style>#{css}</style>")
       File.write(html_path, html)
     end
   end

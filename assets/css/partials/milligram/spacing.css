@@ -1,0 +1,28 @@
+/* Spacing */
+
+.button,
+button,
+dd,
+dt,
+li {
+  margin-bottom: 3rem;
+}
+
+fieldset,
+input,
+select,
+textarea {
+  margin-bottom: 3rem;
+}
+
+blockquote,
+dl,
+figure,
+form,
+ol,
+p,
+pre,
+table,
+ul {
+  margin-bottom: 3rem;
+}
