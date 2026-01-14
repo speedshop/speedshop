@@ -87,7 +87,7 @@ resource "cloudflare_ruleset" "blog_legacy_redirects" {
     description = "Legacy blog URLs to /blog/:slug/"
     enabled     = true
     expression  = <<-EOT
-      (http.request.full_uri wildcard r"https://www.speedshop.co/blog/*/*/*/*.html")
+      (http.request.full_uri wildcard r"https://www.speedshop.co/20*/*/*/*.html")
     EOT
 
     action_parameters {
@@ -98,7 +98,7 @@ resource "cloudflare_ruleset" "blog_legacy_redirects" {
           expression = <<-EOT
             wildcard_replace(
               http.request.full_uri,
-              r"https://www.speedshop.co/blog/*/*/*/*.html",
+              r"https://www.speedshop.co/*/*/*/*.html",
               r"https://www.speedshop.co/blog/$${4}/"
             )
           EOT
