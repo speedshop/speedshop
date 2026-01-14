@@ -7,12 +7,19 @@ Jekyll::Hooks.register :site, :after_init do |site|
   data_dir = File.join(site.source, "_data")
   FileUtils.mkdir_p(data_dir)
 
+  def run_command(cmd, description)
+    return if system(cmd)
+
+    raise "Failed to #{description}: command '#{cmd}' exited with status #{$?.exitstatus}"
+  end
+
   Bundler.with_unbundled_env do
     Dir.chdir(client_notes_path) do
-      system("bundle install --quiet")
-      system("bundle exec rake sla:generate_json[#{data_dir}/sla_status.json]")
-      system("bundle exec rake sla:generate_holidays_ics[#{site.source}/holidays.ics]")
-      system("bundle exec rake availability:generate_json[#{data_dir}/availability.json]")
+      run_command("bundle install --quiet", "install client_notes dependencies")
+      run_command("bundle exec rake sla:generate_json[#{data_dir}/sla_status.json]", "generate SLA status JSON")
+      run_command("bundle exec rake sla:generate_holidays_ics[#{site.source}/holidays.ics]", "generate holidays ICS")
+      run_command("bundle exec rake availability:generate_json[#{data_dir}/availability.json]",
+        "generate availability JSON")
     end
   end
 end
