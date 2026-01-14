@@ -18,7 +18,7 @@ jobs:
         persist-credentials: false
     - uses: ruby/setup-ruby@e5517072e87f198d9533967ae13d97c11b604005 # v1.99.0
       with:
-        ruby-version: '3.3'
+        ruby-version: '3.1'
     - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       with:
         path: vendor/bundle
@@ -40,7 +40,7 @@ jobs:
         persist-credentials: false
     - uses: ruby/setup-ruby@e5517072e87f198d9533967ae13d97c11b604005 # v1.99.0
       with:
-        ruby-version: '3.3'
+        ruby-version: '3.1'
     - uses: r-lib/actions/setup-pandoc@929c772977a3a13c8733b363bf5a2f685c25dd91 # v2.9.0
       with:
         pandoc-version: '2.9.2.1'
