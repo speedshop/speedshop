@@ -1,4 +1,13 @@
 Jekyll::Hooks.register :site, :post_write do |site|
+  # First, run PostCSS to build the CSS
+  puts "🔧 Building CSS with PostCSS..."
+  postcss_cmd = "npx postcss assets/css/app.css -o #{site.dest}/assets/css/app.css"
+
+  unless system(postcss_cmd)
+    puts "❌ PostCSS build failed"
+    next
+  end
+
   css_path = File.join(site.dest, "assets/css/app.css")
 
   unless File.exist?(css_path)

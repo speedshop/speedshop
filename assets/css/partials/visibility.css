@@ -1,0 +1,31 @@
+/* Visibility */
+
+@media (max-width: 768px) {
+  .visible-desktop {
+    display: none !important;
+  }
+
+  .column-mobile-100 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .margin-top-xl {
+    margin-top: 2em;
+  }
+
+  .trusted-by-list {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 768px) {
+  .margin-top-xl {
+    margin-top: 10em;
+  }
+
+  .trusted-by-list {
+    column-count: 3;
+  }
+}

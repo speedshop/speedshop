@@ -1,0 +1,18 @@
+/* CSS Custom Properties (Variables) */
+:root {
+  /* Colors */
+  --color-initial: #fff;
+  --color-primary: #0000EE;
+  --color-secondary: #000;
+  --color-tertiary: #f4f5f6;
+  --color-quaternary: #d1d1d1;
+  --color-quinary: #e1e1e1;
+
+  /* Breakpoints - for reference, used in media queries */
+  /* mini: 544px, medium: 639px, large: 992px, desktop: 1200px, hd: 1500px */
+
+  /* Vertical Rhythm */
+  --rhythm-main: 3.3rem;
+  --rhythm-side: 1.65rem;
+  --rhythm-mobile: 2.1rem;
+}

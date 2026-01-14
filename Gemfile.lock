@@ -126,7 +126,6 @@ DEPENDENCIES
   csv
   foreman
   jekyll (= 4.3.3)
-  jekyll-sass-converter (~> 3.0)
   jekyll-sitemap
   logger
   nokogiri
