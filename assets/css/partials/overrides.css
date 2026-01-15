@@ -1,0 +1,142 @@
+/* Overrides */
+
+a:visited {
+  color: #551A8B;
+}
+
+.button:visited {
+  color: #FFF;
+}
+
+ol {
+  list-style: decimal outside;
+}
+
+ul {
+  list-style: square outside;
+}
+
+@media (max-width: 544px) {
+  ol, ul {
+    margin-left: 1.5em;
+  }
+}
+
+code {
+  margin: 0;
+}
+
+.disabled {
+  color: #999;
+}
+
+html {
+  height: 100%;
+  width: 100%;
+}
+
+pre > code {
+  white-space: pre-wrap;
+  overflow: auto;
+}
+
+.button, button, dd, dt, li {
+  margin-bottom: 0;
+}
+
+.button, button {
+  font-family: 'Helvetica Neue', Inter, Roboto, 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
+  height: auto;
+}
+
+.column.column-collapsible {
+  @media screen and (max-width: 639px) {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 3.5rem;
+  font-weight: 600;
+}
+
+a {
+  &:hover,
+  &:focus {
+    color: rgb(100,100,255);
+  }
+}
+
+.cta-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cta-separator {
+  margin: 0 1rem;
+}
+
+hr {
+  border-top: 0.1rem solid black;
+}
+
+/* Grid */
+
+@media (max-width: 639px) {
+  .container {
+    padding: 0 4rem;
+  }
+}
+
+@media (max-width: 544px) {
+  .container {
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 639px) {
+  .row {
+    flex-direction: row;
+    margin-left: -1.0rem;
+    width: calc(100% + 2.0rem);
+
+    & .column {
+      margin-bottom: inherit;
+      padding: 0 1.0rem;
+    }
+  }
+}
+
+p, li {
+  font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+}
+
+/* Typography */
+
+@media (min-width: 639px) {
+  h1 {
+    font-size: 6.0rem;
+  }
+
+  h2 {
+    font-size: 5.0rem;
+  }
+
+  h3 {
+    font-size: 4.0rem;
+  }
+
+  h4 {
+    font-size: 3.0rem;
+  }
+
+  h5 {
+    font-size: 2.4rem;
+  }
+
+  h6 {
+    font-size: 1.5rem;
+  }
+}
