@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = process.env.PORT || 4000;
-const SITE_DIR = path.join(__dirname, '..', '_site');
+const SITE_DIR = path.join(__dirname, '..', '..', '_site');
 
 const MIME_TYPES = {
   '.html': 'text/html',

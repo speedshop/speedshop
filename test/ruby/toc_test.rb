@@ -1,7 +1,7 @@
 require "minitest/autorun"
 require "liquid"
 
-require_relative "../_plugins/toc"
+require_relative "../../_plugins/toc"
 
 class TocFilterTest < Minitest::Test
   def test_toc_default_is_empty_string

@@ -2,7 +2,7 @@
 const { defineConfig } = require('@playwright/test');
 
 module.exports = defineConfig({
-  testDir: './tests',
+  testDir: './test/browser',
   testMatch: '**/*.spec.cjs',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
@@ -26,7 +26,7 @@ module.exports = defineConfig({
   ],
 
   webServer: {
-    command: 'node tests/server.cjs',
+    command: 'node test/browser/server.cjs',
     url: 'http://localhost:4000',
     reuseExistingServer: !process.env.CI,
     timeout: 10000,

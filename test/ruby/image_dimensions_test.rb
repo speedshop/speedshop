@@ -3,7 +3,7 @@ require "tmpdir"
 require "ostruct"
 require "liquid"
 
-require_relative "../_plugins/image_dimensions"
+require_relative "../../_plugins/image_dimensions"
 
 class ImageDimensionsFilterTest < Minitest::Test
   def test_image_dimensions_default_is_empty
