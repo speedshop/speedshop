@@ -62,7 +62,7 @@ class ImageDimensionsFilterTest < Minitest::Test
 
   def build_filter(site_source)
     filter = Object.new.extend(Jekyll::ImageDimensionsFilter)
-    context = Liquid::Context.new({}, {}, { site: OpenStruct.new(source: site_source) })
+    context = Liquid::Context.new({}, {}, {site: OpenStruct.new(source: site_source)})
     filter.instance_variable_set(:@context, context)
     filter
   end
