@@ -1,6 +1,7 @@
 {
   "name": "speedshop-dotcom",
   "dependencies": {
-      "purgecss": ">= 2.1.2"
+      "purgecss": ">= 2.1.2",
+      "postcss-purgecss": "5.0.0"
   }
 }
