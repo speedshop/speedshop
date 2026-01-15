@@ -25,7 +25,7 @@ module.exports = defineConfig({
   ],
 
   webServer: {
-    command: 'ruby -run -e httpd _site -p 4000',
+    command: 'node tests/server.cjs',
     url: 'http://localhost:4000',
     reuseExistingServer: !process.env.CI,
     timeout: 10000,
