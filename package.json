@@ -1,12 +1,14 @@
 {
   "name": "speedshop-dotcom",
   "scripts": {
-    "build:css": "postcss assets/css/app.css -o _site/assets/css/app.css"
+    "build:css": "postcss assets/css/app.css -o _site/assets/css/app.css",
+    "test": "npx playwright test"
   },
   "dependencies": {
     "purgecss": ">= 2.1.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "postcss": "^8.4.47",
     "postcss-cli": "^11.0.0",
     "postcss-import": "^16.1.0",

@@ -17,3 +17,7 @@ node_modules
 _data/sla_status.json
 _data/availability.json
 holidays.ics
+
+# Playwright test output
+test-results/
+playwright-report/
