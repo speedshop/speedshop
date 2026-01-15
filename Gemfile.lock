@@ -58,9 +58,12 @@ GEM
     logger (1.7.0)
     mercenary (0.4.0)
     mini_portile2 (2.8.9)
+    minitest (6.0.1)
+      prism (~> 1.5)
     nokogiri (1.19.0)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
+    ostruct (0.6.3)
     parallel (1.27.0)
     parser (3.3.10.0)
       ast (~> 2.4.1)
@@ -128,7 +131,9 @@ DEPENDENCIES
   jekyll (= 4.3.3)
   jekyll-sitemap
   logger
+  minitest
   nokogiri
+  ostruct
   standard
 
 BUNDLED WITH
