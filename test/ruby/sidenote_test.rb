@@ -1,7 +1,7 @@
 require "minitest/autorun"
 require "liquid"
 
-require_relative "../_plugins/sidenote"
+require_relative "../../_plugins/sidenote"
 
 class SidenoteTagTest < Minitest::Test
   def test_render_default_is_unnumbered_sidenote

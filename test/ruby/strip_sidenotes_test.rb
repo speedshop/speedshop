@@ -1,7 +1,7 @@
 require "minitest/autorun"
 require "liquid"
 
-require_relative "../_plugins/strip_sidenotes"
+require_relative "../../_plugins/strip_sidenotes"
 
 class StripSidenotesFilterTest < Minitest::Test
   def test_strip_sidenotes_default_is_input_unchanged

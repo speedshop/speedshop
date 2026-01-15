@@ -2,8 +2,8 @@ require "json"
 require "rake/testtask"
 
 Rake::TestTask.new(:test) do |t|
-  t.libs << "test"
-  t.test_files = FileList["test/**/*_test.rb"]
+  t.libs << "test/ruby"
+  t.test_files = FileList["test/ruby/**/*_test.rb"]
 end
 
 desc "Run StandardRB linter"

@@ -2,7 +2,7 @@ require "minitest/autorun"
 require "ostruct"
 require "liquid"
 
-require_relative "../_plugins/marginnote_lazy"
+require_relative "../../_plugins/marginnote_lazy"
 
 class MarginnotelazyTagTest < Minitest::Test
   def test_render_default_includes_marginnote_span
