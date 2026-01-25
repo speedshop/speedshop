@@ -54,6 +54,12 @@ jobs:
         AWS_DEFAULT_REGION: 'us-east-1'
         S3_BUCKET: 'www.speedshop.co'
       run: bundle exec ruby _scripts/s3_deploy.rb
+    - name: Deploy card directory to S3
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: 'us-east-1'
+      run: aws s3 sync card/ s3://www.speedshop.co/card/ --acl public-read --cache-control "max-age=86400"
     - name: Cloudflare Purge Cache
       uses: jakejarvis/cloudflare-purge-action@eee6dba0236093358f25bb1581bd615dc8b3d8e3 # v0.3.0
       env:
