@@ -30,6 +30,12 @@ CACHE_RULES = [
 
 def main
   bucket = ENV.fetch("S3_BUCKET") { abort "S3_BUCKET environment variable required" }
+  forbidden_dirs = %w[client_notes .client_notes].map { |dir| File.join(SITE_DIR, dir) }
+  forbidden_dirs.each do |dir|
+    next unless Dir.exist?(dir)
+
+    abort "Refusing to deploy: found forbidden directory in build output: #{dir}"
+  end
   config = YAML.safe_load_file(CONFIG_FILE)
   content_types = config.fetch("content_types", [])
 

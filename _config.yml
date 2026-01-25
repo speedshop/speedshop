@@ -19,6 +19,8 @@ encoding: utf-8
 exclude:
    - _h2o
    - _scripts
+   - client_notes
+   - .client_notes
    - Procfile
    - wercker.yml
    - Gemfile
