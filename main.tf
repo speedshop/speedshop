@@ -42,7 +42,6 @@ data "aws_iam_policy_document" "bucket_policy" {
 
 resource "aws_s3_bucket" "website" {
   bucket        = local.infra_name
-  acl           = "public-read"
   policy        = data.aws_iam_policy_document.bucket_policy.json
   force_destroy = true
 
@@ -50,6 +49,15 @@ resource "aws_s3_bucket" "website" {
     index_document = "index.html"
     error_document = "error.html"
   }
+}
+
+resource "aws_s3_bucket_public_access_block" "website" {
+  bucket = aws_s3_bucket.website.id
+
+  block_public_acls       = true
+  ignore_public_acls      = true
+  block_public_policy     = false
+  restrict_public_buckets = false
 }
 
 resource "cloudflare_zone" "cdn" {

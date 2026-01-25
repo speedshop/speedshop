@@ -1,4 +1,19 @@
-require "digest"
+require "json"
+
+def load_manifest_entries(path)
+  return {} unless File.exist?(path)
+
+  manifest = JSON.parse(File.read(path))
+  entries = manifest["entries"]
+  unless entries.is_a?(Hash)
+    warn "Manifest entries missing or invalid at #{path}"
+    return {}
+  end
+  entries
+rescue JSON::ParserError => e
+  warn "Manifest JSON invalid at #{path}: #{e.message}"
+  {}
+end
 
 Jekyll::Hooks.register :site, :post_write do |site|
   # Build CSS and JS with esbuild
@@ -10,27 +25,12 @@ Jekyll::Hooks.register :site, :post_write do |site|
     next
   end
 
-  # Fingerprint JS files
-  js_dir = File.join(site.dest, "assets/js")
-  fingerprinted = {}
-
-  if Dir.exist?(js_dir)
-    Dir.glob(File.join(js_dir, "*.js")).each do |js_path|
-      content = File.read(js_path)
-      hash = Digest::MD5.hexdigest(content)[0, 8]
-      basename = File.basename(js_path, ".js")
-      fingerprinted_name = "#{basename}-#{hash}.js"
-      fingerprinted_path = File.join(js_dir, fingerprinted_name)
-
-      File.write(fingerprinted_path, content)
-      puts "Fingerprinted #{basename}.js -> #{fingerprinted_name}"
-
-      fingerprinted["/assets/js/#{basename}.js"] = "/assets/js/#{fingerprinted_name}"
-    end
-  end
+  manifest_path = File.join(site.dest, "assets/manifest.json")
+  manifest_entries = load_manifest_entries(manifest_path)
 
   # Inline CSS
-  css_path = File.join(site.dest, "assets/css/app.css")
+  css_entry = manifest_entries.fetch("/assets/css/app.css", "/assets/css/app.css")
+  css_path = File.join(site.dest, css_entry.sub(%r{\A/}, ""))
 
   unless File.exist?(css_path)
     puts "Could not inline CSS: CSS file not found at #{css_path}"
@@ -51,10 +51,12 @@ Jekyll::Hooks.register :site, :post_write do |site|
       modified = true
     end
 
-    # Update fingerprinted JS references
-    fingerprinted.each do |original, fingerprinted_url|
+    # Update hashed asset references from the manifest
+    manifest_entries.each do |original, hashed|
+      next if original == hashed
+
       if html.include?(original)
-        html.gsub!(original, fingerprinted_url)
+        html.gsub!(original, hashed)
         modified = true
       end
     end

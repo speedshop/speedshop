@@ -36,8 +36,8 @@ def main
 
     abort "Refusing to deploy: found forbidden directory in build output: #{dir}"
   end
-  config = YAML.safe_load_file(CONFIG_FILE)
-  content_types = config.fetch("content_types", [])
+  config = load_config
+  content_types = load_content_types(config)
 
   puts "Deploying #{SITE_DIR}/ to s3://#{bucket}"
 
@@ -54,14 +54,14 @@ def main
     includes = rule[:patterns].map { |p| "--include #{p.shellescape}" }.join(" ")
 
     puts "\n=> Syncing #{rule[:patterns].join(", ")} with Cache-Control: #{cache_value}"
-    run "aws s3 sync #{SITE_DIR} s3://#{bucket} --acl public-read " \
+    run "aws s3 sync #{SITE_DIR} s3://#{bucket} " \
         "--exclude \"*\" #{includes} " \
         "--cache-control #{cache_value.shellescape}"
   end
 
   # Sync standard files (excluding cache-rule patterns and content-type patterns)
   puts "\n=> Syncing standard files with Cache-Control: #{CACHE_CONTROL[:one_day]}"
-  run "aws s3 sync #{SITE_DIR} s3://#{bucket} --acl public-read --delete " \
+  run "aws s3 sync #{SITE_DIR} s3://#{bucket} --delete " \
       "--cache-control #{CACHE_CONTROL[:one_day].shellescape} #{cache_excludes} #{content_type_excludes}"
 
   # Sync files with special Content-Type
@@ -71,7 +71,7 @@ def main
     cache_value = cache_for_pattern(pattern)
 
     puts "\n=> Syncing #{pattern} with Content-Type: #{content_type}, Cache-Control: #{cache_value}"
-    run "aws s3 sync #{SITE_DIR} s3://#{bucket} --acl public-read " \
+    run "aws s3 sync #{SITE_DIR} s3://#{bucket} " \
         "--exclude \"*\" --include #{pattern.shellescape} " \
         "--content-type #{content_type.shellescape} " \
         "--cache-control #{cache_value.shellescape}"
@@ -85,6 +85,46 @@ def cache_for_pattern(pattern)
     return CACHE_CONTROL[rule[:cache]] if rule[:patterns].any? { |p| File.fnmatch(p, pattern) }
   end
   CACHE_CONTROL[:one_day]
+end
+
+def load_config
+  unless File.exist?(CONFIG_FILE)
+    warn "#{CONFIG_FILE} not found; proceeding without content-type overrides."
+    return {}
+  end
+
+  config = YAML.safe_load_file(CONFIG_FILE)
+  if config.nil? || config == false
+    warn "#{CONFIG_FILE} is empty; proceeding without content-type overrides."
+    return {}
+  end
+
+  unless config.is_a?(Hash)
+    abort "#{CONFIG_FILE} must be a YAML mapping with a content_types key."
+  end
+
+  config
+end
+
+def load_content_types(config)
+  content_types = config.fetch("content_types", [])
+  unless content_types.is_a?(Array)
+    abort "#{CONFIG_FILE} content_types must be an array of {pattern, content_type} entries."
+  end
+
+  content_types.each_with_index do |entry, index|
+    unless entry.is_a?(Hash)
+      abort "#{CONFIG_FILE} content_types entry #{index} must be a mapping."
+    end
+
+    pattern = entry["pattern"].to_s.strip
+    content_type = entry["content_type"].to_s.strip
+    if pattern.empty? || content_type.empty?
+      abort "#{CONFIG_FILE} content_types entry #{index} must include pattern and content_type."
+    end
+  end
+
+  content_types
 end
 
 def run(cmd)
