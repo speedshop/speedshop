@@ -117,6 +117,7 @@ resource "cloudflare_worker_script" "card_worker" {
   account_id = var.cloudflare_account_id
   name       = "card-worker"
   content    = file("${path.module}/worker.js")
+  module     = true
 }
 
 resource "cloudflare_worker_route" "card_route" {
