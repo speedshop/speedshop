@@ -17,7 +17,7 @@ jobs:
       with:
         repository: speedshop/client_notes
         token: ${{ secrets.CLIENT_NOTES_PAT }}
-        path: client_notes
+        path: .client_notes
     - uses: ruby/setup-ruby@4fc31e1c823882afd7ef55985266a526c589de90 # v1.282.0
       with:
         ruby-version-file: '.ruby-version'
@@ -43,7 +43,7 @@ jobs:
       run: bundle exec rake validate:ruby_version
     - name: Build site
       env:
-        CLIENT_NOTES_PATH: client_notes
+        CLIENT_NOTES_PATH: .client_notes
       run: bundle exec jekyll build
     - name: Validate generated data
       run: bundle exec rake validate:generated_data
