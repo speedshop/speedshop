@@ -9,16 +9,16 @@
  */
 
 const FORMATS = {
-  json:    { key: "card.json",  type: "application/json" },
-  html:    { key: "card.html",  type: "text/html" },
-  vcard:   { key: "card.vcf",   type: "text/vcard" },
-  xml:     { key: "card.xml",   type: "application/xml" },
-  yaml:    { key: "card.yaml",  type: "application/x-yaml" },
-  qrcode:  { key: "card.svg",   type: "image/svg+xml" },
-  jpeg:    { key: "card.jpeg",  type: "image/jpeg" },
-  wav:     { key: "card.wav",   type: "audio/wav" },
+  json:    { key: "card/card.json",  type: "application/json" },
+  html:    { key: "card/card.html",  type: "text/html" },
+  vcard:   { key: "card/card.vcf",   type: "text/vcard" },
+  xml:     { key: "card/card.xml",   type: "application/xml" },
+  yaml:    { key: "card/card.yaml",  type: "application/x-yaml" },
+  qrcode:  { key: "card/card.svg",   type: "image/svg+xml" },
+  jpeg:    { key: "card/card.jpeg",  type: "image/jpeg" },
+  wav:     { key: "card/card.wav",   type: "audio/wav" },
   help:    { key: null,         type: "text/plain" },
-  default: { key: "card.txt",   type: "text/plain" }
+  default: { key: "card/card.txt",   type: "text/plain" }
 };
 
 const S3_BASE_URL = "https://www.speedshop.co";
