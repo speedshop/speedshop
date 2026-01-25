@@ -107,3 +107,15 @@ resource "cloudflare_ruleset" "blog_legacy_redirects" {
     }
   }
 }
+
+resource "cloudflare_worker_script" "card_worker" {
+  account_id = var.cloudflare_account_id
+  name       = "card-worker"
+  content    = file("${path.module}/worker.js")
+}
+
+resource "cloudflare_worker_route" "card_route" {
+  zone_id     = cloudflare_zone.cdn.id
+  pattern     = "www.speedshop.co/card*"
+  script_name = cloudflare_worker_script.card_worker.name
+}
