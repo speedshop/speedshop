@@ -1,3 +1,5 @@
+require "fileutils"
+
 Jekyll::Hooks.register :site, :post_write do |site|
   post_paths = Dir["#{site.dest}/**/*"].select { |p| p.end_with?(".html") }
   next if post_paths.empty?
@@ -5,10 +7,18 @@ Jekyll::Hooks.register :site, :post_write do |site|
   pandoc_opts = "--lua-filter #{site.source}/_pandoc/url_filter.lua --resource-path=#{site.dest} --pdf-engine=xelatex"
 
   errors = []
+  alias_md_paths = []
   mutex = Mutex.new
 
   threads = post_paths.flat_map do |pp|
     base_path = pp.sub(/\.html$/, "")
+
+    if (match = pp.match(%r{/blog/([^/]+)/index\.html$}))
+      alias_md_paths << {
+        source: "#{base_path}.md",
+        target: File.join(site.dest, "blog", "#{match[1]}.md")
+      }
+    end
 
     [
       Thread.new do
@@ -27,6 +37,16 @@ Jekyll::Hooks.register :site, :post_write do |site|
   end
 
   threads.map(&:join)
+
+  alias_md_paths.each do |paths|
+    next unless File.exist?(paths[:source])
+
+    begin
+      FileUtils.cp(paths[:source], paths[:target])
+    rescue StandardError => e
+      errors << "MD alias #{paths[:target]}: #{e.message}"
+    end
+  end
 
   if errors.any?
     Jekyll.logger.error "Pandoc", "Errors during conversion:"
