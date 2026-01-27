@@ -43,7 +43,7 @@ Jekyll::Hooks.register :site, :post_write do |site|
 
     begin
       FileUtils.cp(paths[:source], paths[:target])
-    rescue StandardError => e
+    rescue => e
       errors << "MD alias #{paths[:target]}: #{e.message}"
     end
   end
