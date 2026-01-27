@@ -1,9 +1,14 @@
 require "yaml"
 require "date"
+require "pathname"
 
 SITE_URL = "https://www.speedshop.co"
 
 Jekyll::Hooks.register :site, :post_write do |site|
+  posts_by_path = site.posts.docs.each_with_object({}) do |post, index|
+    index[post.relative_path] = post.url
+  end
+
   posts = Dir["#{site.source}/_posts/*.md"].map do |post_path|
     content = File.read(post_path, encoding: "UTF-8")
     front_matter = content.match(/\A---\n(.+?)\n---/m)
@@ -20,12 +25,18 @@ Jekyll::Hooks.register :site, :post_write do |site|
       next
     end
 
+    relative_path = Pathname(post_path).relative_path_from(Pathname(site.source)).to_s
+    post_url = posts_by_path[relative_path]
+    md_path = post_url ? post_url.sub(%r{/$}, "") : url_path
+    html_url = post_url || "#{url_path}.html"
+
     body = content.sub(/\A---\n.+?\n---\n*/m, "")
 
     {
       title: meta["title"],
       summary: meta["summary"],
-      url_path: url_path,
+      url_md: "#{md_path}.md",
+      url_html: html_url,
       date: date,
       body: body
     }
@@ -43,7 +54,7 @@ Jekyll::Hooks.register :site, :post_write do |site|
   posts.each do |post|
     desc = post[:summary] ? ": #{post[:summary][0, 150].gsub(/\s+/, " ").strip}" : ""
     desc = desc[0, 150] + "..." if desc.length > 153
-    llms_txt << "- [#{post[:title]}](#{SITE_URL}#{post[:url_path]}.md)#{desc}\n"
+    llms_txt << "- [#{post[:title]}](#{SITE_URL}#{post[:url_md]})#{desc}\n"
   end
 
   File.write("#{site.dest}/llms.txt", llms_txt, encoding: "UTF-8")
@@ -59,7 +70,7 @@ Jekyll::Hooks.register :site, :post_write do |site|
   posts.each do |post|
     llms_full << "\n---\n\n"
     llms_full << "## #{post[:title]}\n\n"
-    llms_full << "URL: #{SITE_URL}#{post[:url_path]}.html\n\n"
+    llms_full << "URL: #{SITE_URL}#{post[:url_html]}\n\n"
     llms_full << post[:body]
     llms_full << "\n"
   end
