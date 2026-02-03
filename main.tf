@@ -141,3 +141,22 @@ resource "cloudflare_worker_route" "card_route" {
   pattern     = "www.speedshop.co/card*"
   script_name = cloudflare_worker_script.card_worker.name
 }
+
+# Agent-ready content negotiation worker
+# Implements Mintlify's agent-ready documentation pattern:
+# - Serves markdown when Accept: text/markdown header is present
+# - Adds Link header advertising llms.txt on all responses
+# - Adds X-Robots-Tag: noindex, nofollow on markdown responses
+
+resource "cloudflare_worker_script" "agent_worker" {
+  account_id = var.cloudflare_account_id
+  name       = "agent-worker"
+  content    = file("${path.module}/agent-worker.js")
+  module     = true
+}
+
+resource "cloudflare_worker_route" "agent_route" {
+  zone_id     = cloudflare_zone.cdn.id
+  pattern     = "www.speedshop.co/*"
+  script_name = cloudflare_worker_script.agent_worker.name
+}

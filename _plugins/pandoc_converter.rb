@@ -48,6 +48,14 @@ Jekyll::Hooks.register :site, :post_write do |site|
     end
   end
 
+  # Prepend llms.txt reference to all generated markdown files for agent discovery
+  llms_header = "<!-- For full site context, see: https://www.speedshop.co/llms.txt -->\n\n"
+  Dir["#{site.dest}/**/*.md"].each do |md_file|
+    content = File.read(md_file, encoding: "UTF-8")
+    next if content.start_with?("<!--")
+    File.write(md_file, llms_header + content, encoding: "UTF-8")
+  end
+
   if errors.any?
     Jekyll.logger.error "Pandoc", "Errors during conversion:"
     errors.each { |e| Jekyll.logger.error "Pandoc", e }

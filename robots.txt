@@ -1,3 +1,8 @@
 User-agent: *
-Disallow: /rpw_checkout_success.html 
+Disallow: /rpw_checkout_success.html
 Disallow: /rpw_contact_success.html
+
+# Agent-ready documentation index
+# See: https://www.mintlify.com/blog/context-for-agents
+Allow: /llms.txt
+Allow: /llms-full.txt
