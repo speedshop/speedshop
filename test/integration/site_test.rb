@@ -70,6 +70,24 @@ class SiteTest < Minitest::Test
       "Markdown files should have llms.txt reference header (requires pandoc_converter.rb update)")
   end
 
+  def test_markdown_has_no_pandoc_artifacts
+    response = get("/blog/the-complete-guide-to-rails-caching/index.md")
+    body = response.body
+
+    refute_match(/^:::/, body,
+      "Markdown should not have Pandoc div markers (:::)")
+    refute_match(/\{\.[\w-]+\}/, body,
+      "Markdown should not have Pandoc attribute syntax ({.class})")
+  end
+
+  def test_markdown_preserves_liquid_tags
+    response = get("/blog/the-complete-guide-to-rails-caching/index.md")
+    body = response.body
+
+    assert_match(/\{%\s*(marginnote_lazy|sidenote)/, body,
+      "Markdown should preserve Liquid tags like marginnote_lazy and sidenote")
+  end
+
   # Content negotiation tests (requires Cloudflare worker in production)
 
   def test_accept_markdown_returns_markdown
