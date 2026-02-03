@@ -1,1 +1,78 @@
 env_file = ".env"
+
+[tasks.lint]
+description = "Run all linters"
+run = "bundle exec standardrb"
+
+[tasks."test:ruby"]
+description = "Run Ruby unit tests"
+depends = ["lint"]
+run = "bundle exec rake test"
+
+[tasks."test:browser"]
+description = "Run Playwright browser tests"
+depends = ["test:ruby"]
+run = "npm test"
+
+[tasks."test:integration"]
+description = "Run integration tests against local Cloudflare worker"
+depends = ["test:browser"]
+dir = "{{config_root}}"
+run = """
+#!/usr/bin/env bash
+set -e
+
+cleanup() {
+  echo "Cleaning up..."
+  pkill -f 'http.server 4000' 2>/dev/null || true
+  pkill -f 'wrangler dev' 2>/dev/null || true
+}
+trap cleanup EXIT
+
+# Start static file server
+echo "Starting static file server..."
+(cd _site && python3 -m http.server 4000 > /dev/null 2>&1) &
+sleep 2
+
+# Start Cloudflare worker using local node_modules
+echo "Starting Cloudflare worker..."
+./node_modules/.bin/wrangler dev --port 8787 > /tmp/wrangler.log 2>&1 &
+sleep 4
+
+# Wait for wrangler to be ready
+for i in {1..15}; do
+  if curl -s -o /dev/null http://localhost:8787/ 2>/dev/null; then
+    echo "Wrangler ready"
+    break
+  fi
+  echo "Waiting for wrangler... ($i)"
+  sleep 2
+done
+
+# Verify servers are running
+if ! curl -s -o /dev/null http://localhost:4000/ 2>/dev/null; then
+  echo "Error: Static server not responding"
+  exit 1
+fi
+
+if ! curl -s -o /dev/null http://localhost:8787/ 2>/dev/null; then
+  echo "Error: Wrangler not responding"
+  cat /tmp/wrangler.log
+  exit 1
+fi
+
+echo "Running integration tests..."
+BASE_URL=http://localhost:8787 bundle exec ruby test/integration/site_test.rb
+"""
+
+[tasks."test:integration:prod"]
+description = "Run integration tests against production"
+run = "BASE_URL=https://www.speedshop.co bundle exec ruby test/integration/site_test.rb"
+
+[tasks.test]
+description = "Run all tests and linters"
+depends = ["test:integration"]
+
+[tasks."test:ci"]
+description = "Run tests for CI (no local workers)"
+depends = ["test:browser"]

@@ -1,0 +1,28 @@
+name: Integration Tests
+
+on:
+  workflow_run:
+    workflows: ["Deploy"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Base URL to test against'
+        required: false
+        default: 'https://www.speedshop.co'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3'
+        bundler-cache: true
+    - name: Run integration tests
+      env:
+        BASE_URL: ${{ github.event.inputs.base_url || 'https://www.speedshop.co' }}
+      run: bundle exec ruby test/integration/site_test.rb

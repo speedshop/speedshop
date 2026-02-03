@@ -3,7 +3,9 @@
   "type": "module",
   "scripts": {
     "build": "node _scripts/build.mjs",
-    "test": "npx playwright test"
+    "test": "npx playwright test",
+    "dev:worker": "wrangler dev",
+    "dev:static": "cd _site && python3 -m http.server 4000"
   },
   "dependencies": {
     "pjax": "^0.2.8",
@@ -11,6 +13,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
-    "esbuild": "^0.27.2"
+    "esbuild": "^0.27.2",
+    "wrangler": "^4.62.0"
   }
 }

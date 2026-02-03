@@ -27,3 +27,7 @@ exclude:
    - Gemfile
    - Gemfile.lock
    - assets/js/main.js
+   - mise.toml
+   - wrangler.toml
+   - test
+   - AGENTS.md

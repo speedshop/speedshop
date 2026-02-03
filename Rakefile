@@ -6,6 +6,11 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = FileList["test/ruby/**/*_test.rb"]
 end
 
+desc "Run integration tests (set BASE_URL env var, default: http://localhost:4000)"
+task :integration do
+  sh "ruby test/integration/site_test.rb"
+end
+
 desc "Run StandardRB linter"
 task :lint do
   sh "bundle exec standardrb"

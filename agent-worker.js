@@ -7,6 +7,11 @@
  * - Adds X-Robots-Tag: noindex, nofollow on markdown responses
  *
  * https://www.mintlify.com/blog/context-for-agents
+ *
+ * Local development:
+ *   1. Start static server: cd _site && python3 -m http.server 4000
+ *   2. Run worker: npx wrangler dev
+ *   3. Test at http://localhost:8787
  */
 
 const SITE_URL = "https://www.speedshop.co";
@@ -78,6 +83,21 @@ function isStaticAsset(pathname) {
   );
 }
 
+async function fetchFromOrigin(pathname, env) {
+  // In local dev, fetch from the static file server
+  // In production, fetch from the same origin (Cloudflare routes to S3)
+  const originUrl = env?.ORIGIN_URL || SITE_URL;
+  const url = originUrl + pathname;
+
+  return fetch(url, {
+    cf: {
+      // Bypass cache to go directly to origin
+      cacheTtl: 0,
+      cacheEverything: false
+    }
+  });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -85,7 +105,7 @@ export default {
 
     // Skip content negotiation for static assets and already-markdown files
     if (isStaticAsset(pathname)) {
-      const response = await fetch(request);
+      const response = await fetchFromOrigin(pathname, env);
       return new Response(response.body, {
         status: response.status,
         statusText: response.statusText,
@@ -96,17 +116,9 @@ export default {
     // Content negotiation: serve markdown if requested
     if (wantsMarkdown(request)) {
       const mdPath = getMarkdownPath(pathname);
-      const mdUrl = new URL(mdPath, url.origin);
 
       try {
-        // Fetch the markdown version from origin, bypassing cache/worker loops
-        const mdResponse = await fetch(mdUrl.toString(), {
-          cf: {
-            // Bypass cache to go directly to origin
-            cacheTtl: 0,
-            cacheEverything: false
-          }
-        });
+        const mdResponse = await fetchFromOrigin(mdPath, env);
 
         if (mdResponse.ok) {
           return new Response(mdResponse.body, {
@@ -120,7 +132,7 @@ export default {
     }
 
     // Default: serve HTML with agent headers
-    const response = await fetch(request);
+    const response = await fetchFromOrigin(pathname, env);
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
