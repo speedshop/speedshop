@@ -31,3 +31,12 @@ exclude:
    - wrangler.toml
    - test
    - AGENTS.md
+   - main.tf
+   - variables.tf
+   - versions.tf
+   - Rakefile
+   - package.json
+   - package-lock.json
+   - playwright.config.cjs
+   - node_modules
+   - .terraform
