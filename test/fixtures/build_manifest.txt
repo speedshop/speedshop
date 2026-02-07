@@ -1,0 +1,40 @@
+# Build manifest - expected contents of _site
+# Update this file when intentionally adding/removing site content
+#
+# Syntax:
+#   dir/        - directory (contents not checked by this test)
+#   page.*      - page with format variants (.html, .md, .pdf, .epub)
+#   file.ext    - exact file
+#
+# Sitemap section uses full URLs
+
+[directories]
+assets/
+blog/
+
+[pages]
+index.*
+rails-performance-workshop.*
+retainer.*
+rpw_checkout_success.*
+status.*
+vertical_debug.*
+
+[files]
+agent-worker.js
+feed.xml
+holidays.ics
+llms-full.txt
+llms.txt
+robots.txt
+sitemap.xml
+worker.js
+
+[sitemap]
+# Static pages in sitemap (blog posts are allowed dynamically)
+https://www.speedshop.co/
+https://www.speedshop.co/assets/files/TuneWikiEdu.pdf
+https://www.speedshop.co/blog/
+https://www.speedshop.co/rails-performance-workshop.html
+https://www.speedshop.co/retainer.html
+https://www.speedshop.co/rpw_checkout_success.html
