@@ -238,6 +238,18 @@ class SiteTest < Minitest::Test
     assert_includes response["content-type"], "application/epub"
   end
 
+  def test_blog_post_pdf_available_at_slug
+    response = get("/blog/the-complete-guide-to-rails-caching.pdf")
+    assert_equal "200", response.code
+    assert_includes response["content-type"], "application/pdf"
+  end
+
+  def test_blog_post_epub_available_at_slug
+    response = get("/blog/the-complete-guide-to-rails-caching.epub")
+    assert_equal "200", response.code
+    assert_includes response["content-type"], "application/epub"
+  end
+
   # Legacy redirect tests
 
   def test_legacy_blog_url_redirects
