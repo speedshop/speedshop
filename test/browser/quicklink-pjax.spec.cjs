@@ -76,14 +76,9 @@ test.describe('Quicklink and Pjax behavior', () => {
     // Click the link
     await link.click();
 
-    // Wait for pjax to complete
-    await page.waitForFunction(() => {
-      return document.body.innerHTML.includes('retainer') ||
-             window.location.pathname.includes('retainer');
-    }, { timeout: 5000 });
-
-    // Verify URL changed
-    expect(page.url()).toContain('retainer');
+    // Wait for pjax to complete. Don't key off body text here, since the home page
+    // can contain "retainer" in link URLs and make this pass before navigation finishes.
+    await expect(page).toHaveURL(/retainer/, { timeout: 5000 });
 
     // Pjax should NOT trigger a full page load event
     // (Note: this might be flaky since pjax replaces body content)

@@ -15,12 +15,13 @@ module Jekyll
       return content if content.nil? || content.empty?
 
       doc = Nokogiri::HTML.fragment(content)
+      document = doc.document
       doc.css("h2[id], h3[id], h4[id]").each do |header|
-        anchor = Nokogiri::XML::Node.new("a", doc)
+        anchor = Nokogiri::XML::Node.new("a", document)
         anchor["href"] = "##{header["id"]}"
         anchor["class"] = "header-anchor"
         anchor.content = "#"
-        header.add_child(" ")
+        header.add_child(Nokogiri::XML::Text.new(" ", document))
         header.add_child(anchor)
       end
       doc.to_html
@@ -40,7 +41,8 @@ module Jekyll
     def build_toc(headers)
       return "" if headers.empty?
 
-      output = %(<nav class="toc">\n)
+      # Use a mutable string to avoid Ruby's "literal string will be frozen" warning.
+      output = +%(<nav class="toc">\n)
       output << %(<h4>Contents</h4>\n)
       output << %(<ol>\n)
 
