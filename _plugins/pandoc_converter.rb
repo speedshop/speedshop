@@ -16,6 +16,8 @@ Jekyll::Hooks.register :site, :post_write do |site|
 
   errors = []
   alias_md_paths = []
+  alias_pdf_paths = []
+  alias_epub_paths = []
   mutex = Mutex.new
 
   threads = post_paths.flat_map do |pp|
@@ -23,9 +25,18 @@ Jekyll::Hooks.register :site, :post_write do |site|
     blog_match = pp.match(%r{/blog/([^/]+)/index\.html$})
 
     if blog_match
+      slug = blog_match[1]
       alias_md_paths << {
         source: "#{base_path}.md",
-        target: File.join(site.dest, "blog", "#{blog_match[1]}.md")
+        target: File.join(site.dest, "blog", "#{slug}.md")
+      }
+      alias_pdf_paths << {
+        source: "#{base_path}.pdf",
+        target: File.join(site.dest, "blog", "#{slug}.pdf")
+      }
+      alias_epub_paths << {
+        source: "#{base_path}.epub",
+        target: File.join(site.dest, "blog", "#{slug}.epub")
       }
     end
 
@@ -75,6 +86,26 @@ Jekyll::Hooks.register :site, :post_write do |site|
       FileUtils.cp(paths[:source], paths[:target])
     rescue => e
       errors << "MD alias #{paths[:target]}: #{e.message}"
+    end
+  end
+
+  alias_pdf_paths.each do |paths|
+    next unless File.exist?(paths[:source])
+
+    begin
+      FileUtils.cp(paths[:source], paths[:target])
+    rescue => e
+      errors << "PDF alias #{paths[:target]}: #{e.message}"
+    end
+  end
+
+  alias_epub_paths.each do |paths|
+    next unless File.exist?(paths[:source])
+
+    begin
+      FileUtils.cp(paths[:source], paths[:target])
+    rescue => e
+      errors << "EPUB alias #{paths[:target]}: #{e.message}"
     end
   end
 
