@@ -2,6 +2,7 @@ source "https://rubygems.org"
 
 gem "base64"
 gem "csv"
+gem "cgi"
 gem "foreman"
 gem "jekyll", "4.3.3"
 gem "jekyll-sitemap"
