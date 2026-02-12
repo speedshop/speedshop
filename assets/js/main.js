@@ -8,6 +8,7 @@ function init() {
   // Initialize PJAX for smooth page transitions
   new Pjax({
     selectors: ["body"],
+    cacheBust: false,
   });
 
   // Fallback to full navigation on PJAX errors (e.g., 404 responses).
