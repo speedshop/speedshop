@@ -34,7 +34,7 @@ We'll deal with these questions and more in this article.
 
 {% sidenote "Most descriptions of the GVL immediately dive into concepts like atomicity and thread-safety. This description will start from a more basic premise and work up to that." %}
 
-{% sidenote "YARV was essentially [Koichi Sasada's graduate thesis.](https://dl.acm.org/doi/pdf/10.1145/1094855.1094912)" %}
+{% sidenote "YARV was essentially [Koichi Sasada's graduate thesis.](https://en.wikipedia.org/wiki/YARV)" %}
 
 Wait: isn't it the GIL? What's the GVL? 
 

@@ -31,7 +31,7 @@ To open Chrome Timeline, open up Chrome Developer Tools (Cmd + Alt + I on Mac) a
 
 The Chrome Timeline records page interactions a lot like a VCR. You can click the little circular icon (the record button) at any time to turn on Timeline recording, and then click it again to stop recording. If the Timeline is open during a refresh, it will automatically record until the page has loaded.
 
-Let's try it on [http://todomvc-turbolinks.herokuapp.com/](http://todomvc-turbolinks.herokuapp.com/). This is a [TodoMVC](http://todomvc.com) implementation I did for a previous blog on Turbolinks. While the Timeline is open, you can trigger a full page load with CMD + Shift + R and Chrome will automatically record the page load for you in Timeline.{% sidenote 1 "Be sure you're doing a hard refresh here, otherwise you may not redownload any assets." %}
+Let's try it on [https://github.com/nateberkopec/todomvc-turbolinks](https://github.com/nateberkopec/todomvc-turbolinks). This is a [TodoMVC](http://todomvc.com) implementation I did for a previous blog on Turbolinks. While the Timeline is open, you can trigger a full page load with CMD + Shift + R and Chrome will automatically record the page load for you in Timeline.{% sidenote 1 "Be sure you're doing a hard refresh here, otherwise you may not redownload any assets." %}
 
 **Note that browser extensions will show up on Chrome Timeline.** Any extension that alters the page may show up and make your timelines confusing. Do yourself a favor and disable all of your extensions while profiling with Chrome Timeline.
 

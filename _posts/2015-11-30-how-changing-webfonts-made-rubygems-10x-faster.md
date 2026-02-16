@@ -16,7 +16,7 @@ Internet access is not great everywhere - Akamai puts the global average connect
 
 When designing the website for a project that wants to encourage global collaboration, as most FOSS sites do, we need to be thinking about our users in low-bandwidth areas (which is to say, the majority of global internet users). We don't want to make a high-bandwidth connection a barrier to learning a programming language or contributing to open-source.
 
-It's with this mindset that I've been looking at the performance of [Rubygems.org](Rubygems.org) for the last few weeks. As a Rubyist, I want people all over the world to be able to use Ruby - fast connection or no.
+It's with this mindset that I've been looking at the performance of [Rubygems.org](https://rubygems.org) for the last few weeks. As a Rubyist, I want people all over the world to be able to use Ruby - fast connection or no.
 
 Rubygems.org is one of the most critical infrastructure pieces in the Ruby ecosystem - you use it every time you `gem install` (or `bundle install`, for that matter). Rubygems.org also has a web application, which hosts a gem index and search function. It also has some backend tools for gem maintainers.
 
@@ -27,7 +27,7 @@ I decided to dig in to the frontend performance of Rubygems.org for these reason
 {% marginnote_lazy https://i.imgur.com/5fnVtiy.png|For more about Chrome Timeline, [see my guide.](/blog/frontend-performance-chrome-timeline/) %} When diagnosing a website's performance, I do two things straight off the bat:
 
 * Open the site in Chrome. Open DevTools, and do a hard refresh while the Network tab is open.
-* Run a test on [webpagetest.org](http://www.webpagetest.org).
+* Run a test on [webpagetest.org](https://www.webpagetest.org).
 
 Both webpagetest.org and Google Chrome's Network tools pointed out an interesting fact - while total page weight was reasonable (about 600 KB), over 72% of the total page size was WebFonts (434 KB!). Both of these tools were showing that page loads were being heavily delayed by waiting for these fonts to download.
 
@@ -40,7 +40,7 @@ I plugged Akamai's bandwidth statistics into DevTool's network throttling functi
 
 Ouch! I used DevTool's Filmstrip view to get a rough idea of when fonts were loaded in as well. You can use the fancy new [Resource Timing API](http://googledevelopers.blogspot.com/2013/12/measuring-network-performance-with.html) to get this value precisely (and on client browsers!) but I was being lazy.
 
-{% marginnote_lazy https://i.imgur.com/acKj5tD.png|When these standards were discovered (1968), [The Nova Minicomputer](https://en.wikipedia.org/wiki/Data_General_Nova) had just been released. 1968 was a good year for computing - [Djikstra wrote GOTO considered harmful](http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html), the [Apollo Guidance Computer](https://en.wikipedia.org/wiki/Apollo_Guidance_Computers) left the atmosphere on Apollo 8, and [The Mother of All Demos](https://www.youtube.com/watch?v=yJDv-zdhzMY) was presented. %} When evaluating the results of any performance test, I use the following rules-of-thumb. These guidelines for human-computer interaction speeds have remained constant since [they were first discovered in the late 60's](http://theixdlibrary.com/pdf/Miller1968.pdf):
+{% marginnote_lazy https://i.imgur.com/acKj5tD.png|When these standards were discovered (1968), [The Nova Minicomputer](https://en.wikipedia.org/wiki/Data_General_Nova) had just been released. 1968 was a good year for computing - [Djikstra wrote GOTO considered harmful](https://www.cs.utexas.edu/~EWD/transcriptions/EWD02xx/EWD215.html), the [Apollo Guidance Computer](https://en.wikipedia.org/wiki/Apollo_Guidance_Computer) left the atmosphere on Apollo 8, and [The Mother of All Demos](https://www.youtube.com/watch?v=yJDv-zdhzMY) was presented. %} When evaluating the results of any performance test, I use the following rules-of-thumb. These guidelines for human-computer interaction speeds have remained constant since [they were first discovered in the late 60's](https://en.wikipedia.org/wiki/The_Magical_Number_Seven,_Plus_or_Minus_Two):
 
 * **0.1 seconds** is about the limit for having the user feel that the system is reacting instantaneously, meaning that no special feedback is necessary except to display the result.
 * **1.0 second** is about the limit for the user's flow of thought to stay uninterrupted, even though the user will notice the delay. Normally, no special feedback is necessary during delays of more than 0.1 but less than 1.0 second, but the user does lose the feeling of operating directly on the data.
@@ -242,5 +242,5 @@ Here are some links for further reading on making WebFonts fast:
 
 * [Ilya Grigorik, Optimizing WebFont Rendering Performance](https://www.igvita.com/2014/01/31/optimizing-web-font-rendering-performance/)
 * [Adam Beres-Deak, Loading webfonts with high performance on responsive websites](http://bdadam.com/blog/loading-webfonts-with-high-performance.html) Using LocalStorage to store and serve WebFonts. Try this one in your browser with Chrome Timeline open - it performs far worse than Google Fonts on first load.
-* [Patrick Sexton, Webfont options and speed](https://varvy.com/pagespeed/web-font-options.html) Great overview of the multitude of options available to you outside of Google Fonts.
+* [Patrick Sexton, Webfont options and speed](https://web.dev/articles/font-best-practices) Great overview of the multitude of options available to you outside of Google Fonts.
 * [Filament Group, Font Loading Revisited](https://www.filamentgroup.com/lab/font-events.html)

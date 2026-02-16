@@ -241,7 +241,7 @@ As you can see, Action Cable slows linearly in response to more concurrent conne
 | 30  | 89ms |
 | 300 | 855 ms |
 
-Interestingly, these numbers are slightly better than a [node.js application I found](https://github.com/sitegui/nodejs-websocket/blob/master/samples/chat/server.js), which seemed to completely crumple under higher load. Here are the results against this node.js chat app:
+Interestingly, these numbers are slightly better than a [node.js application I found](https://github.com/websockets/ws/tree/master/examples), which seemed to completely crumple under higher load. Here are the results against this node.js chat app:
 
 | Simultaneous WebSocket connections | Mean connection time |
 | -------- | -------- |

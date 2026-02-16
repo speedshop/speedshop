@@ -76,4 +76,4 @@ For updates on both of these projects, you're probably best off subscribing to m
 
 I had a great time at Rubyconf. Plus, who knew downtown Cincinatti had a huge casino? Thanks, [ballot initiatives](https://ballotpedia.org/Ohio_Casino_Approval_and_Tax_Distribution,_Amendment_3_(2009))!
 
-Looking forward to seeing all of you at Railsconf in the spring. [By the way, did you know the CFP is already open?](http://cfp.railsconf.com/events/railsconf2017)
+Looking forward to seeing all of you at Railsconf in the spring. [By the way, did you know the CFP is already open?](https://railsconf.org)

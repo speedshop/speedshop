@@ -145,7 +145,7 @@ New objects: 17029
 
 ```
 
-Here's the first section. If that output looks familiar to you, it is - it's the output of `GC.stat`. [GC is a module from the stdlib](http://ruby-doc.org/core-2.2.0/GC.html) that has a whole lot of convenience methods for working with the garbage collector. `stat` gives us that output above. For a full explanation about what each of those values mean, read Sam's post [on how Ruby's GC works](http://samsaffron.com/archive/2013/11/22/demystifying-the-ruby-gc).
+Here's the first section. If that output looks familiar to you, it is - it's the output of `GC.stat`. [GC is a module from the stdlib](http://ruby-doc.org/core-2.2.0/GC.html) that has a whole lot of convenience methods for working with the garbage collector. `stat` gives us that output above. For a full explanation about what each of those values mean, read Sam's post [on how Ruby's GC works](https://samsaffron.com/archive/2013/11/22/demystifying-the-ruby-gc).
 
 At the bottom, you'll see the new bytes allocated outside of Ruby heaps, along with a count of new objects. Pay attention to any requests that generate abnormally high values here (10+ MB allocated per request, for example).
 

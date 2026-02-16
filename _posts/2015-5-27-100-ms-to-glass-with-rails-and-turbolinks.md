@@ -26,7 +26,7 @@ But there was a critical difference between Turbolinks and their SPA brethren: i
 
 "View-over-the-wire" technologies like turbolinks and pjax have laid mostly out of the limelight since their release in ~2012, despite their usage by such high-profile sites as [Shopify](https://www.shopify.com/technology/15646068-rebuilding-the-shopify-admin-improving-developer-productivity-by-deleting-28-000-lines-of-javascript) and Github. But with Rails 5, Turbolinks is getting a nice upgrade, with new features like partial replacement and a progress bar with a public API. So I wanted to answer for myself the question: how does building an application with Turbolinks feel? Can it be not just fast, but *instantaneous*?
 
-And just what is an instantaneous response? Thankfully, the guidelines for human-computer interaction speeds have remained constant since [they were first discovered in the late 60's](http://theixdlibrary.com/pdf/Miller1968.pdf):
+And just what is an instantaneous response? Thankfully, the guidelines for human-computer interaction speeds have remained constant since [they were first discovered in the late 60's](https://en.wikipedia.org/wiki/The_Magical_Number_Seven,_Plus_or_Minus_Two):
 
 * **0.1 second** is about the limit for having the user feel that the system is reacting instantaneously, meaning that no special feedback is necessary except to display the result.
 * **1.0 second** is about the limit for the user's flow of thought to stay uninterrupted, even though the user will notice the delay. Normally, no special feedback is necessary during delays of more than 0.1 but less than 1.0 second, but the user does lose the feeling of operating directly on the data.
@@ -44,7 +44,7 @@ But in the Turbolinks/pjax world, we get to cut out a lot of the work that usual
 
 All of this translates into eliminating 200-700ms on each new page. This lets us move out of the 1 second human-computer interaction realm, and start to flirt with the 100 ms realm of "instantaneous" interaction.
 
-As an experiment, I've constructed a TodoMVC app using Rails 5 (still under active development) and Turbolinks 3. You can find [the application here](http://todomvc-turbolinks.herokuapp.com/) and [the code here](https://github.com/nateberkopec/todomvc-turbolinks). It also utilizes partial replacement, a new feature in Turbolinks 3. Using your browsers favorite development tools, you can confirm that most interactions in the app take about 100-250ms, from the time the click event is registered until the response is painted to the screen.
+As an experiment, I've constructed a TodoMVC app using Rails 5 (still under active development) and Turbolinks 3. You can find [the application here](https://github.com/nateberkopec/todomvc-turbolinks) and [the code here](https://github.com/nateberkopec/todomvc-turbolinks). It also utilizes partial replacement, a new feature in Turbolinks 3. Using your browsers favorite development tools, you can confirm that most interactions in the app take about 100-250ms, from the time the click event is registered until the response is painted to the screen.
 
 By comparison, the reference Backbone implementation for TodoMVC takes about 25-40ms. Consider also that our Backbone implementation isn't making any roundtrips to a server to update data - most TodoMVC implementations use LocalStorage. I can't find a live TodoMVC implementation that uses a javascript framework *and* a server backend, so the comparison will have to suffice. In any case, after removing network timing, Turbolinks takes about the same amount of time to update the page state and paint the new elements about as quickly as Backbone. And we didn't even have to write any new Javascript!
 
@@ -73,7 +73,7 @@ Caching can be a double-edged sword in small apps, though. Sometimes, the amount
 
 ### rack-mini-profiler and the flamegraph
 
-[rack-mini-profiler](https://github.com/MiniProfiler/rack-mini-profiler) {% marginnote_lazy https://i.imgur.com/1J1hlPt.png %} has become an indispensable part of my Ruby workflow. It's written by the incredible Sam Saffron, who's doing absolutely vital work (along with others) on Ruby speed over at  [RubyBench.org](https://rubybench.org).
+[rack-mini-profiler](https://github.com/MiniProfiler/rack-mini-profiler) {% marginnote_lazy https://i.imgur.com/1J1hlPt.png %} has become an indispensable part of my Ruby workflow. It's written by the incredible Sam Saffron, who's doing absolutely vital work (along with others) on Ruby speed over at  [RubyBench.org](https://rubybench.github.io).
 
 rack-mini-profiler puts a little white box at the upper left of a page, showing you exactly how long the last request took to process, along with a breakdown of how many SQL queries were executed. The amount of unnecessary SQL queries I've eliminated with this tool must number in the thousands.
 

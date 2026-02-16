@@ -69,6 +69,10 @@ BASE_URL=http://localhost:8787 bundle exec ruby test/integration/site_test.rb
 description = "Run integration tests against production"
 run = "BASE_URL=https://www.speedshop.co bundle exec ruby test/integration/site_test.rb"
 
+[tasks."test:links"]
+description = "Run built-site link integrity checks"
+run = "bundle exec rake test:links"
+
 [tasks.test]
 description = "Run all tests and linters"
 depends = ["test:integration"]

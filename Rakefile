@@ -6,6 +6,12 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = FileList["test/ruby/**/*_test.rb"]
 end
 
+desc "Run built-site link integrity checks"
+Rake::TestTask.new("test:links") do |t|
+  t.libs << "test/integration"
+  t.test_files = FileList["test/integration/link_integrity_test.rb"]
+end
+
 desc "Run integration tests (set BASE_URL env var, default: http://localhost:4000)"
 task :integration do
   sh "ruby test/integration/site_test.rb"
