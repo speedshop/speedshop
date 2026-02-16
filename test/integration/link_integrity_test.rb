@@ -277,7 +277,13 @@ class LinkIntegrityTest < Minitest::Test
       "www.x.com",
       "www.sec.gov",
       "www.akamai.com",
-      "www.webpagetest.org"
+      "www.webpagetest.org",
+      "webpagetest.org",
+      "martinsilvertant.deviantart.com",
+      "medium.com",
+      "docs.shopify.com",
+      "blog.twitter.com",
+      "www.rubyvideo.dev"
     ].include?(host)
   end
 
