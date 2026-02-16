@@ -12,7 +12,7 @@ There's one universal law of front-end performance - **less is more**. Simple pa
 
 And yet, it's trivial to find a website whose complexity seems to reach astronomical levels. {% sidenote 1 "Literally. The Apollo Guidance Computer had just 64 KB of ROM, but most webpages require more than 1MB of data to render. There are some webpages that are actually 100x as complex as the software that took us to the moon." %} It's perhaps telling that media and news sites tend to be the worst here - most media sites in 2015 take ages to load, not to mention all the time you spend clicking past their paywall popups (NYTimes) or full-page advertisements (Forbes).
 
-{% marginnote_lazy https://i.imgur.com/lnAzS1o.jpg|<i>"Dear Adobe: Flash is a dumpster fire. Love, Steve."</i> %} Remember when [Steve Jobs said Apple's mobile products would never support Flash?](http://www.apple.com/hotnews/thoughts-on-flash/) For a year or two there, it was a bit of a golden age in web performance - broadband was becoming widespread, 4G started to come on the scene, and, most importantly, websites started dropping Flash cruft. The "loading!" screens and unnecessarily complicated navigation schemes became something of yesteryear.
+{% marginnote_lazy https://i.imgur.com/lnAzS1o.jpg|<i>"Dear Adobe: Flash is a dumpster fire. Love, Steve."</i> %} Remember when [Steve Jobs said Apple's mobile products would never support Flash?](https://web.archive.org/web/20100130044557/http://www.apple.com/hotnews/thoughts-on-flash/) For a year or two there, it was a bit of a golden age in web performance - broadband was becoming widespread, 4G started to come on the scene, and, most importantly, websites started dropping Flash cruft. The "loading!" screens and unnecessarily complicated navigation schemes became something of yesteryear.
 
 That, is, until the marketing department figured out how to use Javascript. The Guardian's homepage sets advertising tracking cookies across 4 different partner domains. Business Insider thought to one-up their neighbors across the pond and sets **cookies across 17 domains**, requires **284 requests** (to nearly 100 unique domains) and a **4.9MB download** which took a full *9 seconds* to load on my cable connection, which is a fairly average broadband ~20 megabit pipe. {% marginnote_lazy https://i.imgur.com/L8K5kUM.gif|<i>"They think Business Insider is a news site and not just an ad delivery mechanism? That's rich!"</i>|true %} Business Insider is, ostensibly, a news site. The purpose of the Business Insider is to deliver text content. Why does that require 5 MB of *things which are not text*?
 
@@ -117,7 +117,7 @@ In addition, modern preloaders are smart enough not to request resources that ar
 
 The fastest HTTP request is the one that is never made. That's really all HTTP caching is for - preventing unnecessary requests. Cache control headers are really for telling clients "Hey - this resource, it's not going to change very quickly. Don't ask me again for this resource until..." That's awesome. We should do that everywhere possible.
 
-[Yet, the size of the resource cache is smaller than you might think.](http://www.guypo.com/mobile-browser-cache-sizes-round-2/) Here's the default disk cache size in modern browsers:
+[Yet, the size of the resource cache is smaller than you might think.](https://web.archive.org/web/20160201000000/http://www.guypo.com/mobile-browser-cache-sizes-round-2/) Here's the default disk cache size in modern browsers:
 {% marginnote_lazy https://i.imgur.com/E0yJ6HR.jpg||true %}
 
 | Browser | Cache Size (default) |
@@ -189,7 +189,7 @@ The only thing it won't do is actually download the (sub)resource - the browser 
 
 **When to Use It:** Here's an example from [Rubygems.org](https://rubygems.org).
 
-Taking a look at how Rubygems.org loads in [webpagetest.org](webpagetest.org), we notice a few things. What we're looking for is network utilization after the document is downloaded - once the main "/" document loads, we should see a bunch of network requests fire at once. Ideally, they'd all fire off at this point. In a perfect world, network utilization would look like a flat line at 100%, which then stops as soon as the page loads completely. Preconnect helps us to do that by allowing us to move some network tasks earlier in the page load process.
+Taking a look at how Rubygems.org loads in [webpagetest.org](https://www.webpagetest.org), we notice a few things. What we're looking for is network utilization after the document is downloaded - once the main "/" document loads, we should see a bunch of network requests fire at once. Ideally, they'd all fire off at this point. In a perfect world, network utilization would look like a flat line at 100%, which then stops as soon as the page loads completely. Preconnect helps us to do that by allowing us to move some network tasks earlier in the page load process.
 
 Notice these these two resources, closer to the end of the page load:
 

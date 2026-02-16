@@ -88,6 +88,8 @@ jobs:
         bundle install --jobs 4 --retry 3
     - name: Build site
       run: bundle exec jekyll build
+    - name: Run link integrity checks
+      run: bundle exec rake test:links
     - name: Install Playwright
       run: npx playwright install --with-deps chromium
     - name: Run browser tests
