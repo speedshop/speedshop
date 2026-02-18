@@ -161,7 +161,7 @@ layout: default
 <div id="big-black-bar" class="visible-desktop">
   <canvas height="800" width="500" id="sslogocanvas" style="position: relative"></canvas>
 
-  <svg style="position: absolute; top:0; left: 0; overflow: visible"
+  <svg style="position: absolute; left: 0; overflow: visible"
           xmlns="http://www.w3.org/2000/svg"
            preserveAspectRatio="xMidYMid slice">
     <defs>
@@ -188,67 +188,193 @@ layout: default
 </div>
 
 <script type="module" async="">
-        // Set up canvas
-        const canvas = document.getElementById('sslogocanvas');
-        const x = canvas.getContext('2d');
-
-        // Define S as Math.sin (this is what the original code uses)
-        const S = Math.sin;
-
-        // Animation variables
-        let t = 0;
-        const RESTART_INTERVAL_MS = 30000;
-
-        // Calculate scaling factor for different screen sizes
-        const baseWidth = 700;
-        const scale = Math.min(canvas.width / baseWidth, 1);
-
-        // Animation function
-        function animate() {
-            // Fill canvas with black
-            x.fillStyle = 'black';
-            x.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Center the animation on the canvas
-            x.save();
-            x.translate((canvas.width - baseWidth * scale) / 2 - 400, 0);
-            x.scale(scale, scale);
-
-            // Now we'll modify the algorithm to draw colored particles instead of clearing rectangles
-            let k = 4736;
-            let i, j;
-
-            // Instead of using clearRect, we'll draw colored rectangles
-            for (k = 4736; j = --k >> 7;) {
-                i = k % 128;
-
-                // Calculate position using the original formula
-                const xPos = 384 + i * t - j * 8 + i * j / 9;
-                const yPos = 150 + j * 20 + 99 * S(i / 19 + j / 5 + t * 3);
-
-                // Calculate a rainbow color based on position and time
-                const hue = (i * 2 + j * 3 + t * 50) % 360;
-                x.fillStyle = `hsl(${hue}, 100%, 50%)`;
-
-                // Draw the particle
-                x.fillRect(xPos, yPos, 9, 9);
+        (() => {
+            const canvas = document.getElementById('sslogocanvas');
+            if (!canvas) {
+                return;
             }
 
-            // Restore canvas state
-            x.restore();
+            const context = canvas.getContext('2d');
+            if (!context) {
+                return;
+            }
 
-            // Increment time
-            t += 0.01;
+            const desktopMedia = window.matchMedia('(min-width: 769px)');
+            const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-            // Continue animation
-            requestAnimationFrame(animate);
-        }
+            const S = Math.sin;
+            const RESTART_INTERVAL_MS = 30000;
+            const BASE_WIDTH = 700;
+            const PARTICLE_SIZE = 9;
+            const PARTICLE_COUNT = 4736;
 
-        // Restart the demo on an interval
-        setInterval(() => {
-            t = 0;
-        }, RESTART_INTERVAL_MS);
+            let palette = null;
+            let particles = null;
 
-        // Start animation
-        animate();
+            let t = 0;
+            let frameId = null;
+            let restartIntervalId = null;
+            let running = false;
+
+            function addMediaChangeListener(mediaQuery, listener) {
+                if (typeof mediaQuery.addEventListener === 'function') {
+                    mediaQuery.addEventListener('change', listener);
+                    return;
+                }
+
+                mediaQuery.addListener(listener);
+            }
+
+            function removeMediaChangeListener(mediaQuery, listener) {
+                if (typeof mediaQuery.removeEventListener === 'function') {
+                    mediaQuery.removeEventListener('change', listener);
+                    return;
+                }
+
+                mediaQuery.removeListener(listener);
+            }
+
+            function initializeAnimationData() {
+                if (particles && palette) {
+                    return;
+                }
+
+                palette = Array.from({ length: 360 }, (_, hue) => `hsl(${hue}, 100%, 50%)`);
+
+                particles = [];
+                for (let k = PARTICLE_COUNT, j; (j = --k >> 7);) {
+                    const i = k % 128;
+                    particles.push({
+                        i,
+                        xBase: 384 - j * 8 + i * j / 9,
+                        yBase: 150 + j * 20,
+                        phase: i / 19 + j / 5,
+                        hueBase: (i * 2 + j * 3) % 360,
+                    });
+                }
+            }
+
+            function shouldAnimate() {
+                const visible = typeof document.visibilityState === 'undefined' || document.visibilityState === 'visible';
+                return desktopMedia.matches && !reducedMotionMedia.matches && visible;
+            }
+
+            function drawFrame() {
+                if (!running) {
+                    return;
+                }
+
+                const scale = Math.min(canvas.width / BASE_WIDTH, 1);
+                const translateX = (canvas.width - BASE_WIDTH * scale) / 2 - 400;
+
+                const minVisibleX = (-translateX - PARTICLE_SIZE * scale) / scale;
+                const maxVisibleX = (canvas.width - translateX) / scale;
+                const maxVisibleY = canvas.height / scale;
+
+                const timeOffset = t * 3;
+                const hueOffset = ((t * 50) | 0) % 360;
+
+                context.fillStyle = 'black';
+                context.fillRect(0, 0, canvas.width, canvas.height);
+
+                context.save();
+                context.translate(translateX, 0);
+                context.scale(scale, scale);
+
+                for (let index = 0; index < particles.length; index++) {
+                    const particle = particles[index];
+                    const xPos = particle.xBase + particle.i * t;
+
+                    // Cull particles outside the visible canvas area before drawing.
+                    if (xPos < minVisibleX || xPos > maxVisibleX) {
+                        continue;
+                    }
+
+                    const yPos = particle.yBase + 99 * S(particle.phase + timeOffset);
+                    if (yPos < -PARTICLE_SIZE || yPos > maxVisibleY) {
+                        continue;
+                    }
+
+                    let hue = particle.hueBase + hueOffset;
+                    if (hue >= 360) {
+                        hue -= 360;
+                    }
+
+                    context.fillStyle = palette[hue];
+                    context.fillRect(xPos, yPos, PARTICLE_SIZE, PARTICLE_SIZE);
+                }
+
+                context.restore();
+
+                t += 0.01;
+                frameId = requestAnimationFrame(drawFrame);
+            }
+
+            function stopAnimation() {
+                if (!running) {
+                    return;
+                }
+
+                running = false;
+
+                if (frameId !== null) {
+                    cancelAnimationFrame(frameId);
+                    frameId = null;
+                }
+
+                if (restartIntervalId !== null) {
+                    clearInterval(restartIntervalId);
+                    restartIntervalId = null;
+                }
+            }
+
+            function startAnimation() {
+                if (running || !shouldAnimate()) {
+                    return;
+                }
+
+                initializeAnimationData();
+
+                running = true;
+                t = 0;
+
+                restartIntervalId = setInterval(() => {
+                    t = 0;
+                }, RESTART_INTERVAL_MS);
+
+                frameId = requestAnimationFrame(drawFrame);
+            }
+
+            function handleStateChange() {
+                if (shouldAnimate()) {
+                    startAnimation();
+                    return;
+                }
+
+                stopAnimation();
+            }
+
+            function handlePageHide() {
+                stopAnimation();
+            }
+
+            function teardownAnimation() {
+                stopAnimation();
+
+                removeMediaChangeListener(desktopMedia, handleStateChange);
+                removeMediaChangeListener(reducedMotionMedia, handleStateChange);
+                document.removeEventListener('visibilitychange', handleStateChange);
+                document.removeEventListener('pjax:send', teardownAnimation);
+                window.removeEventListener('pagehide', handlePageHide);
+            }
+
+            addMediaChangeListener(desktopMedia, handleStateChange);
+            addMediaChangeListener(reducedMotionMedia, handleStateChange);
+            document.addEventListener('visibilitychange', handleStateChange);
+
+            document.addEventListener('pjax:send', teardownAnimation, { once: true });
+            window.addEventListener('pagehide', handlePageHide);
+
+            handleStateChange();
+        })();
     </script>

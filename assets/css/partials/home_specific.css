@@ -27,4 +27,14 @@ video#logo-vid {
     top: 0;
     left: 0;
   }
+
+  & svg {
+    top: 0;
+  }
+}
+
+@media (max-width: 940px) and (max-height: 450px) {
+  #big-black-bar svg {
+    top: -150px;
+  }
 }

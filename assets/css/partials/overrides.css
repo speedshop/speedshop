@@ -16,7 +16,7 @@ ul {
   list-style: square outside;
 }
 
-@media (max-width: 544px) {
+@media (max-width: 940px) {
   ol, ul {
     margin-left: 1.5em;
   }
@@ -85,12 +85,6 @@ hr {
 /* Grid */
 
 @media (max-width: 639px) {
-  .container {
-    padding: 0 4rem;
-  }
-}
-
-@media (max-width: 544px) {
   .container {
     padding: 0 2rem;
   }
