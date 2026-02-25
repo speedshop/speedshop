@@ -6,10 +6,7 @@ require "time"
 
 module Speedshop
   module FourLineArchiveGenerator
-    ARCHIVE_CANDIDATES = [
-      File.join("speedshop", "lines", "archive"),
-      File.join("lines", "archive")
-    ].freeze
+    ARCHIVE_DIR = File.join("speedshop", "lines", "archive")
     NUMBERED_LINE = /^\s*\d+\.\s+(.+?)\s*$/
 
     module_function
@@ -24,8 +21,10 @@ module Speedshop
     end
 
     def generate(client_notes_path:)
-      archive_dir = find_archive_dir(client_notes_path)
-      return default_payload unless archive_dir
+      return default_payload unless client_notes_path
+
+      archive_dir = File.join(client_notes_path, ARCHIVE_DIR)
+      return default_payload unless Dir.exist?(archive_dir)
 
       today = Date.today.to_s
       lines = Dir.glob(File.join(archive_dir, "*.md")).sort.reverse.flat_map do |path|
@@ -40,14 +39,6 @@ module Speedshop
         "line_count" => lines.count,
         "lines" => lines
       }
-    end
-
-    def find_archive_dir(client_notes_path)
-      return nil unless client_notes_path
-
-      ARCHIVE_CANDIDATES
-        .map { |relative| File.join(client_notes_path, relative) }
-        .find { |path| Dir.exist?(path) }
     end
 
     def extract_lines(path)
