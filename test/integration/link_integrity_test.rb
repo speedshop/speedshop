@@ -54,7 +54,12 @@ class LinkIntegrityTest < Minitest::Test
 
     response_cache = Concurrent::Map.new
 
-    failures.concat(check_targets(url_targets, response_cache))
+    target_failures = check_targets(url_targets, response_cache)
+    external_timeout_failures, hard_target_failures = target_failures.partition { |failure| failure[:kind] == :external_timeout }
+
+    warn format_external_timeout_warnings(external_timeout_failures) unless external_timeout_failures.empty?
+
+    failures.concat(hard_target_failures)
     failures.concat(check_fragments(fragment_targets, response_cache))
 
     assert failures.empty?, format_failures(failures)
@@ -160,11 +165,14 @@ class LinkIntegrityTest < Minitest::Test
 
     last_error = nil
     last_response = nil
+    all_attempts_timed_out = true
 
     MAX_RETRIES.times do
       result = request_with_redirects(uri)
       response = result[:response]
       code = response.code.to_i
+
+      all_attempts_timed_out = false
 
       if successful_status?(uri, code)
         response_cache[url] = result
@@ -175,12 +183,22 @@ class LinkIntegrityTest < Minitest::Test
       last_error = "HTTP #{code}"
     rescue => e
       last_error = "#{e.class}: #{e.message}"
+      all_attempts_timed_out &&= timeout_exception?(e)
     end
 
     details = if last_response
       "HTTP #{last_response.code} after #{MAX_RETRIES} attempts"
     else
       "#{last_error} after #{MAX_RETRIES} attempts"
+    end
+
+    if all_attempts_timed_out && external_host?(uri.host)
+      return {
+        kind: :external_timeout,
+        url: url,
+        locations: locations,
+        details: details
+      }
     end
 
     {
@@ -366,6 +384,28 @@ class LinkIntegrityTest < Minitest::Test
   def valid_tel?(value)
     number = value.delete_prefix("tel:").strip
     number.match?(/\A\+?[0-9()\-.\s]+\z/) && number.match?(/[0-9]/)
+  end
+
+  def external_host?(host)
+    !@internal_hosts.include?(host)
+  end
+
+  def timeout_exception?(error)
+    error.is_a?(Net::OpenTimeout) ||
+      error.is_a?(Net::ReadTimeout) ||
+      error.is_a?(Timeout::Error) ||
+      error.is_a?(Errno::ETIMEDOUT)
+  end
+
+  def format_external_timeout_warnings(failures)
+    details = failures.first(20).map do |failure|
+      "- #{failure[:url]} (#{failure[:details]})"
+    end.join("\n")
+
+    <<~MSG
+      Skipping #{failures.count} external links due to network timeouts:
+      #{details}
+    MSG
   end
 
   def served_path_for(file_path)
