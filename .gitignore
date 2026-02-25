@@ -13,9 +13,8 @@ node_modules
 .terraform.lock.hcl
 .env
 
-# Generated SLA status files
-_data/sla_status.json
-_data/availability.json
+# Generated build data artifacts
+_data/
 holidays.ics
 
 # Playwright test output

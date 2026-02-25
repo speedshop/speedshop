@@ -258,3 +258,42 @@ header {
   font-size: 0.9rem;
   color: #666;
 }
+
+.four-line-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.four-line-result-count {
+  margin: 1rem 0;
+  color: #666;
+}
+
+.four-line-no-results {
+  color: #666;
+}
+
+.four-line-results {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.four-line-result {
+  border-top: 1px solid #ececec;
+  padding: 1rem 0;
+}
+
+.four-line-meta {
+  margin: 0 0 0.35rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.four-line-text {
+  margin: 0;
+
+  & a {
+    word-break: break-word;
+  }
+}

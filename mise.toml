@@ -16,7 +16,7 @@ run = "npm test"
 
 [tasks."test:integration"]
 description = "Run integration tests against local Cloudflare worker"
-depends = ["test:browser"]
+depends = ["test:links"]
 dir = "{{config_root}}"
 run = """
 #!/usr/bin/env bash
@@ -71,6 +71,7 @@ run = "BASE_URL=https://www.speedshop.co bundle exec ruby test/integration/site_
 
 [tasks."test:links"]
 description = "Run built-site link integrity checks"
+depends = ["test:browser"]
 run = "bundle exec rake test:links"
 
 [tasks.test]
@@ -79,4 +80,7 @@ depends = ["test:integration"]
 
 [tasks."test:ci"]
 description = "Run tests for CI (no local workers)"
-depends = ["test:browser"]
+depends = ["test:links"]
+
+[tools]
+ruby = "latest"
