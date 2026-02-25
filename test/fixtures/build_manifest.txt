@@ -13,6 +13,7 @@ assets/
 blog/
 
 [pages]
+four-line-fridays.*
 index.*
 rails-performance-workshop.*
 retainer.*

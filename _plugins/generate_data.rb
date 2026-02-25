@@ -1,6 +1,8 @@
 require "fileutils"
 require "json"
 
+require_relative "four_line_archive_generator"
+
 module Speedshop
   module GenerateDataDefaults
     module_function
@@ -49,7 +51,18 @@ Jekyll::Hooks.register :site, :after_init do |site|
 
   sla_status_path = File.join(data_dir, "sla_status.json")
   availability_path = File.join(data_dir, "availability.json")
+  four_line_archive_path = File.join(data_dir, "four_line_archive.json")
   holidays_path = File.join(site.source, "holidays.ics")
+
+  fallback_client_notes_path = File.expand_path("../client_notes", site.source)
+  archive_source_path = if client_notes_path && Dir.exist?(client_notes_path)
+    client_notes_path
+  elsif Dir.exist?(fallback_client_notes_path)
+    fallback_client_notes_path
+  end
+
+  four_line_archive = Speedshop::FourLineArchiveGenerator.generate(client_notes_path: archive_source_path)
+  File.write(four_line_archive_path, "#{JSON.pretty_generate(four_line_archive)}\n")
 
   unless client_notes_path && Dir.exist?(client_notes_path)
     # CI and local dev often don't have the private client notes repo checked out.

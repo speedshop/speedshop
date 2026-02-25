@@ -1,0 +1,115 @@
+---
+layout: default
+title: Four Line Fridays Archive
+summary: Search every Four Line Fridays entry in one place.
+sitemap: false
+---
+
+<div class="container four-line-page">
+  <div class="row" style="margin-top: 3.5rem">
+    <div class="column">
+      <h1>Four Line Fridays Archive</h1>
+      <p>Four Line Fridays is our weekly email with four short links and notes on Ruby performance, tooling, and software engineering.</p>
+      <p>Here, you can view and search every line from every Four Line Fridays issue.</p>
+      {% include mailchimp.html %}
+
+      <label for="four-line-search">Search</label>
+      <input id="four-line-search" type="search" placeholder="Try: queue, Sidekiq, LLM, Puma" autocomplete="off">
+
+      <p class="four-line-result-count" id="four-line-result-count"></p>
+      <p class="four-line-no-results" id="four-line-no-results" hidden>No matching lines.</p>
+
+      <ul class="four-line-results" id="four-line-results"></ul>
+    </div>
+  </div>
+</div>
+
+<script id="four-line-archive-data" type="application/json">{{ site.data.four_line_archive | jsonify }}</script>
+
+<script>
+(function() {
+  var dataElement = document.getElementById('four-line-archive-data');
+  var input = document.getElementById('four-line-search');
+  var list = document.getElementById('four-line-results');
+  var count = document.getElementById('four-line-result-count');
+  var noResults = document.getElementById('four-line-no-results');
+
+  if (!dataElement || !input || !list || !count || !noResults) {
+    return;
+  }
+
+  var payload = JSON.parse(dataElement.textContent || '{}');
+  var lines = Array.isArray(payload.lines) ? payload.lines : [];
+
+  function debounce(fn, wait) {
+    var timer = null;
+
+    return function() {
+      var args = arguments;
+      var self = this;
+      clearTimeout(timer);
+      timer = setTimeout(function() {
+        fn.apply(self, args);
+      }, wait);
+    };
+  }
+
+  function normalize(value) {
+    return (value || '').toLowerCase().trim();
+  }
+
+  function formatDate(value) {
+    var date = new Date(value + 'T00:00:00');
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  var items = [];
+  lines.forEach(function(line) {
+    var item = document.createElement('li');
+    item.className = 'four-line-result';
+
+    var meta = document.createElement('p');
+    meta.className = 'four-line-meta';
+    meta.textContent = formatDate(line.issue_date);
+
+    var content = document.createElement('p');
+    content.className = 'four-line-text';
+    content.innerHTML = line.line_html || '';
+
+    item.appendChild(meta);
+    item.appendChild(content);
+    list.appendChild(item);
+
+    item._haystack = normalize((line.line_text || '') + ' ' + (line.issue_date || ''));
+    items.push(item);
+  });
+
+  function search(query) {
+    var normalized = normalize(query);
+    var matched = 0;
+
+    items.forEach(function(item) {
+      var visible = !normalized || item._haystack.indexOf(normalized) !== -1;
+      item.hidden = !visible;
+      if (visible) matched++;
+    });
+
+    count.textContent = matched + ' result' + (matched === 1 ? '' : 's');
+    noResults.hidden = matched > 0;
+  }
+
+  input.addEventListener('input', debounce(function(event) {
+    search(event.target.value);
+  }, 120));
+
+  search('');
+})();
+</script>

@@ -208,6 +208,13 @@ class SiteTest < Minitest::Test
     assert_equal "200", response.code
   end
 
+  def test_four_line_friday_archive_loads
+    response = get("/four-line-fridays.html")
+
+    assert_equal "200", response.code
+    assert_includes response.body, 'id="four-line-search"'
+  end
+
   def test_robots_txt_exists
     response = get("/robots.txt")
     assert_equal "200", response.code

@@ -14,8 +14,8 @@ Ruby on Rails performance consultancy website. Jekyll static site hosted on S3 w
 Run all tests with mise:
 
 ```bash
-mise run test          # Full suite: lint, ruby, browser, integration (with local workers)
-mise run test:ci       # CI suite: lint, ruby, browser (no local workers)
+mise run test          # Full suite: lint, ruby, browser, links, integration (with local workers)
+mise run test:ci       # CI suite: lint, ruby, browser, links (no local workers)
 ```
 
 Individual test suites:
@@ -24,6 +24,7 @@ Individual test suites:
 mise run lint                    # StandardRB linter
 mise run test:ruby               # Ruby unit tests (test/ruby/)
 mise run test:browser            # Playwright browser tests (test/browser/)
+mise run test:links              # Link integrity checks over built site
 mise run test:integration        # Integration tests with local Cloudflare worker
 mise run test:integration:prod   # Integration tests against production
 ```
