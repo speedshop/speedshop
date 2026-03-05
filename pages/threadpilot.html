@@ -1,37 +1,183 @@
 ---
 layout: default
 title: Threadpilot - Adaptive Ruby Concurrency
-summary: "Threadpilot adaptively tunes Puma and Sidekiq thread counts at runtime to improve throughput without excessive latency or memory use."
+summary: "Threadpilot automatically adjusts your Ruby application's thread count at runtime based on actual workload demands, improving throughput and reducing tail latency."
 permalink: /threadpilot.html
 ---
 
-<header class="threadpilot-coming-soon-hero">
+<header class="fancy-ruby" style="padding-top:4rem">
   <div class="container container-narrow">
-    <a class="threadpilot-wordmark" href="/" aria-label="Speedshop homepage">
-      {% include speedshop_wordmark.svg %}
-    </a>
-    <h1>Never set threads again<br>in Puma or Sidekiq.</h1>
-    <p class="threadpilot-deck">Threadpilot adaptively tunes your Sidekiq and Puma processes at runtime, in response to your real workloads. Improve throughput by up to 5-10x, without excessive latency or memory use.</p>
+    <div class="row" style="margin-bottom:6rem">
+      <div class="column column-20">
+        {% include speedshop_wordmark.svg %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column" style="text-align: center">
+        <h1>
+          Threadpilot
+        </h1>
+        <p>Adaptive concurrency for Ruby. One gem. Zero config changes. Faster apps.</p>
+      </div>
+    </div>
   </div>
 </header>
 
-<div class="container container-narrow threadpilot-coming-soon">
+<div class="container container-narrow">
+
   <div class="row">
     <div class="column">
-      <h2>If you're tired of guessing at the perfect thread count, we've solved it.</h2>
-      <p>For over ten years, as the author of the Complete Guide to Rails Performance, I've taught people about Ruby's Global VM Lock (GVL) and how it impacts thread settings in multithread execution environments like Puma and Sidekiq. It's extremely complicated, and takes many hours to grok properly.</p>
-      <p>And even when you do understand it, you have the following problems to solve:</p>
-      <ul>
-        <li><b>How will I observe my workload's time spent waiting in IO?</b> In order to set thread counts properly, you need to know what % of the time the GVL is sitting unlocked. How will you do that?</li>
-        <li><b>What happens if my workload changes?</b> Even if you do know what percent of the time your workload spends waiting on IO, is that a constant number? What if you have a batch of Sidekiq jobs which spend 60 seconds waiting on an upstream HTTP API, and then a batch of Sidekiq jobs doing something CPU heavy like Fibonacci sequences?</li>
-      </ul>
-      <p>We realized that the only answer was that Sidekiq and Puma have to self-tune. So, after 18 months of research and development, we've now built that.</p>
+      <h3>Your Thread Count Is Wrong</h3>
+
+      <p>
+        Every Ruby application server asks you to pick a thread count. Five threads? Ten? Twenty? You pick a number, deploy it, and hope for the best. But your workload isn't static. Traffic patterns shift throughout the day. Some requests hit the database for 200 milliseconds. Others crunch numbers in pure Ruby. The right thread count for one is the wrong thread count for the other.
+      </p>
+
+      <p>
+        When your workload is I/O-heavy, you need more threads to keep the CPU busy while requests wait on the network and disk. When your workload is CPU-bound, extra threads just pile up behind the GVL, adding queueing delay and inflating your tail latencies. You've been forced to pick one number and live with the compromise.
+      </p>
+
+      <p>
+        Until now.
+      </p>
     </div>
   </div>
 
-  <section class="threadpilot-signup" aria-labelledby="threadpilot-signup-heading">
-    <h2 id="threadpilot-signup-heading">Sign up to be notified on launch</h2>
-    <p>Threadpilot is already in production at a handful of Speedshop clients. We will be making it available to the public soon. To get notified, join Speedshop's email list.</p>
-    {% include mailchimp.html %}
-  </section>
+  <div class="row">
+    <div class="column">
+      <h3>Runtime Concurrency, Automatically Tuned</h3>
+
+      <p>
+        Threadpilot observes your application's actual GVL utilization in real time and adjusts your thread count to match. It uses the GVL instrumentation API introduced in Ruby 3.2 (via the <code>gvl_timing</code> gem) to measure how much time threads spend waiting for the lock versus waiting on I/O.
+      </p>
+
+      <p>
+        When Threadpilot detects that your workload has shifted toward I/O-heavy requests, it scales threads up so more work proceeds in parallel. When it detects rising GVL contention, a telltale sign of CPU-bound work, it scales threads back down to eliminate queueing delay. The result is an application that adapts continuously to whatever your users throw at it.
+      </p>
+
+      <p>
+        No cron jobs. No manual tuning. No restarts required.
+      </p>
+    </div>
+  </div>
+
+  <div class="sales-testimonials">
+    <div class="row">
+      <div class="column">
+        <p>
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum in felis ac justo accumsan viverra vel at libero. Integer fermentum sapien nec facilisis tincidunt. Proin sodales urna non lacus convallis, at dictum massa cursus."
+          <br> - Placeholder Reviewer, Acme Corp
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column">
+      <h3>Two Problems, One Solution</h3>
+
+      <p>
+        <b>Higher throughput when I/O dominates.</b> Database queries, HTTP calls to third-party services, reading from disk: these are all moments where the GVL is released and other threads could be doing useful work. Threadpilot ensures you have enough threads to fill those idle gaps, even when the I/O burst is temporary and transient.
+      </p>
+
+      <p>
+        <b>Lower tail latency when CPU dominates.</b> When threads compete for the GVL, each one waits in line before it can run. This queueing time shows up directly in your p95, p99, and beyond. Threadpilot detects this contention pattern and reduces thread counts, cutting the queue and bringing those tail latencies back down.
+      </p>
+
+      <p>
+        Most applications experience both patterns, sometimes within the same minute. Threadpilot handles the transitions for you.
+      </p>
+    </div>
+  </div>
+
+  <div class="row" style="padding-bottom:4rem">
+    <div class="column card">
+      <h4>Drop-in installation</h4>
+      <p>Add the gem, configure your min and max thread bounds, and let Threadpilot do the rest. Works with Puma out of the box.</p>
+    </div>
+    <div class="column card">
+      <h4>Built on public APIs</h4>
+      <p>Uses Ruby 3.2+'s GVL instrumentation API. No monkey-patching. No C extensions beyond what Ruby itself provides.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column">
+      <h3>How It Works</h3>
+
+      <p>
+        Threadpilot runs a lightweight background loop that samples GVL timing data at a configurable interval. From these samples, it computes an I/O wait ratio: the fraction of wall-clock time your threads spend waiting on I/O versus holding or waiting for the GVL.
+      </p>
+
+      <p>
+        When the I/O wait ratio is high, the application benefits from more concurrency. Threadpilot nudges the thread count upward. When the ratio drops, indicating CPU-bound work and GVL contention, Threadpilot brings threads back down. The adjustments are bounded by your configured minimum and maximum, and rate-limited to avoid oscillation.
+      </p>
+
+      <p>
+        The overhead of the instrumentation and control loop is negligible. GVL timing hooks are maintained by the Ruby core team and designed for production use.
+      </p>
+    </div>
+  </div>
+
+  <div class="sales-testimonials">
+    <div class="row">
+      <div class="column">
+        <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce dignissim erat vitae est auctor, vel pharetra nulla suscipit. Cras nec feugiat risus, at laoreet augue." <br> - Placeholder Reviewer</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="column">
+        <p>
+          "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam. Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."
+          <br> - Another Placeholder, Example Inc
+        </p>
+      </div>
+      <div class="column">
+        <p>
+          "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt."
+          <br> - Yet Another Placeholder, Demo LLC
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column">
+      <h3>Requirements</h3>
+
+      <p>
+        Threadpilot requires Ruby 3.2 or later (for GVL instrumentation) and MRI/CRuby. It works with any threaded application server. Puma integration is included and requires zero configuration beyond adding the gem.
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column">
+      <h3>Who Made This?</h3>
+      <div class="row">
+        <div class="column column-75">
+          <p>My name is Nate Berkopec. I maintain <a href="https://puma.io">Puma</a>, the most popular Ruby application server, and I've spent the last decade helping companies make their Ruby applications faster. Threadpilot is the tool I wished existed every time I saw an application with the wrong thread count. Now it does.</p>
+        </div>
+        <div class="column column-25">
+          <img src="/assets/img/nate.jpg">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="buy-now">
+    <div class="row">
+      <div class="column" style="text-align: center;">
+        <h2>Get Threadpilot</h2>
+      </div>
+    </div>
+    <div class="row" style="margin-bottom: 4rem">
+      <div class="column column-50 column-offset-25" style="text-align: center;">
+        <a href="https://buy.polar.sh/polar_cl_o0TXgcSq89KFB7dHWSYEUN52uJykuDk8unOhL3V7qhX" data-polar-checkout data-polar-checkout-theme="dark">Purchase</a>
+        <script src="https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.1/dist/embed.global.js" defer data-auto-init></script>
+      </div>
+    </div>
+  </div>
+
 </div>
