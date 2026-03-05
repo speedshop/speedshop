@@ -22,6 +22,7 @@ rpw_checkout_success.*
 threadpilot.*
 slack.*
 status.*
+threadpilot-success.*
 
 [files]
 feed.xml
@@ -43,4 +44,5 @@ https://www.speedshop.co/blog/
 https://www.speedshop.co/retainer.html
 https://www.speedshop.co/rpw_checkout_success.html
 https://www.speedshop.co/slack.html
+https://www.speedshop.co/threadpilot-success.html
 https://www.speedshop.co/threadpilot.html
