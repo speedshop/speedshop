@@ -178,7 +178,7 @@ One of Turbolinks' problems, IMO, is that it lacks a lot of teaching resources o
 
 This was touched on briefly in Aaron's keynote, but in hallway conversations with [Aaron](https://github.com/tenderlove) and [Evan](https://github.com/evanphx), the path forward on HTTP/2 support in Rack was discussed.
 
-I've advocated that you [just throw an HTTP/2-enabled CDN in front of your app and Be Done With It](/blog/what-http2-means-for-ruby-developers/) before, and Aaron and I pretty much agree on that. Aaron wants to add an HTTP/2-specific key to the Rack env hash, which could take a callback so you can do whatever fancy HTTP/2-y stuff you want in your application if Rack tells you it's an HTTP/2-enabled request. I see the uses of this being pretty limited, however, as Server Push can mostly [be implemented by your CDN](https://blog.cloudflare.com/announcing-support-for-http-2-server-push-2/) or [your reverse proxy](https://h2o.examp1e.net/configure/http2_directives.html).
+I've advocated that you [just throw an HTTP/2-enabled CDN in front of your app and Be Done With It](/blog/what-http2-means-for-ruby-developers/) before, and Aaron and I pretty much agree on that. Aaron wants to add an HTTP/2-specific key to the Rack env hash, which could take a callback so you can do whatever fancy HTTP/2-y stuff you want in your application if Rack tells you it's an HTTP/2-enabled request. I see the uses of this being pretty limited, however, as Server Push can mostly [be implemented by your CDN](https://blog.cloudflare.com/announcing-support-for-http-2-server-push-2/) or your reverse proxy.
 
 ## RPRG/Chat Update
 

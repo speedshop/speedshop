@@ -31,7 +31,7 @@ jobs:
     - name: Determine Ruby version
       id: ruby
       run: |
-        echo "version=$(awk -F'"' '/^ruby = / { print $2; exit }' mise.toml)" >> "$GITHUB_OUTPUT"
+        echo "version=$(awk -F'\"' '/^ruby = / { print $2; exit }' mise.toml)" >> "$GITHUB_OUTPUT"
     - uses: ./.github/actions/canonical-image
       with:
         ruby-version: ${{ steps.ruby.outputs.version }}
