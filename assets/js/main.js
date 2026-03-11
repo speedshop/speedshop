@@ -2,6 +2,7 @@
 // Uses ES modules for tree-shaking with esbuild
 
 import Pjax from 'pjax';
+import { initThreadpilotSimulation } from './threadpilot_simulation.js';
 import { boot as vizBoot } from './viz/core.js';
 
 function init() {
@@ -225,11 +226,15 @@ function init() {
     return request;
   };
 
-  // Initialize quicklink-style prefetching
+  // Initialize prefetching and page-specific UI
   initQuicklink();
+  initThreadpilotSimulation();
 
-  // Re-initialize prefetching after PJAX navigation
-  document.addEventListener('pjax:complete', initQuicklink);
+  // Re-initialize prefetching and page-specific UI after PJAX navigation
+  document.addEventListener('pjax:complete', function () {
+    initQuicklink();
+    initThreadpilotSimulation();
+  });
 
   // Signup popup functionality
   function signup() {

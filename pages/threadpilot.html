@@ -5,6 +5,375 @@ summary: "Threadpilot automatically adjusts your Ruby application's thread count
 permalink: /threadpilot.html
 ---
 
+<style>
+  .threadpilot-sim {
+    background: #f7f7f7;
+    border: 1px solid #d9d9d9;
+    border-radius: 1.2rem;
+    padding: 2rem;
+    margin: 2rem 0 3rem;
+  }
+
+  .threadpilot-sim__intro {
+    margin-bottom: 1.5rem;
+  }
+
+  .threadpilot-sim__controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem 2rem;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .threadpilot-sim__labels {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    align-items: baseline;
+  }
+
+  .threadpilot-sim__labels strong {
+    display: inline-block;
+    min-width: 4.5rem;
+  }
+
+  .threadpilot-sim__slider-wrap {
+    grid-column: 1 / -1;
+  }
+
+  .threadpilot-sim__slider-wrap input {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .threadpilot-sim__autoplay {
+    color: #666;
+    font-size: 1.4rem;
+    text-align: right;
+  }
+
+  .threadpilot-sim__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .threadpilot-sim__card {
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 1rem;
+    padding: 1.6rem;
+    transition: background-color 220ms ease, border-color 220ms ease, opacity 400ms ease, transform 220ms ease;
+  }
+
+  .threadpilot-sim__card--dead {
+    background: #ffe4e7;
+    border-color: #d7263d;
+    transform: scale(0.985);
+    animation: threadpilot-dead-flash 1200ms ease-out forwards;
+  }
+
+  .threadpilot-sim__card--dead > *:not(.threadpilot-sim__dead-overlay) {
+    opacity: 0.22;
+  }
+
+  .threadpilot-sim__card--respawning {
+    animation: threadpilot-respawn 650ms ease;
+  }
+
+  .threadpilot-sim__dead-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.2rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: #fff;
+    background: rgba(215, 38, 61, 0.9);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .threadpilot-sim__card--dead .threadpilot-sim__dead-overlay {
+    animation: threadpilot-dead-overlay 1200ms ease-out forwards;
+  }
+
+  .threadpilot-sim__card h4,
+  .threadpilot-sim__card p {
+    margin-bottom: 0.8rem;
+  }
+
+  .threadpilot-sim__headline {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: baseline;
+  }
+
+  .threadpilot-sim__headline small {
+    color: #666;
+  }
+
+  .threadpilot-sim__live {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 1.2rem 0;
+  }
+
+  .threadpilot-sim__stat {
+    background: #fafafa;
+    border: 1px solid #ebebeb;
+    border-radius: 0.8rem;
+    padding: 1rem;
+  }
+
+  .threadpilot-sim__flow {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .threadpilot-sim__flow-row {
+    display: grid;
+    grid-template-columns: 4.8rem 1fr;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .threadpilot-sim__flow-row small {
+    color: #666;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .threadpilot-sim__flow-track {
+    position: relative;
+    height: 1.2rem;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #ececec;
+  }
+
+  .threadpilot-sim__flow-dot {
+    position: absolute;
+    top: 50%;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 999px;
+    transform: translate(-50%, -50%);
+  }
+
+  .threadpilot-sim__flow-dot--arrival {
+    background: #0000ee;
+  }
+
+  .threadpilot-sim__flow-dot--completion {
+    background: #16a085;
+  }
+
+  .threadpilot-sim__stat span,
+  .threadpilot-sim__metric span {
+    display: block;
+    color: #666;
+    font-size: 1.2rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .threadpilot-sim__stat strong,
+  .threadpilot-sim__metric strong {
+    font-size: 2rem;
+    line-height: 1.1;
+    transition: color 180ms ease;
+  }
+
+  .threadpilot-sim__value--bad {
+    color: #d7263d;
+  }
+
+  @keyframes threadpilot-dead-flash {
+    0% {
+      background: #fff;
+      border-color: #d9d9d9;
+      box-shadow: 0 0 0 rgba(215, 38, 61, 0);
+      opacity: 1;
+    }
+
+    18% {
+      background: #ff5c6f;
+      border-color: #d7263d;
+      box-shadow: 0 0 2.4rem rgba(215, 38, 61, 0.5);
+      opacity: 1;
+    }
+
+    100% {
+      background: #ffd8dd;
+      border-color: #d7263d;
+      box-shadow: 0 0 0 rgba(215, 38, 61, 0);
+      opacity: 0.18;
+    }
+  }
+
+  @keyframes threadpilot-dead-overlay {
+    0% {
+      opacity: 0;
+    }
+
+    18% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes threadpilot-respawn {
+    from {
+      opacity: 0;
+      transform: scale(0.985);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .threadpilot-sim__viz-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 0.4rem;
+  }
+
+  .threadpilot-sim__queue-bar,
+  .threadpilot-sim__pool-bar {
+    width: 100%;
+    height: 1.2rem;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #ececec;
+    margin-bottom: 1rem;
+  }
+
+  .threadpilot-sim__queue-fill,
+  .threadpilot-sim__pool-fill {
+    display: block;
+    height: 100%;
+    transition: width 180ms ease;
+  }
+
+  .threadpilot-sim__queue-fill {
+    background: linear-gradient(90deg, #0000ee, #6d6dff);
+  }
+
+  .threadpilot-sim__pool-bar {
+    display: flex;
+  }
+
+  .threadpilot-sim__pool-fill--cpu {
+    background: #111;
+  }
+
+  .threadpilot-sim__pool-fill--wait {
+    background: #7d5fff;
+  }
+
+  .threadpilot-sim__pool-fill--io {
+    background: #16a085;
+  }
+
+  .threadpilot-sim__pool-fill--idle {
+    background: #d8d8d8;
+  }
+
+  .threadpilot-sim__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem 1.2rem;
+    margin-bottom: 1.2rem;
+    font-size: 1.2rem;
+  }
+
+  .threadpilot-sim__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .threadpilot-sim__swatch {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 999px;
+    display: inline-block;
+  }
+
+  .threadpilot-sim__swatch--cpu {
+    background: #111;
+  }
+
+  .threadpilot-sim__swatch--wait {
+    background: #7d5fff;
+  }
+
+  .threadpilot-sim__swatch--io {
+    background: #16a085;
+  }
+
+  .threadpilot-sim__swatch--idle {
+    background: #d8d8d8;
+  }
+
+  .threadpilot-sim__metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+
+  .threadpilot-sim__metric {
+    border-top: 1px solid #efefef;
+    padding-top: 0.8rem;
+  }
+
+  .threadpilot-sim__footnote {
+    color: #666;
+    font-size: 1.3rem;
+    margin-bottom: 0;
+  }
+
+  @media screen and (max-width: 992px) {
+    .threadpilot-sim__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media screen and (max-width: 639px) {
+    .threadpilot-sim {
+      padding: 1.5rem;
+    }
+
+    .threadpilot-sim__controls,
+    .threadpilot-sim__live,
+    .threadpilot-sim__metrics {
+      grid-template-columns: 1fr;
+    }
+
+    .threadpilot-sim__autoplay {
+      text-align: left;
+    }
+  }
+</style>
+
 <header class="fancy-ruby" style="padding-top:4rem">
   <div class="container container-narrow">
     <div class="row" style="margin-bottom:6rem">
@@ -53,6 +422,204 @@ permalink: /threadpilot.html
   <div class="row">
     <div class="column">
       <h3>What's the right number of threads? 1? 5? 125?</h3>
+      <div class="threadpilot-sim" id="threadpilot-simulator" data-threadpilot-simulator>
+        <div class="threadpilot-sim__intro">
+          <p><strong>Same arrival rate. Same work. Three different thread pools.</strong> In MRI, only one thread can run Ruby at a time, but many can be blocked on I/O. Drag the slider and watch how queueing, DB usage, and latency change.</p>
+        </div>
+
+        <div class="threadpilot-sim__controls">
+          <div class="threadpilot-sim__labels">
+            <div>I/O wait <strong data-threadpilot-io-label>50%</strong></div>
+            <div>CPU <strong data-threadpilot-cpu-label>50%</strong></div>
+          </div>
+          <div class="threadpilot-sim__autoplay" data-threadpilot-autoplay-status>Auto-sweeping until you touch the slider.</div>
+          <div class="threadpilot-sim__slider-wrap">
+            <input id="threadpilot-io-slider" type="range" min="0" max="100" step="1" value="50" aria-label="I/O wait percentage" data-threadpilot-io-slider>
+            <div class="threadpilot-sim__viz-label">
+              <span>0% I/O / 100% CPU</span>
+              <span>100% I/O / 0% CPU</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="threadpilot-sim__grid">
+          <article class="threadpilot-sim__card" data-threadpilot-card="1">
+            <div class="threadpilot-sim__dead-overlay" data-threadpilot-dead-overlay>DEAD</div>
+            <div class="threadpilot-sim__headline">
+              <h4>1 thread</h4>
+              <small>Single-threaded</small>
+            </div>
+            <div class="threadpilot-sim__live">
+              <div class="threadpilot-sim__stat">
+                <span>Queue time</span>
+                <strong data-threadpilot-queue>0 ms</strong>
+              </div>
+              <div class="threadpilot-sim__stat">
+                <span>Request flow</span>
+                <div class="threadpilot-sim__flow">
+                  <div class="threadpilot-sim__flow-row">
+                    <small>Arrive</small>
+                    <div class="threadpilot-sim__flow-track" data-threadpilot-arrivals-track></div>
+                  </div>
+                  <div class="threadpilot-sim__flow-row">
+                    <small>Done</small>
+                    <div class="threadpilot-sim__flow-track" data-threadpilot-completions-track></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="threadpilot-sim__viz-label">
+              <span>Arrival queue</span>
+              <span data-threadpilot-queue-label>0 waiting</span>
+            </div>
+            <div class="threadpilot-sim__queue-bar">
+              <span class="threadpilot-sim__queue-fill" data-threadpilot-queue-fill></span>
+            </div>
+            <div class="threadpilot-sim__viz-label">
+              <span>Thread state</span>
+              <span data-threadpilot-pool-label>0 busy / 1 total</span>
+            </div>
+            <div class="threadpilot-sim__pool-bar">
+              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--cpu" data-threadpilot-pool-cpu></span>
+              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--wait" data-threadpilot-pool-wait></span>
+              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--io" data-threadpilot-pool-io></span>
+              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--idle" data-threadpilot-pool-idle></span>
+            </div>
+            <div class="threadpilot-sim__legend">
+              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--cpu"></span>CPU <strong data-threadpilot-cpu-active>0</strong></span>
+              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--wait"></span>GVL wait <strong data-threadpilot-gvl-wait>0</strong></span>
+              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--io"></span>I/O <strong data-threadpilot-io-active>0</strong></span>
+              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--idle"></span>Idle <strong data-threadpilot-idle>1</strong></span>
+            </div>
+            <div class="threadpilot-sim__metrics">
+              <div class="threadpilot-sim__metric"><span>Est. RSS</span><strong data-threadpilot-rss>—</strong></div>
+              <div class="threadpilot-sim__metric"><span>DB conns in use</span><strong data-threadpilot-db>0</strong></div>
+              <div class="threadpilot-sim__metric"><span>Throughput</span><strong data-threadpilot-throughput>—</strong></div>
+              <div class="threadpilot-sim__metric"><span>p95 latency</span><strong data-threadpilot-p95>—</strong></div>
+              <div class="threadpilot-sim__metric"><span>p99 latency</span><strong data-threadpilot-p99>—</strong></div>
+              <div class="threadpilot-sim__metric"><span>Max latency</span><strong data-threadpilot-max>—</strong></div>
+            </div>
+          </article>
+
+          <article class="threadpilot-sim__card" data-threadpilot-card="5">
+            <div class="threadpilot-sim__dead-overlay" data-threadpilot-dead-overlay>DEAD</div>
+            <div class="threadpilot-sim__headline">
+              <h4>5 threads</h4>
+              <small>Typical default</small>
+            </div>
+            <div class="threadpilot-sim__live">
+              <div class="threadpilot-sim__stat">
+                <span>Queue time</span>
+                <strong data-threadpilot-queue>0 ms</strong>
+              </div>
+              <div class="threadpilot-sim__stat">
+                <span>Request flow</span>
+                <div class="threadpilot-sim__flow">
+                  <div class="threadpilot-sim__flow-row">
+                    <small>Arrive</small>
+                    <div class="threadpilot-sim__flow-track" data-threadpilot-arrivals-track></div>
+                  </div>
+                  <div class="threadpilot-sim__flow-row">
+                    <small>Done</small>
+                    <div class="threadpilot-sim__flow-track" data-threadpilot-completions-track></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="threadpilot-sim__viz-label">
+              <span>Arrival queue</span>
+              <span data-threadpilot-queue-label>0 waiting</span>
+            </div>
+            <div class="threadpilot-sim__queue-bar">
+              <span class="threadpilot-sim__queue-fill" data-threadpilot-queue-fill></span>
+            </div>
+            <div class="threadpilot-sim__viz-label">
+              <span>Thread state</span>
+              <span data-threadpilot-pool-label>0 busy / 5 total</span>
+            </div>
+            <div class="threadpilot-sim__pool-bar">
+              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--cpu" data-threadpilot-pool-cpu></span>
+              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--wait" data-threadpilot-pool-wait></span>
+              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--io" data-threadpilot-pool-io></span>
+              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--idle" data-threadpilot-pool-idle></span>
+            </div>
+            <div class="threadpilot-sim__legend">
+              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--cpu"></span>CPU <strong data-threadpilot-cpu-active>0</strong></span>
+              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--wait"></span>GVL wait <strong data-threadpilot-gvl-wait>0</strong></span>
+              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--io"></span>I/O <strong data-threadpilot-io-active>0</strong></span>
+              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--idle"></span>Idle <strong data-threadpilot-idle>5</strong></span>
+            </div>
+            <div class="threadpilot-sim__metrics">
+              <div class="threadpilot-sim__metric"><span>Est. RSS</span><strong data-threadpilot-rss>—</strong></div>
+              <div class="threadpilot-sim__metric"><span>DB conns in use</span><strong data-threadpilot-db>0</strong></div>
+              <div class="threadpilot-sim__metric"><span>Throughput</span><strong data-threadpilot-throughput>—</strong></div>
+              <div class="threadpilot-sim__metric"><span>p95 latency</span><strong data-threadpilot-p95>—</strong></div>
+              <div class="threadpilot-sim__metric"><span>p99 latency</span><strong data-threadpilot-p99>—</strong></div>
+              <div class="threadpilot-sim__metric"><span>Max latency</span><strong data-threadpilot-max>—</strong></div>
+            </div>
+          </article>
+
+          <article class="threadpilot-sim__card" data-threadpilot-card="125">
+            <div class="threadpilot-sim__dead-overlay" data-threadpilot-dead-overlay>DEAD</div>
+            <div class="threadpilot-sim__headline">
+              <h4>125 threads</h4>
+              <small>Very aggressive</small>
+            </div>
+            <div class="threadpilot-sim__live">
+              <div class="threadpilot-sim__stat">
+                <span>Queue time</span>
+                <strong data-threadpilot-queue>0 ms</strong>
+              </div>
+              <div class="threadpilot-sim__stat">
+                <span>Request flow</span>
+                <div class="threadpilot-sim__flow">
+                  <div class="threadpilot-sim__flow-row">
+                    <small>Arrive</small>
+                    <div class="threadpilot-sim__flow-track" data-threadpilot-arrivals-track></div>
+                  </div>
+                  <div class="threadpilot-sim__flow-row">
+                    <small>Done</small>
+                    <div class="threadpilot-sim__flow-track" data-threadpilot-completions-track></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="threadpilot-sim__viz-label">
+              <span>Arrival queue</span>
+              <span data-threadpilot-queue-label>0 waiting</span>
+            </div>
+            <div class="threadpilot-sim__queue-bar">
+              <span class="threadpilot-sim__queue-fill" data-threadpilot-queue-fill></span>
+            </div>
+            <div class="threadpilot-sim__viz-label">
+              <span>Thread state</span>
+              <span data-threadpilot-pool-label>0 busy / 125 total</span>
+            </div>
+            <div class="threadpilot-sim__pool-bar">
+              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--cpu" data-threadpilot-pool-cpu></span>
+              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--wait" data-threadpilot-pool-wait></span>
+              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--io" data-threadpilot-pool-io></span>
+              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--idle" data-threadpilot-pool-idle></span>
+            </div>
+            <div class="threadpilot-sim__legend">
+              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--cpu"></span>CPU <strong data-threadpilot-cpu-active>0</strong></span>
+              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--wait"></span>GVL wait <strong data-threadpilot-gvl-wait>0</strong></span>
+              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--io"></span>I/O <strong data-threadpilot-io-active>0</strong></span>
+              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--idle"></span>Idle <strong data-threadpilot-idle>125</strong></span>
+            </div>
+            <div class="threadpilot-sim__metrics">
+              <div class="threadpilot-sim__metric"><span>Est. RSS</span><strong data-threadpilot-rss>—</strong></div>
+              <div class="threadpilot-sim__metric"><span>DB conns in use</span><strong data-threadpilot-db>0</strong></div>
+              <div class="threadpilot-sim__metric"><span>Throughput</span><strong data-threadpilot-throughput>—</strong></div>
+              <div class="threadpilot-sim__metric"><span>p95 latency</span><strong data-threadpilot-p95>—</strong></div>
+              <div class="threadpilot-sim__metric"><span>p99 latency</span><strong data-threadpilot-p99>—</strong></div>
+              <div class="threadpilot-sim__metric"><span>Max latency</span><strong data-threadpilot-max>—</strong></div>
+            </div>
+          </article>
+        </div>
+
+        <p class="threadpilot-sim__footnote">Latency is queue time plus service time, based on the rolling last 400 completed jobs for each setup.</p>
+      </div>
       <p>
         How many threads are you running for Puma and Sidekiq processes today? Are you even sure you know? And when you do figure out the number - how did you pick it? Forget it - just ship the default. Or, you probably Googled for 5 minutes or let Claude pick. Nothing broke, you moved on. But you're a curious engineer: what gains did you leave on the table?
       </p>
@@ -223,13 +790,6 @@ permalink: /threadpilot.html
     </div>
   </div>
 
-  <!-- SECTION 15: Pricing -->
-  <!-- Present AFTER maximum value has been established. Frame against the cost
-       of the problem, not competitors. If using tiers, use 3 (starter/pro/enterprise).
-       Highlight the middle tier as "Most Popular." Consider one-time lifetime pricing
-       (Tailwind Plus model) to remove subscription objection.
-       Use charm pricing ($97, $197) for value positioning or round numbers for premium.
-       Include a cost-of-problem anchor: "If Threadpilot saves your team 2 hours/month..." -->
   <div class="buy-now">
     <div class="row">
       <div class="column" style="text-align: center;">
