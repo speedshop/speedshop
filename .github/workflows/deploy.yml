@@ -18,9 +18,17 @@ jobs:
         repository: speedshop/client_notes
         token: ${{ secrets.CLIENT_NOTES_PAT }}
         path: .client_notes
+    - name: Determine Ruby version for deploy
+      id: ruby_version
+      run: |
+        if [ -f .client_notes/.ruby-version ]; then
+          echo "value=$(tr -d '\n' < .client_notes/.ruby-version)" >> "$GITHUB_OUTPUT"
+        else
+          echo "value=$(tr -d '\n' < .ruby-version)" >> "$GITHUB_OUTPUT"
+        fi
     - uses: ruby/setup-ruby@4fc31e1c823882afd7ef55985266a526c589de90 # v1.282.0
       with:
-        ruby-version: '4.0.0'
+        ruby-version: ${{ steps.ruby_version.outputs.value }}
     - uses: r-lib/actions/setup-pandoc@929c772977a3a13c8733b363bf5a2f685c25dd91 # v2.9.0
       with:
         pandoc-version: '2.9.2.1'
