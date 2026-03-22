@@ -20,27 +20,28 @@ jobs:
         repository: speedshop/client_notes
         token: ${{ secrets.CLIENT_NOTES_PAT }}
         path: .client_notes
-    - name: Determine Ruby version for deploy
-      id: ruby_version
+    - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+      with:
+        install: false
+    - name: Determine deploy Ruby source
+      id: deploy_ruby
       run: |
-        version=$(awk -F'"' '/^ruby = / { print $2 }' mise.toml)
-        source=mise.toml
+        ruby_version=$(awk -F'"' '/^ruby = / { print $2 }' mise.toml)
+        ruby_source=mise.toml
 
         if [ -f .client_notes/.ruby-version ]; then
-          version=$(tr -d '\n' < .client_notes/.ruby-version)
-          source=.client_notes/.ruby-version
+          ruby_version=$(tr -d '\n' < .client_notes/.ruby-version)
+          ruby_source=.client_notes/.ruby-version
         fi
 
-        echo "value=$version" >> "$GITHUB_OUTPUT"
-        echo "source=$source" >> "$GITHUB_OUTPUT"
-    - uses: ruby/setup-ruby@319994f95fa847cf3fb3cd3dbe89f6dcde9f178f # v1.295.0
-      with:
-        ruby-version: ${{ steps.ruby_version.outputs.value }}
-    - name: Install Pandoc
+        echo "Using Ruby $ruby_version from $ruby_source"
+        echo "value=$ruby_version" >> "$GITHUB_OUTPUT"
+        echo "source=$ruby_source" >> "$GITHUB_OUTPUT"
+    - name: Install toolchain via mise
       run: |
-        curl -fsSL -o /tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/2.9.2.1/pandoc-2.9.2.1-1-amd64.deb
-        sudo dpkg -i /tmp/pandoc.deb
-    - name: Install PDF dependencies
+        mise install ruby@${{ steps.deploy_ruby.outputs.value }}
+        mise install --locked node pandoc awscli
+    - name: Install PDF system dependencies (explicit exception; see #94)
       run: |
         sudo apt-get update
         sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-xetex librsvg2-bin
@@ -50,27 +51,28 @@ jobs:
         key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.client_notes/.ruby-version') }}
         restore-keys: |
           ${{ runner.os }}-gems-
-    - uses: bahmutov/npm-install@20216767ca67f0f7b4d095dc5859c5700a6581cb # v1.12.1
+    - name: npm ci
+      run: npm ci
     - name: Bundle install
       run: |
-        bundle config path vendor/bundle
-        bundle install --jobs 4 --retry 3
-    - name: Validate Ruby version
-      if: ${{ steps.ruby_version.outputs.source == 'mise.toml' }}
-      run: bundle exec rake validate:ruby_version
+        mise exec ruby@${{ steps.deploy_ruby.outputs.value }} -- bundle config path vendor/bundle
+        mise exec ruby@${{ steps.deploy_ruby.outputs.value }} -- bundle install --jobs 4 --retry 3
+    - name: Validate repo Ruby version
+      if: ${{ steps.deploy_ruby.outputs.source == 'mise.toml' }}
+      run: mise exec ruby@${{ steps.deploy_ruby.outputs.value }} -- bundle exec rake validate:ruby_version
     - name: Build site
       env:
         CLIENT_NOTES_PATH: .client_notes
-      run: bundle exec jekyll build
+      run: mise exec ruby@${{ steps.deploy_ruby.outputs.value }} -- bundle exec jekyll build
     - name: Validate generated data
-      run: bundle exec rake validate:generated_data
+      run: mise exec ruby@${{ steps.deploy_ruby.outputs.value }} -- bundle exec rake validate:generated_data
     - name: Deploy to S3
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: 'us-east-1'
         S3_BUCKET: 'www.speedshop.co'
-      run: bundle exec ruby _scripts/s3_deploy.rb
+      run: mise exec ruby@${{ steps.deploy_ruby.outputs.value }} -- bundle exec ruby _scripts/s3_deploy.rb
     - name: Deploy card directory to S3
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
