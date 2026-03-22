@@ -1,5 +1,8 @@
 name: Deploy
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches:
@@ -38,13 +41,13 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-xetex librsvg2-bin
-    - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+    - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
         key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-gems-
-    - uses: bahmutov/npm-install@cfc4184a518fdc2648e3734d6507ae8b9e0200e9 # v1.9.0
+    - uses: bahmutov/npm-install@20216767ca67f0f7b4d095dc5859c5700a6581cb # v1.12.1
     - name: Bundle install
       run: |
         bundle config path vendor/bundle
