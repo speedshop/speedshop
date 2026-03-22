@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      with:
+        persist-credentials: false
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
         repository: speedshop/client_notes
@@ -21,13 +23,16 @@ jobs:
     - name: Determine Ruby version for deploy
       id: ruby_version
       run: |
-        ruby_version_file=.ruby-version
+        version=$(awk -F'"' '/^ruby = / { print $2 }' mise.toml)
+        source=mise.toml
+
         if [ -f .client_notes/.ruby-version ]; then
-          ruby_version_file=.client_notes/.ruby-version
+          version=$(tr -d '\n' < .client_notes/.ruby-version)
+          source=.client_notes/.ruby-version
         fi
 
-        version=$(tr -d '\n' < "$ruby_version_file")
-        echo "value=$(printf '%s' "$version" | cut -d. -f1,2)" >> "$GITHUB_OUTPUT"
+        echo "value=$version" >> "$GITHUB_OUTPUT"
+        echo "source=$source" >> "$GITHUB_OUTPUT"
     - uses: ruby/setup-ruby@319994f95fa847cf3fb3cd3dbe89f6dcde9f178f # v1.295.0
       with:
         ruby-version: ${{ steps.ruby_version.outputs.value }}
@@ -42,7 +47,7 @@ jobs:
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.client_notes/.ruby-version') }}
         restore-keys: |
           ${{ runner.os }}-gems-
     - uses: bahmutov/npm-install@20216767ca67f0f7b4d095dc5859c5700a6581cb # v1.12.1
@@ -51,6 +56,7 @@ jobs:
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
     - name: Validate Ruby version
+      if: ${{ steps.ruby_version.outputs.source == 'mise.toml' }}
       run: bundle exec rake validate:ruby_version
     - name: Build site
       env:
