@@ -18,9 +18,14 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     steps:
     - uses: actions/checkout@v4
+    - name: Determine Ruby version for CI
+      id: ruby_version
+      run: |
+        version=$(tr -d '\n' < .ruby-version)
+        echo "value=$(printf '%s' "$version" | cut -d. -f1,2)" >> "$GITHUB_OUTPUT"
     - uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.3'
+        ruby-version: ${{ steps.ruby_version.outputs.value }}
         bundler-cache: true
     - name: Run integration tests
       env:
