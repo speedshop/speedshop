@@ -13,26 +13,21 @@ jobs:
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
         persist-credentials: false
-    - name: Determine Ruby version for CI
-      id: ruby_version
-      run: |
-        version=$(tr -d '\n' < .ruby-version)
-        echo "value=$(printf '%s' "$version" | cut -d. -f1,2)" >> "$GITHUB_OUTPUT"
-    - uses: ruby/setup-ruby@319994f95fa847cf3fb3cd3dbe89f6dcde9f178f # v1.295.0
+    - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
       with:
-        ruby-version: ${{ steps.ruby_version.outputs.value }}
+        install_args: --locked ruby
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml') }}
         restore-keys: |
           ${{ runner.os }}-gems-
     - name: Bundle install
       run: |
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
-    - name: Run linter and tests
-      run: bundle exec rake
+    - name: Run linter
+      run: mise run lint
 
   build:
     runs-on: ubuntu-latest
@@ -40,29 +35,21 @@ jobs:
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
         persist-credentials: false
-    - name: Determine Ruby version for CI
-      id: ruby_version
-      run: |
-        version=$(tr -d '\n' < .ruby-version)
-        echo "value=$(printf '%s' "$version" | cut -d. -f1,2)" >> "$GITHUB_OUTPUT"
-    - uses: ruby/setup-ruby@319994f95fa847cf3fb3cd3dbe89f6dcde9f178f # v1.295.0
+    - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
       with:
-        ruby-version: ${{ steps.ruby_version.outputs.value }}
-    - name: Install Pandoc
-      run: |
-        curl -fsSL -o /tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/2.9.2.1/pandoc-2.9.2.1-1-amd64.deb
-        sudo dpkg -i /tmp/pandoc.deb
-    - name: Install PDF dependencies
+        install_args: --locked ruby node pandoc
+    - name: Install PDF system dependencies (explicit exception; see #94)
       run: |
         sudo apt-get update
         sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-xetex librsvg2-bin
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml') }}
         restore-keys: |
           ${{ runner.os }}-gems-
-    - uses: bahmutov/npm-install@20216767ca67f0f7b4d095dc5859c5700a6581cb # v1.12.1
+    - name: npm ci
+      run: npm ci
     - name: Bundle install
       run: |
         bundle config path vendor/bundle
@@ -76,38 +63,26 @@ jobs:
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
         persist-credentials: false
-    - name: Determine Ruby version for CI
-      id: ruby_version
-      run: |
-        version=$(tr -d '\n' < .ruby-version)
-        echo "value=$(printf '%s' "$version" | cut -d. -f1,2)" >> "$GITHUB_OUTPUT"
-    - uses: ruby/setup-ruby@319994f95fa847cf3fb3cd3dbe89f6dcde9f178f # v1.295.0
+    - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
       with:
-        ruby-version: ${{ steps.ruby_version.outputs.value }}
-    - name: Install Pandoc
-      run: |
-        curl -fsSL -o /tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/2.9.2.1/pandoc-2.9.2.1-1-amd64.deb
-        sudo dpkg -i /tmp/pandoc.deb
-    - name: Install PDF dependencies
+        install_args: --locked ruby node pandoc
+    - name: Install PDF system dependencies (explicit exception; see #94)
       run: |
         sudo apt-get update
         sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-xetex librsvg2-bin
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml') }}
         restore-keys: |
           ${{ runner.os }}-gems-
-    - uses: bahmutov/npm-install@20216767ca67f0f7b4d095dc5859c5700a6581cb # v1.12.1
+    - name: npm ci
+      run: npm ci
     - name: Bundle install
       run: |
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
-    - name: Build site
-      run: bundle exec jekyll build
-    - name: Run link integrity checks
-      run: bundle exec rake test:links
     - name: Install Playwright
-      run: npx playwright install --with-deps chromium
-    - name: Run browser tests
-      run: npm test
+      run: npx --no-install playwright install --with-deps chromium
+    - name: Run CI test suite
+      run: mise run test:ci
