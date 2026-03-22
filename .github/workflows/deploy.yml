@@ -75,3 +75,21 @@ jobs:
       env:
         CLOUDFLARE_ZONE: ${{ secrets.CLOUDFLARE_ZONE }}
         CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+    - name: Report scheduled deploy to Dead Man's Snitch
+      if: ${{ always() && github.event_name == 'schedule' }}
+      env:
+        DEAD_MANS_SNITCH_URL: https://nosnch.in/447fc8972e
+        JOB_STATUS: ${{ job.status }}
+        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        status=1
+        if [ "$JOB_STATUS" = "success" ]; then
+          status=0
+        fi
+
+        if ! curl --fail --silent --show-error \
+          --data-urlencode "s=$status" \
+          --data-urlencode "m=deploy $JOB_STATUS: $RUN_URL" \
+          "$DEAD_MANS_SNITCH_URL" >/dev/null; then
+          echo "::warning::Dead Man's Snitch check-in failed"
+        fi
