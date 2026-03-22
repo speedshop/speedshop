@@ -55,9 +55,11 @@ class LinkIntegrityTest < Minitest::Test
     response_cache = Concurrent::Map.new
 
     target_failures = check_targets(url_targets, response_cache)
-    external_timeout_failures, hard_target_failures = target_failures.partition { |failure| failure[:kind] == :external_timeout }
+    external_flaky_failures, hard_target_failures = target_failures.partition do |failure|
+      [:external_timeout, :external_rate_limited].include?(failure[:kind])
+    end
 
-    warn format_external_timeout_warnings(external_timeout_failures) unless external_timeout_failures.empty?
+    warn format_external_link_warnings(external_flaky_failures) unless external_flaky_failures.empty?
 
     failures.concat(hard_target_failures)
     failures.concat(check_fragments(fragment_targets, response_cache))
@@ -195,6 +197,15 @@ class LinkIntegrityTest < Minitest::Test
     if all_attempts_timed_out && external_host?(uri.host)
       return {
         kind: :external_timeout,
+        url: url,
+        locations: locations,
+        details: details
+      }
+    end
+
+    if last_response&.code.to_i == 429 && external_host?(uri.host)
+      return {
+        kind: :external_rate_limited,
         url: url,
         locations: locations,
         details: details
@@ -397,13 +408,13 @@ class LinkIntegrityTest < Minitest::Test
       error.is_a?(Errno::ETIMEDOUT)
   end
 
-  def format_external_timeout_warnings(failures)
+  def format_external_link_warnings(failures)
     details = failures.first(20).map do |failure|
       "- #{failure[:url]} (#{failure[:details]})"
     end.join("\n")
 
     <<~MSG
-      Skipping #{failures.count} external links due to network timeouts:
+      Skipping #{failures.count} external links due to flaky network or rate limiting:
       #{details}
     MSG
   end

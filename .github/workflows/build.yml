@@ -16,15 +16,15 @@ jobs:
     - name: Determine Ruby version for CI
       id: ruby_version
       run: |
-        version=$(tr -d '\n' < .ruby-version)
-        echo "value=$(printf '%s' "$version" | cut -d. -f1,2)" >> "$GITHUB_OUTPUT"
+        version=$(awk -F'"' '/^ruby = / { print $2 }' mise.toml)
+        echo "value=$version" >> "$GITHUB_OUTPUT"
     - uses: ruby/setup-ruby@319994f95fa847cf3fb3cd3dbe89f6dcde9f178f # v1.295.0
       with:
         ruby-version: ${{ steps.ruby_version.outputs.value }}
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml') }}
         restore-keys: |
           ${{ runner.os }}-gems-
     - name: Bundle install
@@ -43,8 +43,8 @@ jobs:
     - name: Determine Ruby version for CI
       id: ruby_version
       run: |
-        version=$(tr -d '\n' < .ruby-version)
-        echo "value=$(printf '%s' "$version" | cut -d. -f1,2)" >> "$GITHUB_OUTPUT"
+        version=$(awk -F'"' '/^ruby = / { print $2 }' mise.toml)
+        echo "value=$version" >> "$GITHUB_OUTPUT"
     - uses: ruby/setup-ruby@319994f95fa847cf3fb3cd3dbe89f6dcde9f178f # v1.295.0
       with:
         ruby-version: ${{ steps.ruby_version.outputs.value }}
@@ -59,7 +59,7 @@ jobs:
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml') }}
         restore-keys: |
           ${{ runner.os }}-gems-
     - uses: bahmutov/npm-install@20216767ca67f0f7b4d095dc5859c5700a6581cb # v1.12.1
@@ -79,8 +79,8 @@ jobs:
     - name: Determine Ruby version for CI
       id: ruby_version
       run: |
-        version=$(tr -d '\n' < .ruby-version)
-        echo "value=$(printf '%s' "$version" | cut -d. -f1,2)" >> "$GITHUB_OUTPUT"
+        version=$(awk -F'"' '/^ruby = / { print $2 }' mise.toml)
+        echo "value=$version" >> "$GITHUB_OUTPUT"
     - uses: ruby/setup-ruby@319994f95fa847cf3fb3cd3dbe89f6dcde9f178f # v1.295.0
       with:
         ruby-version: ${{ steps.ruby_version.outputs.value }}
@@ -95,7 +95,7 @@ jobs:
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml') }}
         restore-keys: |
           ${{ runner.os }}-gems-
     - uses: bahmutov/npm-install@20216767ca67f0f7b4d095dc5859c5700a6581cb # v1.12.1
@@ -108,6 +108,6 @@ jobs:
     - name: Run link integrity checks
       run: bundle exec rake test:links
     - name: Install Playwright
-      run: npx playwright install --with-deps chromium
+      run: npx --no-install playwright install --with-deps chromium
     - name: Run browser tests
       run: npm test
