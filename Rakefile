@@ -28,15 +28,20 @@ namespace :validate do
   desc "Run all validations"
   task all: [:ruby_version, :generated_data]
 
-  desc "Validate Ruby version matches .ruby-version"
+  desc "Validate Ruby version matches mise.toml"
   task :ruby_version do
-    ruby_version_file = File.join(__dir__, ".ruby-version")
-    unless File.exist?(ruby_version_file)
-      puts "No .ruby-version file found, skipping version check"
+    mise_config_file = File.join(__dir__, "mise.toml")
+    unless File.exist?(mise_config_file)
+      puts "No mise.toml file found, skipping version check"
       next
     end
 
-    expected_version = File.read(ruby_version_file).strip
+    expected_version = File.read(mise_config_file)[/^ruby\s*=\s*"([^"]+)"$/, 1]
+    unless expected_version
+      puts "No Ruby version configured in mise.toml, skipping version check"
+      next
+    end
+
     current_version = RUBY_VERSION
 
     # Compare major.minor.patch - allow for exact match or compatible patch versions
@@ -47,10 +52,10 @@ namespace :validate do
     if expected_parts[0] != current_parts[0] || expected_parts[1] != current_parts[1]
       abort <<~ERROR
         Ruby version mismatch!
-        Expected: #{expected_version} (from .ruby-version)
+        Expected: #{expected_version} (from mise.toml)
         Current:  #{current_version}
 
-        Please install the correct Ruby version or update .ruby-version.
+        Please install the correct Ruby version via mise or update mise.toml.
       ERROR
     end
 

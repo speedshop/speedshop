@@ -3,7 +3,7 @@ Jekyll::Hooks.register :site, :post_write do |site|
 
   # Run prettier on all HTML, CSS, and JS files
   prettier_cmd = <<~CMD
-    npx prettier \
+    npx --no-install prettier \
       --write \
       "#{site.dest}/**/*.{html,css,js}" \
       --ignore-path .prettierignore
