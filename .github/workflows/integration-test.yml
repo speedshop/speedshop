@@ -17,10 +17,15 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     steps:
-    - uses: actions/checkout@v4
-    - uses: ruby/setup-ruby@v1
+    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+    - name: Determine Ruby version for CI
+      id: ruby_version
+      run: |
+        version=$(tr -d '\n' < .ruby-version)
+        echo "value=$(printf '%s' "$version" | cut -d. -f1,2)" >> "$GITHUB_OUTPUT"
+    - uses: ruby/setup-ruby@319994f95fa847cf3fb3cd3dbe89f6dcde9f178f # v1.295.0
       with:
-        ruby-version: '3.3'
+        ruby-version: ${{ steps.ruby_version.outputs.value }}
         bundler-cache: true
     - name: Run integration tests
       env:

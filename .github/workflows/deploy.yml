@@ -12,8 +12,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
         repository: speedshop/client_notes
         token: ${{ secrets.CLIENT_NOTES_PAT }}
@@ -21,12 +21,14 @@ jobs:
     - name: Determine Ruby version for deploy
       id: ruby_version
       run: |
+        ruby_version_file=.ruby-version
         if [ -f .client_notes/.ruby-version ]; then
-          echo "value=$(tr -d '\n' < .client_notes/.ruby-version)" >> "$GITHUB_OUTPUT"
-        else
-          echo "value=$(tr -d '\n' < .ruby-version)" >> "$GITHUB_OUTPUT"
+          ruby_version_file=.client_notes/.ruby-version
         fi
-    - uses: ruby/setup-ruby@4fc31e1c823882afd7ef55985266a526c589de90 # v1.282.0
+
+        version=$(tr -d '\n' < "$ruby_version_file")
+        echo "value=$(printf '%s' "$version" | cut -d. -f1,2)" >> "$GITHUB_OUTPUT"
+    - uses: ruby/setup-ruby@319994f95fa847cf3fb3cd3dbe89f6dcde9f178f # v1.295.0
       with:
         ruby-version: ${{ steps.ruby_version.outputs.value }}
     - uses: r-lib/actions/setup-pandoc@929c772977a3a13c8733b363bf5a2f685c25dd91 # v2.9.0
