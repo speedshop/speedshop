@@ -1,8 +1,5 @@
 name: Deploy
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 on:
   push:
     branches:
@@ -34,9 +31,10 @@ jobs:
     - uses: ruby/setup-ruby@319994f95fa847cf3fb3cd3dbe89f6dcde9f178f # v1.295.0
       with:
         ruby-version: ${{ steps.ruby_version.outputs.value }}
-    - uses: r-lib/actions/setup-pandoc@929c772977a3a13c8733b363bf5a2f685c25dd91 # v2.9.0
-      with:
-        pandoc-version: '2.9.2.1'
+    - name: Install Pandoc
+      run: |
+        curl -fsSL -o /tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/2.9.2.1/pandoc-2.9.2.1-1-amd64.deb
+        sudo dpkg -i /tmp/pandoc.deb
     - name: Install PDF dependencies
       run: |
         sudo apt-get update
