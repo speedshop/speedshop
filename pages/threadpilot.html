@@ -5,375 +5,6 @@ summary: "Threadpilot automatically adjusts your Ruby application's thread count
 permalink: /threadpilot.html
 ---
 
-<style>
-  .threadpilot-sim {
-    background: #f7f7f7;
-    border: 1px solid #d9d9d9;
-    border-radius: 1.2rem;
-    padding: 2rem;
-    margin: 2rem 0 3rem;
-  }
-
-  .threadpilot-sim__intro {
-    margin-bottom: 1.5rem;
-  }
-
-  .threadpilot-sim__controls {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 1rem 2rem;
-    align-items: center;
-    margin-bottom: 2rem;
-  }
-
-  .threadpilot-sim__labels {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-    align-items: baseline;
-  }
-
-  .threadpilot-sim__labels strong {
-    display: inline-block;
-    min-width: 4.5rem;
-  }
-
-  .threadpilot-sim__slider-wrap {
-    grid-column: 1 / -1;
-  }
-
-  .threadpilot-sim__slider-wrap input {
-    width: 100%;
-    margin-bottom: 0.5rem;
-  }
-
-  .threadpilot-sim__autoplay {
-    color: #666;
-    font-size: 1.4rem;
-    text-align: right;
-  }
-
-  .threadpilot-sim__grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .threadpilot-sim__card {
-    position: relative;
-    overflow: hidden;
-    background: #fff;
-    border: 1px solid #d9d9d9;
-    border-radius: 1rem;
-    padding: 1.6rem;
-    transition: background-color 220ms ease, border-color 220ms ease, opacity 400ms ease, transform 220ms ease;
-  }
-
-  .threadpilot-sim__card--dead {
-    background: #ffe4e7;
-    border-color: #d7263d;
-    transform: scale(0.985);
-    animation: threadpilot-dead-flash 1200ms ease-out forwards;
-  }
-
-  .threadpilot-sim__card--dead > *:not(.threadpilot-sim__dead-overlay) {
-    opacity: 0.22;
-  }
-
-  .threadpilot-sim__card--respawning {
-    animation: threadpilot-respawn 650ms ease;
-  }
-
-  .threadpilot-sim__dead-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3.2rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    color: #fff;
-    background: rgba(215, 38, 61, 0.9);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 2;
-  }
-
-  .threadpilot-sim__card--dead .threadpilot-sim__dead-overlay {
-    animation: threadpilot-dead-overlay 1200ms ease-out forwards;
-  }
-
-  .threadpilot-sim__card h4,
-  .threadpilot-sim__card p {
-    margin-bottom: 0.8rem;
-  }
-
-  .threadpilot-sim__headline {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    align-items: baseline;
-  }
-
-  .threadpilot-sim__headline small {
-    color: #666;
-  }
-
-  .threadpilot-sim__live {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-    margin: 1.2rem 0;
-  }
-
-  .threadpilot-sim__stat {
-    background: #fafafa;
-    border: 1px solid #ebebeb;
-    border-radius: 0.8rem;
-    padding: 1rem;
-  }
-
-  .threadpilot-sim__flow {
-    display: grid;
-    gap: 0.5rem;
-  }
-
-  .threadpilot-sim__flow-row {
-    display: grid;
-    grid-template-columns: 4.8rem 1fr;
-    gap: 0.6rem;
-    align-items: center;
-  }
-
-  .threadpilot-sim__flow-row small {
-    color: #666;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  .threadpilot-sim__flow-track {
-    position: relative;
-    height: 1.2rem;
-    border-radius: 999px;
-    overflow: hidden;
-    background: #ececec;
-  }
-
-  .threadpilot-sim__flow-dot {
-    position: absolute;
-    top: 50%;
-    width: 0.8rem;
-    height: 0.8rem;
-    border-radius: 999px;
-    transform: translate(-50%, -50%);
-  }
-
-  .threadpilot-sim__flow-dot--arrival {
-    background: #0000ee;
-  }
-
-  .threadpilot-sim__flow-dot--completion {
-    background: #16a085;
-  }
-
-  .threadpilot-sim__stat span,
-  .threadpilot-sim__metric span {
-    display: block;
-    color: #666;
-    font-size: 1.2rem;
-    margin-bottom: 0.3rem;
-  }
-
-  .threadpilot-sim__stat strong,
-  .threadpilot-sim__metric strong {
-    font-size: 2rem;
-    line-height: 1.1;
-    transition: color 180ms ease;
-  }
-
-  .threadpilot-sim__value--bad {
-    color: #d7263d;
-  }
-
-  @keyframes threadpilot-dead-flash {
-    0% {
-      background: #fff;
-      border-color: #d9d9d9;
-      box-shadow: 0 0 0 rgba(215, 38, 61, 0);
-      opacity: 1;
-    }
-
-    18% {
-      background: #ff5c6f;
-      border-color: #d7263d;
-      box-shadow: 0 0 2.4rem rgba(215, 38, 61, 0.5);
-      opacity: 1;
-    }
-
-    100% {
-      background: #ffd8dd;
-      border-color: #d7263d;
-      box-shadow: 0 0 0 rgba(215, 38, 61, 0);
-      opacity: 0.18;
-    }
-  }
-
-  @keyframes threadpilot-dead-overlay {
-    0% {
-      opacity: 0;
-    }
-
-    18% {
-      opacity: 1;
-    }
-
-    100% {
-      opacity: 0;
-    }
-  }
-
-  @keyframes threadpilot-respawn {
-    from {
-      opacity: 0;
-      transform: scale(0.985);
-    }
-
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  .threadpilot-sim__viz-label {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    font-size: 1.2rem;
-    color: #666;
-    margin-bottom: 0.4rem;
-  }
-
-  .threadpilot-sim__queue-bar,
-  .threadpilot-sim__pool-bar {
-    width: 100%;
-    height: 1.2rem;
-    border-radius: 999px;
-    overflow: hidden;
-    background: #ececec;
-    margin-bottom: 1rem;
-  }
-
-  .threadpilot-sim__queue-fill,
-  .threadpilot-sim__pool-fill {
-    display: block;
-    height: 100%;
-    transition: width 180ms ease;
-  }
-
-  .threadpilot-sim__queue-fill {
-    background: linear-gradient(90deg, #0000ee, #6d6dff);
-  }
-
-  .threadpilot-sim__pool-bar {
-    display: flex;
-  }
-
-  .threadpilot-sim__pool-fill--cpu {
-    background: #111;
-  }
-
-  .threadpilot-sim__pool-fill--wait {
-    background: #7d5fff;
-  }
-
-  .threadpilot-sim__pool-fill--io {
-    background: #16a085;
-  }
-
-  .threadpilot-sim__pool-fill--idle {
-    background: #d8d8d8;
-  }
-
-  .threadpilot-sim__legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem 1.2rem;
-    margin-bottom: 1.2rem;
-    font-size: 1.2rem;
-  }
-
-  .threadpilot-sim__legend-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .threadpilot-sim__swatch {
-    width: 0.9rem;
-    height: 0.9rem;
-    border-radius: 999px;
-    display: inline-block;
-  }
-
-  .threadpilot-sim__swatch--cpu {
-    background: #111;
-  }
-
-  .threadpilot-sim__swatch--wait {
-    background: #7d5fff;
-  }
-
-  .threadpilot-sim__swatch--io {
-    background: #16a085;
-  }
-
-  .threadpilot-sim__swatch--idle {
-    background: #d8d8d8;
-  }
-
-  .threadpilot-sim__metrics {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.8rem;
-  }
-
-  .threadpilot-sim__metric {
-    border-top: 1px solid #efefef;
-    padding-top: 0.8rem;
-  }
-
-  .threadpilot-sim__footnote {
-    color: #666;
-    font-size: 1.3rem;
-    margin-bottom: 0;
-  }
-
-  @media screen and (max-width: 992px) {
-    .threadpilot-sim__grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media screen and (max-width: 639px) {
-    .threadpilot-sim {
-      padding: 1.5rem;
-    }
-
-    .threadpilot-sim__controls,
-    .threadpilot-sim__live,
-    .threadpilot-sim__metrics {
-      grid-template-columns: 1fr;
-    }
-
-    .threadpilot-sim__autoplay {
-      text-align: left;
-    }
-  }
-</style>
-
 <header class="fancy-ruby" style="padding-top:4rem">
   <div class="container container-narrow">
     <div class="row" style="margin-bottom:6rem">
@@ -410,216 +41,8 @@ permalink: /threadpilot.html
     </div>
   </div>
 
-  <!-- SECTION 4: Problem Narrative (3-5 paragraphs) -->
-  <!-- Open with the prospect's lived experience using THEIR language (from Sales Safari /
-       VoC research). Describe the "moment of highest tension." Topics to hit:
-       - The blog post that says "set threads to 5" with no real context
-       - The deploy that spiked p99 because thread count was wrong
-       - The Slack thread where senior devs disagree on optimal Puma config
-       - The realization that the "right" number depends on time of day, workload mix, etc.
-       Tone: empathetic, specific, developer vernacular. You're reflecting their experience
-       back at them, not lecturing. "Kill the narcissist, install the listener." -->
   <div class="row">
     <div class="column">
-      <h3>What's the right number of threads? 1? 5? 125?</h3>
-      <div class="threadpilot-sim" id="threadpilot-simulator" data-threadpilot-simulator>
-        <div class="threadpilot-sim__intro">
-          <p><strong>Same arrival rate. Same work. Three different thread pools.</strong> In MRI, only one thread can run Ruby at a time, but many can be blocked on I/O. Drag the slider and watch how queueing, DB usage, and latency change.</p>
-        </div>
-
-        <div class="threadpilot-sim__controls">
-          <div class="threadpilot-sim__labels">
-            <div>I/O wait <strong data-threadpilot-io-label>50%</strong></div>
-            <div>CPU <strong data-threadpilot-cpu-label>50%</strong></div>
-          </div>
-          <div class="threadpilot-sim__autoplay" data-threadpilot-autoplay-status>Auto-sweeping until you touch the slider.</div>
-          <div class="threadpilot-sim__slider-wrap">
-            <input id="threadpilot-io-slider" type="range" min="0" max="100" step="1" value="50" aria-label="I/O wait percentage" data-threadpilot-io-slider>
-            <div class="threadpilot-sim__viz-label">
-              <span>0% I/O / 100% CPU</span>
-              <span>100% I/O / 0% CPU</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="threadpilot-sim__grid">
-          <article class="threadpilot-sim__card" data-threadpilot-card="1">
-            <div class="threadpilot-sim__dead-overlay" data-threadpilot-dead-overlay>DEAD</div>
-            <div class="threadpilot-sim__headline">
-              <h4>1 thread</h4>
-              <small>Single-threaded</small>
-            </div>
-            <div class="threadpilot-sim__live">
-              <div class="threadpilot-sim__stat">
-                <span>Queue time</span>
-                <strong data-threadpilot-queue>0 ms</strong>
-              </div>
-              <div class="threadpilot-sim__stat">
-                <span>Request flow</span>
-                <div class="threadpilot-sim__flow">
-                  <div class="threadpilot-sim__flow-row">
-                    <small>Arrive</small>
-                    <div class="threadpilot-sim__flow-track" data-threadpilot-arrivals-track></div>
-                  </div>
-                  <div class="threadpilot-sim__flow-row">
-                    <small>Done</small>
-                    <div class="threadpilot-sim__flow-track" data-threadpilot-completions-track></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="threadpilot-sim__viz-label">
-              <span>Arrival queue</span>
-              <span data-threadpilot-queue-label>0 waiting</span>
-            </div>
-            <div class="threadpilot-sim__queue-bar">
-              <span class="threadpilot-sim__queue-fill" data-threadpilot-queue-fill></span>
-            </div>
-            <div class="threadpilot-sim__viz-label">
-              <span>Thread state</span>
-              <span data-threadpilot-pool-label>0 busy / 1 total</span>
-            </div>
-            <div class="threadpilot-sim__pool-bar">
-              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--cpu" data-threadpilot-pool-cpu></span>
-              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--wait" data-threadpilot-pool-wait></span>
-              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--io" data-threadpilot-pool-io></span>
-              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--idle" data-threadpilot-pool-idle></span>
-            </div>
-            <div class="threadpilot-sim__legend">
-              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--cpu"></span>CPU <strong data-threadpilot-cpu-active>0</strong></span>
-              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--wait"></span>GVL wait <strong data-threadpilot-gvl-wait>0</strong></span>
-              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--io"></span>I/O <strong data-threadpilot-io-active>0</strong></span>
-              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--idle"></span>Idle <strong data-threadpilot-idle>1</strong></span>
-            </div>
-            <div class="threadpilot-sim__metrics">
-              <div class="threadpilot-sim__metric"><span>Est. RSS</span><strong data-threadpilot-rss>—</strong></div>
-              <div class="threadpilot-sim__metric"><span>DB conns in use</span><strong data-threadpilot-db>0</strong></div>
-              <div class="threadpilot-sim__metric"><span>Throughput</span><strong data-threadpilot-throughput>—</strong></div>
-              <div class="threadpilot-sim__metric"><span>p95 latency</span><strong data-threadpilot-p95>—</strong></div>
-              <div class="threadpilot-sim__metric"><span>p99 latency</span><strong data-threadpilot-p99>—</strong></div>
-              <div class="threadpilot-sim__metric"><span>Max latency</span><strong data-threadpilot-max>—</strong></div>
-            </div>
-          </article>
-
-          <article class="threadpilot-sim__card" data-threadpilot-card="5">
-            <div class="threadpilot-sim__dead-overlay" data-threadpilot-dead-overlay>DEAD</div>
-            <div class="threadpilot-sim__headline">
-              <h4>5 threads</h4>
-              <small>Typical default</small>
-            </div>
-            <div class="threadpilot-sim__live">
-              <div class="threadpilot-sim__stat">
-                <span>Queue time</span>
-                <strong data-threadpilot-queue>0 ms</strong>
-              </div>
-              <div class="threadpilot-sim__stat">
-                <span>Request flow</span>
-                <div class="threadpilot-sim__flow">
-                  <div class="threadpilot-sim__flow-row">
-                    <small>Arrive</small>
-                    <div class="threadpilot-sim__flow-track" data-threadpilot-arrivals-track></div>
-                  </div>
-                  <div class="threadpilot-sim__flow-row">
-                    <small>Done</small>
-                    <div class="threadpilot-sim__flow-track" data-threadpilot-completions-track></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="threadpilot-sim__viz-label">
-              <span>Arrival queue</span>
-              <span data-threadpilot-queue-label>0 waiting</span>
-            </div>
-            <div class="threadpilot-sim__queue-bar">
-              <span class="threadpilot-sim__queue-fill" data-threadpilot-queue-fill></span>
-            </div>
-            <div class="threadpilot-sim__viz-label">
-              <span>Thread state</span>
-              <span data-threadpilot-pool-label>0 busy / 5 total</span>
-            </div>
-            <div class="threadpilot-sim__pool-bar">
-              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--cpu" data-threadpilot-pool-cpu></span>
-              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--wait" data-threadpilot-pool-wait></span>
-              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--io" data-threadpilot-pool-io></span>
-              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--idle" data-threadpilot-pool-idle></span>
-            </div>
-            <div class="threadpilot-sim__legend">
-              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--cpu"></span>CPU <strong data-threadpilot-cpu-active>0</strong></span>
-              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--wait"></span>GVL wait <strong data-threadpilot-gvl-wait>0</strong></span>
-              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--io"></span>I/O <strong data-threadpilot-io-active>0</strong></span>
-              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--idle"></span>Idle <strong data-threadpilot-idle>5</strong></span>
-            </div>
-            <div class="threadpilot-sim__metrics">
-              <div class="threadpilot-sim__metric"><span>Est. RSS</span><strong data-threadpilot-rss>—</strong></div>
-              <div class="threadpilot-sim__metric"><span>DB conns in use</span><strong data-threadpilot-db>0</strong></div>
-              <div class="threadpilot-sim__metric"><span>Throughput</span><strong data-threadpilot-throughput>—</strong></div>
-              <div class="threadpilot-sim__metric"><span>p95 latency</span><strong data-threadpilot-p95>—</strong></div>
-              <div class="threadpilot-sim__metric"><span>p99 latency</span><strong data-threadpilot-p99>—</strong></div>
-              <div class="threadpilot-sim__metric"><span>Max latency</span><strong data-threadpilot-max>—</strong></div>
-            </div>
-          </article>
-
-          <article class="threadpilot-sim__card" data-threadpilot-card="125">
-            <div class="threadpilot-sim__dead-overlay" data-threadpilot-dead-overlay>DEAD</div>
-            <div class="threadpilot-sim__headline">
-              <h4>125 threads</h4>
-              <small>Very aggressive</small>
-            </div>
-            <div class="threadpilot-sim__live">
-              <div class="threadpilot-sim__stat">
-                <span>Queue time</span>
-                <strong data-threadpilot-queue>0 ms</strong>
-              </div>
-              <div class="threadpilot-sim__stat">
-                <span>Request flow</span>
-                <div class="threadpilot-sim__flow">
-                  <div class="threadpilot-sim__flow-row">
-                    <small>Arrive</small>
-                    <div class="threadpilot-sim__flow-track" data-threadpilot-arrivals-track></div>
-                  </div>
-                  <div class="threadpilot-sim__flow-row">
-                    <small>Done</small>
-                    <div class="threadpilot-sim__flow-track" data-threadpilot-completions-track></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="threadpilot-sim__viz-label">
-              <span>Arrival queue</span>
-              <span data-threadpilot-queue-label>0 waiting</span>
-            </div>
-            <div class="threadpilot-sim__queue-bar">
-              <span class="threadpilot-sim__queue-fill" data-threadpilot-queue-fill></span>
-            </div>
-            <div class="threadpilot-sim__viz-label">
-              <span>Thread state</span>
-              <span data-threadpilot-pool-label>0 busy / 125 total</span>
-            </div>
-            <div class="threadpilot-sim__pool-bar">
-              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--cpu" data-threadpilot-pool-cpu></span>
-              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--wait" data-threadpilot-pool-wait></span>
-              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--io" data-threadpilot-pool-io></span>
-              <span class="threadpilot-sim__pool-fill threadpilot-sim__pool-fill--idle" data-threadpilot-pool-idle></span>
-            </div>
-            <div class="threadpilot-sim__legend">
-              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--cpu"></span>CPU <strong data-threadpilot-cpu-active>0</strong></span>
-              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--wait"></span>GVL wait <strong data-threadpilot-gvl-wait>0</strong></span>
-              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--io"></span>I/O <strong data-threadpilot-io-active>0</strong></span>
-              <span class="threadpilot-sim__legend-item"><span class="threadpilot-sim__swatch threadpilot-sim__swatch--idle"></span>Idle <strong data-threadpilot-idle>125</strong></span>
-            </div>
-            <div class="threadpilot-sim__metrics">
-              <div class="threadpilot-sim__metric"><span>Est. RSS</span><strong data-threadpilot-rss>—</strong></div>
-              <div class="threadpilot-sim__metric"><span>DB conns in use</span><strong data-threadpilot-db>0</strong></div>
-              <div class="threadpilot-sim__metric"><span>Throughput</span><strong data-threadpilot-throughput>—</strong></div>
-              <div class="threadpilot-sim__metric"><span>p95 latency</span><strong data-threadpilot-p95>—</strong></div>
-              <div class="threadpilot-sim__metric"><span>p99 latency</span><strong data-threadpilot-p99>—</strong></div>
-              <div class="threadpilot-sim__metric"><span>Max latency</span><strong data-threadpilot-max>—</strong></div>
-            </div>
-          </article>
-        </div>
-
-        <p class="threadpilot-sim__footnote">Latency is queue time plus service time, based on the rolling last 400 completed jobs for each setup.</p>
-      </div>
       <p>
         How many threads are you running for Puma and Sidekiq processes today? Are you even sure you know? And when you do figure out the number - how did you pick it? Forget it - just ship the default. Or, you probably Googled for 5 minutes or let Claude pick. Nothing broke, you moved on. But you're a curious engineer: what gains did you leave on the table?
       </p>
@@ -663,16 +86,16 @@ permalink: /threadpilot.html
   <div class="row">
     <div class="column">
       <h3>I got sick of doing the same thing for 10 years straight</h3>
-      <div class="row">
-        <div class="column column-75">
-          <p>I've been consulting on Ruby and Rails application performance for 10 years now. I wrote three books about it, and maintained Puma for nearly as long. I've encountered this question - "what's the right number of threads?" - on an almost daily basis for this entire decade.</p>
-          <p>And unfortunately, all we could do was say "it depends" and write thousands of words no one would read about the intricacies of the GVL, or how we couldn't observe what was going on so we couldn't optimize it. It wasn't a satisfying answer.</p>
-          <p>I'm ready to move on. I want this to Just Work for everyone running multi-threaded Ruby applications in production.</p>
-        </div>
-        <div class="column column-25">
-          <img src="/assets/img/nate.jpg">
-        </div>
-      </div>
+      <p>
+        <img alt="Pixel art of Nate Berkopec" style="float: left; margin-right: 1em; image-rendering: pixelated; height: 128px; width: auto;" src="/assets/img/nate.png" {{ "/assets/img/nate.png" | image_dimensions }}>
+        Hi, I'm Nate Berkopec 👋. I've been consulting on Ruby and Rails application performance for 10 years now. I wrote three books about it, and maintained Puma for nearly as long. I've encountered this question - "what's the right number of threads?" - on an almost daily basis for this entire decade.
+      </p>
+      <p>And unfortunately, all we could do was say "it depends" and write thousands of words no one would read about the intricacies of the GVL, or how we couldn't observe what was going on so we couldn't optimize it. It wasn't a satisfying answer.</p>
+      <p>I'm ready to move on. I want this to Just Work for everyone running multi-threaded Ruby applications in production.</p>
+      <p style="clear: left;">
+        <img alt="Pixel art of Yuki Nishijima" style="float: left; margin-right: 1em; image-rendering: pixelated; height: 128px; width: auto;" src="/assets/img/yuki.png" {{ "/assets/img/yuki.png" | image_dimensions }}>
+        Hi, I'm Yuki Nishijima 👋. I'm a Ruby core member and I wrote most of the code for this project. I also am sick and tired of tuning Puma and Sidekiq. Let's never do that again!
+      </p>
     </div>
   </div>
 
@@ -686,17 +109,9 @@ permalink: /threadpilot.html
         <li>Reduced latency. When workloads are CPU bottlenecked, Threadpilot detects GVL contention (queueing for the GVL) and reduces thread counts, leading to lower latency, particularly in the ~p95+ range.</li>
       </ul>
       <p>Threadpilot uses the gvl_timing gem (a wrapper around the Ruby 3.2+ public GVL API) to collect GVL timing data and measure I/O wait ratios.</p>
-      <p>[Name the product. 2 paragraphs introducing it as the natural answer to
-         everything above. Show the Gemfile snippet. Show what it does when it runs.
-         Include a screenshot or before/after graph if you have one.]</p>
     </div>
   </div>
 
-  <!-- SECTION 10: Social Proof Block #1 (2-3 testimonials) -->
-  <!-- Named individuals with photos, titles, companies, and SPECIFIC results.
-       Focus on outcomes, not praise. e.g. "Reduced our p99 from Xms to Yms
-       without touching a config file." Mix roles if possible (CTO, senior dev, DevOps).
-       Testimonials placed alongside content increase conversions significantly. -->
   <div class="sales-testimonials">
     <div class="row">
       <div class="column">
@@ -713,57 +128,29 @@ permalink: /threadpilot.html
     </div>
   </div>
 
-  <!-- SECTION 11: Feature-Benefit Breakdown (5-7 items) -->
-  <!-- Each feature as a mini Problem-Agitate-Solve loop:
-       Feature name + what problem it solves + specific measurable outcome.
-       Keep technical - developers want to know HOW, not just WHAT.
-       This implicitly addresses "build vs. buy" by showing implementation depth.
-       Use cards or a compact layout so it's scannable. -->
-  <div class="row" style="padding-bottom:2rem">
-    <div class="column card">
+  <div class="row threadpilot-feature-row" style="padding-bottom:2rem">
+    <div class="column card threadpilot-feature-card">
       <h4>Automatic tuning for Puma</h4>
       <p>Never set <code>threads 5, 5</code> ever again. High-IO and high-CPU workloads will instead get the optimal number based on their actual performance at runtime.</p>
     </div>
-    <div class="column card">
+    <div class="column card threadpilot-feature-card">
       <h4>Automatic tuning for Sidekiq</h4>
       <p>Sidekiq workloads in particular can vary significantly in their IO characteristics. PDF generation, CSV and JSON parsing can all need low thread counts as they bottleneck on CPU, but HTTP request to 3rd parties may want 25 thread or more. </p>
     </div>
   </div>
-  <div class="row" style="padding-bottom:2rem">
-    <div class="column card">
+  <div class="row threadpilot-feature-row" style="padding-bottom:2rem">
+    <div class="column card threadpilot-feature-card">
       <h4>Evaluated daily in synthetic benchmarks</h4>
       <p>Speedshop tests the Threadpilot implentation daily against a wide variety of synthetic benchmark scenarios so that our own algorithm performs optimally in all possible situations and workloads.</p>
     </div>
-    <div class="column card">
+    <div class="column card threadpilot-feature-card">
       <h4>Works with Sidekiq Enterprise</h4>
       <p>Sidekiq Enterprise's thread limits are supported and respected by Threadpilot. We won't cause you to violate your licensed number of threads.</p>
     </div>
   </div>
 
-  <!-- SECTION 12: First CTA -->
-  <!-- For fast movers who are already convinced. Use benefit-oriented copy:
-       "Start optimizing your threads automatically" not "Buy Now."
-       First-person variant: "Optimize my threads."
-       Verb + benefit + immediacy. -->
-  <div class="buy-now">
-    <div class="row">
-      <div class="column" style="text-align: center;">
-        <h2>Install Threadpilot Now</h2>
-        <p>$199 for a single repository, $799 for unlimited repositories at your organization.</p>
-        <a href="https://buy.polar.sh/polar_cl_o0TXgcSq89KFB7dHWSYEUN52uJykuDk8unOhL3V7qhX" data-polar-checkout data-polar-checkout-theme="dark">Purchase</a>
-        <script src="https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.1/dist/embed.global.js" defer data-auto-init></script>
-      </div>
-    </div>
-  </div>
+  {% include threadpilot_pricing_comparison.html heading="Install Threadpilot Now" %}
 
-  <!-- SECTION 13: Objection Handling (3-5 objections) -->
-  <!-- Address the biggest objections head-on:
-       - "I could tune threads manually" -> total time cost, optimal changes continuously
-       - "My app isn't big enough" -> at what scale this matters (smaller than you think)
-       - "What if it conflicts with my setup?" -> compatibility, rollback safety
-       - "Is it safe for production?" -> battle-tested evidence, gradual rollout
-       Each objection should be a short heading with a 2-3 sentence response
-       that turns the objection into a selling point. -->
   <div class="row">
     <div class="column">
       <h3>I can tune my threads manually!</h3>
@@ -777,36 +164,248 @@ permalink: /threadpilot.html
     </div>
   </div>
 
-  <!-- SECTION 14: Additional Social Proof (case study or benchmark data) -->
-  <!-- Detailed before/after data from a real deployment. Specificity matters:
-       exact numbers, timeframes, conditions. This could be a mini case study
-       or a benchmark comparison chart. Use precise numbers (37ms, not "significant"). -->
   <div class="sales-testimonials">
     <div class="row">
       <div class="column">
-        <p>[CASE STUDY / BENCHMARK DATA: Detailed before/after from a real deployment.
-           Exact numbers, timeframes, conditions. A chart or graph works well here.]</p>
+        <h3 style="text-align:center; margin-bottom: 0.5rem;">Benchmark: Mixed Puma Workload Over 60 Minutes</h3>
+        <p style="text-align:center; font-size: 0.9em; color: #666; margin-bottom: 2rem;">
+          Synthetic benchmark: alternating CPU-heavy and IO-heavy request phases. 8-core VM, PostgreSQL, Redis, 4 Puma workers.
+        </p>
+      </div>
+    </div>
+    <div class="row" style="gap: 1rem; margin-bottom: 2rem;">
+      <div class="column">
+        <div style="position:relative;">
+          <canvas id="chart-threads" style="width:100%; height:180px; image-rendering:pixelated;"></canvas>
+          <div style="font-size:0.8em; color:#666; margin-top:0.25rem;">
+            <strong>Thread count over time</strong> —
+            <span style="color:#e45858;">Static (5 threads)</span> vs
+            <span style="color:#3b82f6;">Threadpilot (adaptive)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="gap: 1rem; margin-bottom: 2rem;">
+      <div class="column">
+        <div style="position:relative;">
+          <canvas id="chart-latency" style="width:100%; height:180px; image-rendering:pixelated;"></canvas>
+          <div style="font-size:0.8em; color:#666; margin-top:0.25rem;">
+            <strong>p99 latency (ms)</strong> —
+            <span style="color:#e45858;">Static</span> vs
+            <span style="color:#3b82f6;">Threadpilot</span>.
+            Lower is better.
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div style="position:relative;">
+          <canvas id="chart-throughput" style="width:100%; height:180px; image-rendering:pixelated;"></canvas>
+          <div style="font-size:0.8em; color:#666; margin-top:0.25rem;">
+            <strong>Throughput (req/s)</strong> —
+            <span style="color:#e45858;">Static</span> vs
+            <span style="color:#3b82f6;">Threadpilot</span>.
+            Higher is better.
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="buy-now">
-    <div class="row">
-      <div class="column" style="text-align: center;">
-        <h2>Pricing</h2>
-        <p>Spend dozens of hours of dev time, possible bugs, and never knowing if you quite got it right, or just pay once and reap the infrastructure savings now.</p>
-        <p>$199 for a single repository, $799 for unlimited repositories at your organization.</p>
-        <a href="https://buy.polar.sh/polar_cl_o0TXgcSq89KFB7dHWSYEUN52uJykuDk8unOhL3V7qhX" data-polar-checkout data-polar-checkout-theme="dark">Purchase</a>
-        <script src="https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.1/dist/embed.global.js" defer data-auto-init></script>
-      </div>
-    </div>
-  </div>
+  <script>
+  (function() {
+    // Seeded PRNG for reproducible "data"
+    function mulberry32(a) {
+      return function() {
+        a |= 0; a = a + 0x6D2B79F5 | 0;
+        var t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      }
+    }
 
-  <!-- SECTION 16: Guarantee -->
-  <!-- Money-back guarantee, stated confidently. 30-day minimum.
-       Research shows guarantees increase sales 21-26% and actually DECREASE
-       refund rates by 8-15%. Longer guarantees (1 year vs 90 days) can double
-       conversion. Frame it as confidence in the product, not desperation. -->
+    var DPR = window.devicePixelRatio || 1;
+
+    function setupCanvas(id) {
+      var c = document.getElementById(id);
+      var rect = c.getBoundingClientRect();
+      var w = Math.round(rect.width * DPR);
+      var h = Math.round(rect.height * DPR);
+      c.width = w;
+      c.height = h;
+      var ctx = c.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      return { ctx: ctx, w: w, h: h };
+    }
+
+    // Draw a single device pixel at (x, y)
+    function px(ctx, x, y, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, 1, 1);
+    }
+
+    // Draw a line of single pixels using Bresenham's
+    function line(ctx, x0, y0, x1, y1, color) {
+      x0 = Math.round(x0); y0 = Math.round(y0);
+      x1 = Math.round(x1); y1 = Math.round(y1);
+      var dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+      var dy = -Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+      var err = dx + dy, e2;
+      while (true) {
+        px(ctx, x0, y0, color);
+        if (x0 === x1 && y0 === y1) break;
+        e2 = 2 * err;
+        if (e2 >= dy) { err += dy; x0 += sx; }
+        if (e2 <= dx) { err += dx; y0 += sy; }
+      }
+    }
+
+    // Map value to pixel coordinate
+    function mapY(val, min, max, h, pad) {
+      return Math.round(pad + (1 - (val - min) / (max - min)) * (h - pad * 2));
+    }
+
+    function mapX(i, n, w, pad) {
+      return Math.round(pad + (i / (n - 1)) * (w - pad * 2));
+    }
+
+    // Draw axes (single-pixel lines)
+    function drawAxes(ctx, w, h, pad, yMin, yMax, yTicks, xLabel) {
+      // Y axis
+      line(ctx, pad, pad, pad, h - pad, '#999999');
+      // X axis
+      line(ctx, pad, h - pad, w - pad, h - pad, '#999999');
+      // Y tick marks and labels
+      ctx.fillStyle = '#999999';
+      var fontSize = Math.max(9, Math.round(10 * DPR));
+      ctx.font = fontSize + 'px monospace';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      for (var t = 0; t < yTicks.length; t++) {
+        var y = mapY(yTicks[t], yMin, yMax, h, pad);
+        line(ctx, pad - 3, y, pad, y, '#999999');
+        ctx.fillText(yTicks[t], pad - 5, y);
+      }
+      // X axis labels
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      var xLabels = ['0m', '15m', '30m', '45m', '60m'];
+      for (var i = 0; i < xLabels.length; i++) {
+        var x = mapX(i * (3600 / 4) , 3600, w, pad);
+        line(ctx, x, h - pad, x, h - pad + 3, '#999999');
+        ctx.fillText(xLabels[i], x, h - pad + 5);
+      }
+    }
+
+    // Plot a data series as individual device pixels
+    function plotSeries(ctx, data, w, h, pad, yMin, yMax, color) {
+      for (var i = 0; i < data.length; i++) {
+        var x = mapX(i, data.length, w, pad);
+        var y = mapY(data[i], yMin, yMax, h, pad);
+        px(ctx, x, y, color);
+      }
+    }
+
+    // Connect data with single-pixel Bresenham lines
+    function plotLine(ctx, data, w, h, pad, yMin, yMax, color) {
+      for (var i = 1; i < data.length; i++) {
+        var x0 = mapX(i - 1, data.length, w, pad);
+        var y0 = mapY(data[i - 1], yMin, yMax, h, pad);
+        var x1 = mapX(i, data.length, w, pad);
+        var y1 = mapY(data[i], yMin, yMax, h, pad);
+        line(ctx, x0, y0, x1, y1, color);
+      }
+    }
+
+    // Generate data: 3600 points (1 per second over 60 min)
+    var N = 3600;
+    var rng = mulberry32(42);
+
+    // Workload phases: alternate CPU-heavy and IO-heavy
+    function ioRatio(t) {
+      // Smooth transitions between phases
+      var phase = Math.sin(t / 600 * Math.PI) * 0.5 + 0.5; // 0=CPU, 1=IO
+      // Add some mid-frequency variation
+      phase += Math.sin(t / 120 * Math.PI) * 0.15;
+      return Math.max(0.1, Math.min(0.95, phase));
+    }
+
+    // Threadpilot thread count: adapts to IO ratio
+    var tpThreads = [];
+    var staticThreads = [];
+    var tpLatency = [];
+    var staticLatency = [];
+    var tpThroughput = [];
+    var staticThroughput = [];
+
+    var currentThreads = 5;
+    for (var i = 0; i < N; i++) {
+      var io = ioRatio(i);
+      var noise = (rng() - 0.5) * 0.6;
+
+      // Threadpilot: smoothly tracks optimal = ceil(1 / (1 - io))
+      var optimal = Math.min(25, Math.max(1, Math.ceil(1 / (1.001 - io))));
+      // Exponential moving average with jitter
+      currentThreads += (optimal - currentThreads) * 0.02 + noise * 0.3;
+      currentThreads = Math.max(1, Math.min(25, currentThreads));
+      tpThreads.push(currentThreads);
+      staticThreads.push(5);
+
+      // Latency model: CPU-bound phases with too many threads = GVL contention
+      var staticContention = Math.max(0, 5 - optimal) * 18;
+      var tpContention = Math.max(0, currentThreads - optimal) * 3;
+      var baseLatency = 40 + (1 - io) * 60; // CPU work component
+      staticLatency.push(baseLatency + staticContention + rng() * 25);
+      tpLatency.push(baseLatency + tpContention + rng() * 15);
+
+      // Throughput model: IO-bound phases benefit from more threads
+      var staticTP = 200 + Math.min(5, optimal) / optimal * io * 400;
+      var tpTP = 200 + Math.min(currentThreads, optimal) / Math.max(1, optimal) * io * 400;
+      staticThroughput.push(staticTP + rng() * 30);
+      tpThroughput.push(tpTP + rng() * 20);
+    }
+
+    var PAD_RATIO = 0.18;
+
+    function drawChart(id, staticData, tpData, yMin, yMax, yTicks) {
+      var s = setupCanvas(id);
+      var pad = Math.round(s.w * PAD_RATIO * 0.3);
+      // Background
+      s.ctx.fillStyle = '#fafafa';
+      s.ctx.fillRect(0, 0, s.w, s.h);
+
+      // Gridlines
+      for (var t = 0; t < yTicks.length; t++) {
+        var y = mapY(yTicks[t], yMin, yMax, s.h, pad);
+        for (var x = pad + 2; x < s.w - pad; x += 3) {
+          px(s.ctx, x, y, '#e0e0e0');
+        }
+      }
+
+      drawAxes(s.ctx, s.w, s.h, pad, yMin, yMax, yTicks);
+
+      // Plot both series as individual data points (every point = 1 device pixel)
+      plotSeries(s.ctx, staticData, s.w, s.h, pad, yMin, yMax, '#e45858');
+      plotSeries(s.ctx, tpData, s.w, s.h, pad, yMin, yMax, '#3b82f6');
+    }
+
+    function render() {
+      drawChart('chart-threads', staticThreads, tpThreads, 0, 28, [0, 5, 10, 15, 20, 25]);
+      drawChart('chart-latency', staticLatency, tpLatency, 0, 250, [0, 50, 100, 150, 200, 250]);
+      drawChart('chart-throughput', staticThroughput, tpThroughput, 100, 700, [100, 200, 300, 400, 500, 600, 700]);
+    }
+
+    // Render on load and resize
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', render);
+    } else {
+      render();
+    }
+    window.addEventListener('resize', render);
+  })();
+  </script>
+
+  {% include threadpilot_pricing_comparison.html heading="Pricing" %}
+
   <div class="row">
     <div class="column" style="text-align: center;">
       <h3>Guarantee</h3>
@@ -814,15 +413,6 @@ permalink: /threadpilot.html
     </div>
   </div>
 
-  <!-- SECTION 17: FAQ (5-8 questions) -->
-  <!-- Real objections reframed as questions. Each answer reinforces a selling point.
-       Include:
-       - Ruby version compatibility
-       - Framework/server requirements
-       - How it works with Sidekiq/other threaded gems
-       - Data privacy/security concerns
-       - License terms for multiple apps
-       - What happens if I uninstall it -->
   <div class="row">
     <div class="column">
       <h3>FAQ</h3>
@@ -852,10 +442,6 @@ permalink: /threadpilot.html
     </div>
   </div>
 
-  <!-- SECTION 18: "Perfect For You If..." -->
-  <!-- Help prospects self-select. Include a "NOT for you if..." list for credibility
-       and humor. The "not for you" items signal honesty and can be lightly funny
-       (e.g. "You enjoy manually tuning Puma configs at 3am"). -->
   <div class="row">
     <div class="column">
       <h3>Threadpilot is for you if...</h3>
@@ -876,18 +462,7 @@ permalink: /threadpilot.html
     </div>
   </div>
 
-  <!-- SECTION 19: Final CTA + Close (3-5 lines) -->
-  <!-- Callback to the opening One Big Idea. Succinct. Final benefit summary.
-       Buy button. This is the last thing they read - make it land. -->
-  <div class="buy-now">
-    <div class="row">
-      <div class="column" style="text-align: center;">
-        <h2>Stop guessing. Start tuning.</h2>
-        <p>Your workload changes every minute. Your thread count should too.</p>
-        <a href="https://buy.polar.sh/polar_cl_o0TXgcSq89KFB7dHWSYEUN52uJykuDk8unOhL3V7qhX" data-polar-checkout data-polar-checkout-theme="dark">Purchase</a>
-        <script src="https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.1/dist/embed.global.js" defer data-auto-init></script>
-      </div>
-    </div>
-  </div>
+  {% include threadpilot_pricing_comparison.html heading="Stop guessing. Start tuning." %}
+  <script src="https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.1/dist/embed.global.js" defer data-auto-init></script>
 
 </div>
