@@ -1,0 +1,10 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    platform: ${SPEEDSHOP_PLATFORM:-linux/amd64}
+    init: true
+    command: sleep infinity
+    volumes:
+      - ..:/workspaces/speedshop:cached

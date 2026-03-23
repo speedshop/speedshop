@@ -4,17 +4,42 @@
 version = "2.34.1"
 backend = "aqua:aws/aws-cli"
 
+[tools.awscli."platforms.linux-arm64"]
+checksum = "blake3:7c49425b92887695413a1692877faa954d84b06341ab143d70914208d2163202"
+url = "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-2.34.1.zip"
+
+[tools.awscli."platforms.linux-arm64-musl"]
+url = "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-2.34.1.zip"
+
 [tools.awscli."platforms.linux-x64"]
 url = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.34.1.zip"
 
+[tools.awscli."platforms.linux-x64-musl"]
+url = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.34.1.zip"
+
 [tools.awscli."platforms.macos-arm64"]
+url = "https://awscli.amazonaws.com/AWSCLIV2-2.34.1.pkg"
+
+[tools.awscli."platforms.macos-x64"]
 url = "https://awscli.amazonaws.com/AWSCLIV2-2.34.1.pkg"
 
 [[tools.node]]
 version = "22.6.0"
 backend = "core:node"
 
+[tools.node."platforms.linux-arm64"]
+checksum = "sha256:c6c7ee62de3637401c15df9a022afaa248d236d59ceca8c188944cf97d0be372"
+url = "https://nodejs.org/dist/v22.6.0/node-v22.6.0-linux-arm64.tar.gz"
+
+[tools.node."platforms.linux-arm64-musl"]
+checksum = "sha256:c6c7ee62de3637401c15df9a022afaa248d236d59ceca8c188944cf97d0be372"
+url = "https://nodejs.org/dist/v22.6.0/node-v22.6.0-linux-arm64.tar.gz"
+
 [tools.node."platforms.linux-x64"]
+checksum = "sha256:f2f4ccbcbc0a443e5fadebd1149a22f96087ec09cef52ff343a15ee835206d96"
+url = "https://nodejs.org/dist/v22.6.0/node-v22.6.0-linux-x64.tar.gz"
+
+[tools.node."platforms.linux-x64-musl"]
 checksum = "sha256:f2f4ccbcbc0a443e5fadebd1149a22f96087ec09cef52ff343a15ee835206d96"
 url = "https://nodejs.org/dist/v22.6.0/node-v22.6.0-linux-x64.tar.gz"
 
@@ -22,29 +47,84 @@ url = "https://nodejs.org/dist/v22.6.0/node-v22.6.0-linux-x64.tar.gz"
 checksum = "sha256:9ea60766807cd3c3a3ad6ad419f98918d634a60fe8dea5b9c07507ed0f176d4c"
 url = "https://nodejs.org/dist/v22.6.0/node-v22.6.0-darwin-arm64.tar.gz"
 
+[tools.node."platforms.macos-x64"]
+checksum = "sha256:8766c5968ca22d20fc6237c54c7c5d12ef12e15940d6119a79144ccb163ea737"
+url = "https://nodejs.org/dist/v22.6.0/node-v22.6.0-darwin-x64.tar.gz"
+
+[tools.node."platforms.windows-x64"]
+checksum = "sha256:1fdb0b8e59c98157ba927d51ef7eb050f9459beddc64ebc5a8897b90fd1f46f6"
+url = "https://nodejs.org/dist/v22.6.0/node-v22.6.0-win-x64.zip"
+
 [[tools.pandoc]]
-version = "2.9.2.1"
+version = "3.9.0.2"
 backend = "github:jgm/pandoc"
 
+[tools.pandoc."platforms.linux-arm64"]
+checksum = "sha256:b6d21e8f9c3b15744f5a7ab40248019157ed7793875dbe0383d4c82ff572b528"
+url = "https://github.com/jgm/pandoc/releases/download/3.9.0.2/pandoc-3.9.0.2-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/377165670"
+
+[tools.pandoc."platforms.linux-arm64-musl"]
+checksum = "sha256:b6d21e8f9c3b15744f5a7ab40248019157ed7793875dbe0383d4c82ff572b528"
+url = "https://github.com/jgm/pandoc/releases/download/3.9.0.2/pandoc-3.9.0.2-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/377165670"
+
 [tools.pandoc."platforms.linux-x64"]
-url = "https://github.com/jgm/pandoc/releases/download/2.9.2.1/pandoc-2.9.2.1-linux-amd64.tar.gz"
-url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/18935984"
+checksum = "sha256:a69abfababda8a56969a254b09f9553a7be89ddec00d4e0fe9fd585d71a67508"
+url = "https://github.com/jgm/pandoc/releases/download/3.9.0.2/pandoc-3.9.0.2-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/377165366"
+
+[tools.pandoc."platforms.linux-x64-musl"]
+checksum = "sha256:a69abfababda8a56969a254b09f9553a7be89ddec00d4e0fe9fd585d71a67508"
+url = "https://github.com/jgm/pandoc/releases/download/3.9.0.2/pandoc-3.9.0.2-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/377165366"
 
 [tools.pandoc."platforms.macos-arm64"]
-url = "https://github.com/jgm/pandoc/releases/download/2.9.2.1/pandoc-2.9.2.1-macOS.zip"
-url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/18936002"
+checksum = "sha256:6e9eca844076bcbb599bbeebbba78a70f93b5307782b85c2c272872812c88875"
+url = "https://github.com/jgm/pandoc/releases/download/3.9.0.2/pandoc-3.9.0.2-arm64-macOS.zip"
+url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/377165034"
+
+[tools.pandoc."platforms.macos-x64"]
+checksum = "sha256:b9fbceabccbc8f34ac021a50483fc32f8160568d0b4b2c22d81bb29e3054fd82"
+url = "https://github.com/jgm/pandoc/releases/download/3.9.0.2/pandoc-3.9.0.2-x86_64-macOS.zip"
+url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/377167038"
+
+[tools.pandoc."platforms.windows-x64"]
+checksum = "sha256:c97542f2800f446e788d9f74237856d995421ad1bb3cc8324286840c5f272d3a"
+url = "https://github.com/jgm/pandoc/releases/download/3.9.0.2/pandoc-3.9.0.2-windows-x86_64.zip"
+url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/377166311"
 
 [[tools.python]]
 version = "3.12.0"
 backend = "core:python"
 
+[tools.python."platforms.linux-arm64"]
+checksum = "sha256:bccfe67cf5465a3dfb0336f053966e2613a9bc85a6588c2fcf1366ef930c4f88"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20231002/cpython-3.12.0+20231002-aarch64-unknown-linux-gnu-install_only.tar.gz"
+
+[tools.python."platforms.linux-arm64-musl"]
+checksum = "sha256:bccfe67cf5465a3dfb0336f053966e2613a9bc85a6588c2fcf1366ef930c4f88"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20231002/cpython-3.12.0+20231002-aarch64-unknown-linux-gnu-install_only.tar.gz"
+
 [tools.python."platforms.linux-x64"]
+checksum = "sha256:e51a5293f214053ddb4645b2c9f84542e2ef86870b8655704367bd4b29d39fe9"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20231002/cpython-3.12.0+20231002-x86_64-unknown-linux-gnu-install_only.tar.gz"
+
+[tools.python."platforms.linux-x64-musl"]
 checksum = "sha256:e51a5293f214053ddb4645b2c9f84542e2ef86870b8655704367bd4b29d39fe9"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20231002/cpython-3.12.0+20231002-x86_64-unknown-linux-gnu-install_only.tar.gz"
 
 [tools.python."platforms.macos-arm64"]
 checksum = "sha256:4734a2be2becb813830112c780c9879ac3aff111a0b0cd590e65ec7465774d02"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20231002/cpython-3.12.0+20231002-aarch64-apple-darwin-install_only.tar.gz"
+
+[tools.python."platforms.macos-x64"]
+checksum = "sha256:5a9e88c8aa52b609d556777b52ebde464ae4b4f77e4aac4eb693af57395c9abf"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20231002/cpython-3.12.0+20231002-x86_64-apple-darwin-install_only.tar.gz"
+
+[tools.python."platforms.windows-x64"]
+checksum = "sha256:facfaa1fbc8653f95057f3c4a0f8aa833dab0e0b316e24ee8686bc761d4b4f8d"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20231002/cpython-3.12.0+20231002-x86_64-pc-windows-msvc-shared-install_only.tar.gz"
 
 [[tools.ruby]]
 version = "4.0.2"
@@ -54,10 +134,30 @@ backend = "asdf:ruby"
 version = "1.14.6"
 backend = "aqua:hashicorp/terraform"
 
+[tools.terraform."platforms.linux-arm64"]
+checksum = "sha256:190037f64695556ac75965c00da5d85b3663f38553d909e9a51c4490cba4b6c1"
+url = "https://releases.hashicorp.com/terraform/1.14.6/terraform_1.14.6_linux_arm64.zip"
+
+[tools.terraform."platforms.linux-arm64-musl"]
+checksum = "sha256:190037f64695556ac75965c00da5d85b3663f38553d909e9a51c4490cba4b6c1"
+url = "https://releases.hashicorp.com/terraform/1.14.6/terraform_1.14.6_linux_arm64.zip"
+
 [tools.terraform."platforms.linux-x64"]
+checksum = "sha256:364c6ee08b0cb8fcbb28a115aacb2aa48e88abc56c149170bd65c2f75d98ea8d"
+url = "https://releases.hashicorp.com/terraform/1.14.6/terraform_1.14.6_linux_amd64.zip"
+
+[tools.terraform."platforms.linux-x64-musl"]
 checksum = "sha256:364c6ee08b0cb8fcbb28a115aacb2aa48e88abc56c149170bd65c2f75d98ea8d"
 url = "https://releases.hashicorp.com/terraform/1.14.6/terraform_1.14.6_linux_amd64.zip"
 
 [tools.terraform."platforms.macos-arm64"]
 checksum = "sha256:5d91a8d6877e792de00be8db2324a2561edeb312ec2ff141b877131b82622c76"
 url = "https://releases.hashicorp.com/terraform/1.14.6/terraform_1.14.6_darwin_arm64.zip"
+
+[tools.terraform."platforms.macos-x64"]
+checksum = "sha256:ae13b4d204b00a0742f13a3de78a78994918f31333b1537db682cd0a7085dac0"
+url = "https://releases.hashicorp.com/terraform/1.14.6/terraform_1.14.6_darwin_amd64.zip"
+
+[tools.terraform."platforms.windows-x64"]
+checksum = "sha256:94e9be396dffde19df74744000fe3f5522546048bc81b5604a02328ac7eb1ab5"
+url = "https://releases.hashicorp.com/terraform/1.14.6/terraform_1.14.6_windows_amd64.zip"
