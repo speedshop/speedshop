@@ -3,7 +3,7 @@ services:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
-    platform: linux/amd64
+    platform: ${SPEEDSHOP_PLATFORM:-linux/amd64}
     init: true
     command: sleep infinity
     volumes:
