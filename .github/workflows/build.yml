@@ -23,28 +23,16 @@ jobs:
         key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.devcontainer/Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-gems-
-    - name: Build canonical container
-      run: docker build --platform "$DEVCONTAINER_PLATFORM" -f .devcontainer/Dockerfile -t "$DEVCONTAINER_IMAGE" .
-    - name: Run linter
+    - name: Run linter in canonical container
       run: |
-        mkdir -p "$RUNNER_TEMP/speedshop-home"
-
-        docker run --rm \
-          --platform "$DEVCONTAINER_PLATFORM" \
-          --user "$(id -u):$(id -g)" \
-          -e BUNDLE_PATH=vendor/bundle \
-          -e HOME=/tmp/speedshop-home \
-          -v "$PWD:/workspaces/speedshop" \
-          -v "$RUNNER_TEMP/speedshop-home:/tmp/speedshop-home" \
-          -w /workspaces/speedshop \
-          "$DEVCONTAINER_IMAGE" \
-          bash -lc '
-            set -euo pipefail
-            mise trust --yes /workspaces/speedshop/mise.toml
-            mise install ruby
-            mise exec -- bash -lc "bundle install --jobs 4 --retry 3"
-            mise run lint
-          '
+        ./_scripts/canonical-env.sh '
+          set -euo pipefail
+          mise trust --yes /workspaces/speedshop/mise.toml
+          mise install ruby
+          mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle
+          mise exec -- bundle install --jobs 4 --retry 3
+          mise run lint
+        '
 
   build:
     runs-on: ubuntu-24.04
@@ -58,28 +46,18 @@ jobs:
         key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.devcontainer/Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-gems-
-    - name: Build canonical container
-      run: docker build --platform "$DEVCONTAINER_PLATFORM" -f .devcontainer/Dockerfile -t "$DEVCONTAINER_IMAGE" .
-    - name: Build site
+    - name: Build site in canonical container
       run: |
-        mkdir -p "$RUNNER_TEMP/speedshop-home"
-
-        docker run --rm \
-          --platform "$DEVCONTAINER_PLATFORM" \
-          --user "$(id -u):$(id -g)" \
-          -e BUNDLE_PATH=vendor/bundle \
-          -e HOME=/tmp/speedshop-home \
-          -v "$PWD:/workspaces/speedshop" \
-          -v "$RUNNER_TEMP/speedshop-home:/tmp/speedshop-home" \
-          -w /workspaces/speedshop \
-          "$DEVCONTAINER_IMAGE" \
-          bash -lc '
-            set -euo pipefail
-            mise trust --yes /workspaces/speedshop/mise.toml
-            mise install ruby
-            mise install --locked node pandoc
-            mise exec -- bash -lc "npm ci && bundle install --jobs 4 --retry 3 && bundle exec jekyll build"
-          '
+        ./_scripts/canonical-env.sh '
+          set -euo pipefail
+          mise trust --yes /workspaces/speedshop/mise.toml
+          mise install ruby
+          mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle
+          mise install node pandoc
+          mise exec -- npm ci
+          mise exec -- bundle install --jobs 4 --retry 3
+          mise exec -- bundle exec jekyll build
+        '
 
   test:
     runs-on: ubuntu-24.04
@@ -93,26 +71,18 @@ jobs:
         key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.devcontainer/Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-gems-
-    - name: Build canonical container
-      run: docker build --platform "$DEVCONTAINER_PLATFORM" -f .devcontainer/Dockerfile -t "$DEVCONTAINER_IMAGE" .
-    - name: Run CI test suite
+    - name: Run CI test suite in canonical container
+      env:
+        CI: true
       run: |
-        mkdir -p "$RUNNER_TEMP/speedshop-home"
-
-        docker run --rm \
-          --platform "$DEVCONTAINER_PLATFORM" \
-          --user "$(id -u):$(id -g)" \
-          -e BUNDLE_PATH=vendor/bundle \
-          -e CI=true \
-          -e HOME=/tmp/speedshop-home \
-          -v "$PWD:/workspaces/speedshop" \
-          -v "$RUNNER_TEMP/speedshop-home:/tmp/speedshop-home" \
-          -w /workspaces/speedshop \
-          "$DEVCONTAINER_IMAGE" \
-          bash -lc '
-            set -euo pipefail
-            mise trust --yes /workspaces/speedshop/mise.toml
-            mise install ruby
-            mise install --locked node pandoc
-            mise exec -- bash -lc "npm ci && bundle install --jobs 4 --retry 3 && npx --no-install playwright install chromium && mise run test:ci"
-          '
+        ./_scripts/canonical-env.sh --env CI '
+          set -euo pipefail
+          mise trust --yes /workspaces/speedshop/mise.toml
+          mise install ruby
+          mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle
+          mise install node pandoc
+          mise exec -- npm ci
+          mise exec -- bundle install --jobs 4 --retry 3
+          mise exec -- npx --no-install playwright install chromium
+          mise run test:ci
+        '

@@ -47,9 +47,7 @@ jobs:
         key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.client_notes/.ruby-version', '.devcontainer/Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-gems-
-    - name: Build canonical container
-      run: docker build --platform "$DEVCONTAINER_PLATFORM" -f .devcontainer/Dockerfile -t "$DEVCONTAINER_IMAGE" .
-    - name: Deploy site
+    - name: Deploy site from canonical container
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -59,30 +57,22 @@ jobs:
         DEPLOY_RUBY_SOURCE: ${{ steps.deploy_ruby.outputs.source }}
         S3_BUCKET: www.speedshop.co
       run: |
-        mkdir -p "$RUNNER_TEMP/speedshop-home"
-
-        docker run --rm \
-          --platform "$DEVCONTAINER_PLATFORM" \
-          --user "$(id -u):$(id -g)" \
-          -e AWS_ACCESS_KEY_ID \
-          -e AWS_SECRET_ACCESS_KEY \
-          -e AWS_DEFAULT_REGION \
-          -e BUNDLE_PATH=vendor/bundle \
-          -e CLIENT_NOTES_PATH \
-          -e DEPLOY_RUBY \
-          -e DEPLOY_RUBY_SOURCE \
-          -e HOME=/tmp/speedshop-home \
-          -e S3_BUCKET \
-          -v "$PWD:/workspaces/speedshop" \
-          -v "$RUNNER_TEMP/speedshop-home:/tmp/speedshop-home" \
-          -w /workspaces/speedshop \
-          "$DEVCONTAINER_IMAGE" \
-          bash -lc '
+        ./_scripts/canonical-env.sh \
+          --env AWS_ACCESS_KEY_ID \
+          --env AWS_SECRET_ACCESS_KEY \
+          --env AWS_DEFAULT_REGION \
+          --env CLIENT_NOTES_PATH \
+          --env DEPLOY_RUBY \
+          --env DEPLOY_RUBY_SOURCE \
+          --env S3_BUCKET \
+          '
             set -euo pipefail
             mise trust --yes /workspaces/speedshop/mise.toml
             mise install ruby@${DEPLOY_RUBY}
-            mise install --locked node pandoc awscli
-            mise exec ruby@${DEPLOY_RUBY} -- bash -lc "npm ci && bundle install --jobs 4 --retry 3"
+            mise exec ruby@${DEPLOY_RUBY} -- bundle config set --global path /workspaces/speedshop/vendor/bundle
+            mise install node pandoc awscli
+            mise exec ruby@${DEPLOY_RUBY} -- npm ci
+            mise exec ruby@${DEPLOY_RUBY} -- bundle install --jobs 4 --retry 3
 
             if [ "${DEPLOY_RUBY_SOURCE}" = "mise.toml" ]; then
               mise exec ruby@${DEPLOY_RUBY} -- bundle exec rake validate:ruby_version

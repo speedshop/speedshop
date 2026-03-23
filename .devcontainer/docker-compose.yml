@@ -8,5 +8,3 @@ services:
     command: sleep infinity
     volumes:
       - ..:/workspaces/speedshop:cached
-    environment:
-      BUNDLE_PATH: /workspaces/speedshop/vendor/bundle

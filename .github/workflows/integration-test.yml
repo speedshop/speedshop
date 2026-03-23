@@ -33,27 +33,15 @@ jobs:
         key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.devcontainer/Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-gems-
-    - name: Build canonical container
-      run: docker build --platform "$DEVCONTAINER_PLATFORM" -f .devcontainer/Dockerfile -t "$DEVCONTAINER_IMAGE" .
-    - name: Run integration tests
+    - name: Run integration tests in canonical container
       env:
         BASE_URL: ${{ github.event.inputs.base_url || 'https://www.speedshop.co' }}
       run: |
-        mkdir -p "$RUNNER_TEMP/speedshop-home"
-
-        docker run --rm \
-          --platform "$DEVCONTAINER_PLATFORM" \
-          --user "$(id -u):$(id -g)" \
-          -e BASE_URL \
-          -e BUNDLE_PATH=vendor/bundle \
-          -e HOME=/tmp/speedshop-home \
-          -v "$PWD:/workspaces/speedshop" \
-          -v "$RUNNER_TEMP/speedshop-home:/tmp/speedshop-home" \
-          -w /workspaces/speedshop \
-          "$DEVCONTAINER_IMAGE" \
-          bash -lc '
-            set -euo pipefail
-            mise trust --yes /workspaces/speedshop/mise.toml
-            mise install ruby
-            mise exec -- bash -lc "bundle install --jobs 4 --retry 3 && bundle exec ruby test/integration/site_test.rb"
-          '
+        ./_scripts/canonical-env.sh --env BASE_URL '
+          set -euo pipefail
+          mise trust --yes /workspaces/speedshop/mise.toml
+          mise install ruby
+          mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle
+          mise exec -- bundle install --jobs 4 --retry 3
+          mise exec -- bundle exec ruby test/integration/site_test.rb
+        '
