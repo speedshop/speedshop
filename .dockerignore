@@ -1,0 +1,12 @@
+.git
+.gitignore
+.client_notes
+.devcontainer/.cache
+.pi
+.terraform
+_site
+node_modules
+playwright-report
+test-results
+tmp
+vendor

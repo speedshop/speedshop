@@ -12,30 +12,48 @@ on:
         required: false
         default: 'https://www.speedshop.co'
 
+permissions:
+  contents: read
+
+env:
+  DEVCONTAINER_IMAGE: speedshop-devcontainer
+  DEVCONTAINER_PLATFORM: linux/amd64
+
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     steps:
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
         persist-credentials: false
-    - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
-      with:
-        install: false
-    - name: Install Ruby via mise
-      run: mise install ruby
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.devcontainer/Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-gems-
-    - name: Bundle install
-      run: |
-        bundle config path vendor/bundle
-        bundle install --jobs 4 --retry 3
+    - name: Build canonical container
+      run: docker build --platform "$DEVCONTAINER_PLATFORM" -f .devcontainer/Dockerfile -t "$DEVCONTAINER_IMAGE" .
     - name: Run integration tests
       env:
         BASE_URL: ${{ github.event.inputs.base_url || 'https://www.speedshop.co' }}
-      run: bundle exec ruby test/integration/site_test.rb
+      run: |
+        mkdir -p "$RUNNER_TEMP/speedshop-home"
+
+        docker run --rm \
+          --platform "$DEVCONTAINER_PLATFORM" \
+          --user "$(id -u):$(id -g)" \
+          -e BASE_URL \
+          -e BUNDLE_PATH=vendor/bundle \
+          -e HOME=/tmp/speedshop-home \
+          -v "$PWD:/workspaces/speedshop" \
+          -v "$RUNNER_TEMP/speedshop-home:/tmp/speedshop-home" \
+          -w /workspaces/speedshop \
+          "$DEVCONTAINER_IMAGE" \
+          bash -lc '
+            set -euo pipefail
+            mise trust --yes /workspaces/speedshop/mise.toml
+            mise install ruby
+            mise exec -- bash -lc "bundle install --jobs 4 --retry 3 && bundle exec ruby test/integration/site_test.rb"
+          '

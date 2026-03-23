@@ -1,0 +1,12 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    platform: linux/amd64
+    init: true
+    command: sleep infinity
+    volumes:
+      - ..:/workspaces/speedshop:cached
+    environment:
+      BUNDLE_PATH: /workspaces/speedshop/vendor/bundle

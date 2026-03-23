@@ -8,9 +8,16 @@ on:
     - cron: '0 0 * * *'  # Daily at midnight UTC
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+env:
+  DEVCONTAINER_IMAGE: speedshop-devcontainer
+  DEVCONTAINER_PLATFORM: linux/amd64
+
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
@@ -20,9 +27,6 @@ jobs:
         repository: speedshop/client_notes
         token: ${{ secrets.CLIENT_NOTES_PAT }}
         path: .client_notes
-    - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
-      with:
-        install: false
     - name: Determine deploy Ruby source
       id: deploy_ruby
       run: |
@@ -37,48 +41,58 @@ jobs:
         echo "Using Ruby $ruby_version from $ruby_source"
         echo "value=$ruby_version" >> "$GITHUB_OUTPUT"
         echo "source=$ruby_source" >> "$GITHUB_OUTPUT"
-    - name: Install toolchain via mise
-      run: |
-        mise install ruby@${{ steps.deploy_ruby.outputs.value }}
-        mise install --locked node pandoc awscli
-    - name: Install PDF system dependencies (explicit exception; see #94)
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-xetex librsvg2-bin
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.client_notes/.ruby-version') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.client_notes/.ruby-version', '.devcontainer/Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-gems-
-    - name: npm ci
-      run: npm ci
-    - name: Bundle install
-      run: |
-        mise exec ruby@${{ steps.deploy_ruby.outputs.value }} -- bundle config path vendor/bundle
-        mise exec ruby@${{ steps.deploy_ruby.outputs.value }} -- bundle install --jobs 4 --retry 3
-    - name: Validate repo Ruby version
-      if: ${{ steps.deploy_ruby.outputs.source == 'mise.toml' }}
-      run: mise exec ruby@${{ steps.deploy_ruby.outputs.value }} -- bundle exec rake validate:ruby_version
-    - name: Build site
+    - name: Build canonical container
+      run: docker build --platform "$DEVCONTAINER_PLATFORM" -f .devcontainer/Dockerfile -t "$DEVCONTAINER_IMAGE" .
+    - name: Deploy site
       env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: us-east-1
         CLIENT_NOTES_PATH: .client_notes
-      run: mise exec ruby@${{ steps.deploy_ruby.outputs.value }} -- bundle exec jekyll build
-    - name: Validate generated data
-      run: mise exec ruby@${{ steps.deploy_ruby.outputs.value }} -- bundle exec rake validate:generated_data
-    - name: Deploy to S3
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: 'us-east-1'
-        S3_BUCKET: 'www.speedshop.co'
-      run: mise exec ruby@${{ steps.deploy_ruby.outputs.value }} -- bundle exec ruby _scripts/s3_deploy.rb
-    - name: Deploy card directory to S3
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: 'us-east-1'
-      run: aws s3 sync card/ s3://www.speedshop.co/card/ --cache-control "max-age=86400"
+        DEPLOY_RUBY: ${{ steps.deploy_ruby.outputs.value }}
+        DEPLOY_RUBY_SOURCE: ${{ steps.deploy_ruby.outputs.source }}
+        S3_BUCKET: www.speedshop.co
+      run: |
+        mkdir -p "$RUNNER_TEMP/speedshop-home"
+
+        docker run --rm \
+          --platform "$DEVCONTAINER_PLATFORM" \
+          --user "$(id -u):$(id -g)" \
+          -e AWS_ACCESS_KEY_ID \
+          -e AWS_SECRET_ACCESS_KEY \
+          -e AWS_DEFAULT_REGION \
+          -e BUNDLE_PATH=vendor/bundle \
+          -e CLIENT_NOTES_PATH \
+          -e DEPLOY_RUBY \
+          -e DEPLOY_RUBY_SOURCE \
+          -e HOME=/tmp/speedshop-home \
+          -e S3_BUCKET \
+          -v "$PWD:/workspaces/speedshop" \
+          -v "$RUNNER_TEMP/speedshop-home:/tmp/speedshop-home" \
+          -w /workspaces/speedshop \
+          "$DEVCONTAINER_IMAGE" \
+          bash -lc '
+            set -euo pipefail
+            mise trust --yes /workspaces/speedshop/mise.toml
+            mise install ruby@${DEPLOY_RUBY}
+            mise install --locked node pandoc awscli
+            mise exec ruby@${DEPLOY_RUBY} -- bash -lc "npm ci && bundle install --jobs 4 --retry 3"
+
+            if [ "${DEPLOY_RUBY_SOURCE}" = "mise.toml" ]; then
+              mise exec ruby@${DEPLOY_RUBY} -- bundle exec rake validate:ruby_version
+            fi
+
+            mise exec ruby@${DEPLOY_RUBY} -- bundle exec jekyll build
+            mise exec ruby@${DEPLOY_RUBY} -- bundle exec rake validate:generated_data
+            mise exec ruby@${DEPLOY_RUBY} -- bundle exec ruby _scripts/s3_deploy.rb
+            mise exec ruby@${DEPLOY_RUBY} -- aws s3 sync card/ s3://www.speedshop.co/card/ --cache-control "max-age=86400"
+          '
     - name: Cloudflare Purge Cache
       uses: jakejarvis/cloudflare-purge-action@eee6dba0236093358f25bb1581bd615dc8b3d8e3 # v0.3.0
       env:
