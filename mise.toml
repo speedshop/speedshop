@@ -11,6 +11,13 @@ pandoc = "3.9.0.2"
 terraform = "1.14.6"
 awscli = "2.34.1"
 
+[tasks.setup]
+description = "Install all dependencies"
+run = """
+bundle install
+npm install --ignore-scripts
+"""
+
 [tasks.lint]
 description = "Run all linters"
 run = "bundle exec standardrb"
