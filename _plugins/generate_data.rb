@@ -18,7 +18,7 @@ module Speedshop
           "last_90_days" => 0,
           "last_6_months" => 0
         },
-        "days" => []
+        "days" => {}
       }
     end
 
@@ -39,6 +39,29 @@ module Speedshop
         PRODID:-//speedshop//generated//EN
         END:VCALENDAR
       ICS
+    end
+  end
+
+  module SlaStatusData
+    CUTOFF_DATE = "2026-01-01"
+
+    module_function
+
+    def normalize_file!(path, cutoff_date: CUTOFF_DATE)
+      return unless File.exist?(path)
+
+      payload = JSON.parse(File.read(path))
+      visible_start_date = [payload["start_date"], cutoff_date].compact.max || cutoff_date
+
+      payload["start_date"] = visible_start_date
+      payload["holidays"] = Array(payload["holidays"]).select do |holiday|
+        holiday["date"] && holiday["date"] >= visible_start_date
+      end
+      payload["days"] = Hash(payload["days"] || {}).each_with_object({}) do |(date, status), filtered_days|
+        filtered_days[date] = status if date >= visible_start_date
+      end
+
+      File.write(path, "#{JSON.pretty_generate(payload)}\n")
     end
   end
 end
@@ -70,6 +93,7 @@ Jekyll::Hooks.register :site, :after_init do |site|
     File.write(sla_status_path, "#{JSON.pretty_generate(Speedshop::GenerateDataDefaults.sla_status)}\n") unless File.exist?(sla_status_path)
     File.write(availability_path, "#{JSON.pretty_generate(Speedshop::GenerateDataDefaults.availability)}\n") unless File.exist?(availability_path)
     File.write(holidays_path, Speedshop::GenerateDataDefaults.holidays_ics) unless File.exist?(holidays_path)
+    Speedshop::SlaStatusData.normalize_file!(sla_status_path)
     next
   end
 
@@ -90,4 +114,6 @@ Jekyll::Hooks.register :site, :after_init do |site|
         "generate availability JSON")
     end
   end
+
+  Speedshop::SlaStatusData.normalize_file!(sla_status_path)
 end

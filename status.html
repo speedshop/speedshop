@@ -21,10 +21,6 @@ sitemap: false
           <span class="stat-value{% if site.data.sla_status.performance.last_90_days < 99 %} stat-bad{% endif %}">{{ site.data.sla_status.performance.last_90_days }}%</span>
           <span class="stat-label">Last 90 days</span>
         </div>
-        <div class="stat">
-          <span class="stat-value{% if site.data.sla_status.performance.last_6_months < 99 %} stat-bad{% endif %}">{{ site.data.sla_status.performance.last_6_months }}%</span>
-          <span class="stat-label">Last 6 months</span>
-        </div>
       </div>
 
       <div class="status-legend">
