@@ -1,6 +1,5 @@
 require "yaml"
 require "date"
-require "pathname"
 
 SITE_URL = "https://www.speedshop.co"
 

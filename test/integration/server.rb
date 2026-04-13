@@ -1,4 +1,3 @@
-require "pathname"
 require "webrick"
 
 host = ENV.fetch("TEST_SERVER_HOST", "127.0.0.1")
