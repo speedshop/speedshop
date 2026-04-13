@@ -9,7 +9,7 @@
  * https://www.mintlify.com/blog/context-for-agents
  *
  * Local development:
- *   1. Start static server: cd _site && python -m http.server 4000
+ *   1. Start static server: caddy run --config Caddyfile
  *   2. Run worker: npx wrangler dev
  *   3. Test at http://localhost:8787
  */

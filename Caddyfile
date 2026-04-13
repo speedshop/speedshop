@@ -1,0 +1,17 @@
+{
+	admin off
+	auto_https disable_redirects
+}
+
+http://localhost, http://127.0.0.1 {
+	root * _site
+	encode zstd gzip
+	file_server
+}
+
+https://localhost, https://127.0.0.1 {
+	tls internal
+	root * _site
+	encode zstd gzip
+	file_server
+}

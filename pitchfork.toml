@@ -6,10 +6,10 @@ auto_bump_port = false
 port_bump_attempts = 10
 
 [daemons.static]
-run = "python -m http.server 4000 --directory _site"
+run = "mise exec -- caddy run --config Caddyfile"
 retry = 0
-ready_port = 4000
-expected_port = [4000]
+ready_http = "https://localhost/"
+expected_port = [443]
 auto_bump_port = false
 port_bump_attempts = 10
 depends = ["jekyll"]

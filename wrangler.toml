@@ -8,6 +8,6 @@ port = 8787
 local_protocol = "http"
 
 # For local dev, we need to proxy to the static site server
-# The worker will fetch from this origin
+# The worker fetches over local HTTP while Caddy also serves HTTPS/HTTP2 on localhost.
 [vars]
-ORIGIN_URL = "http://localhost:4000"
+ORIGIN_URL = "http://localhost"

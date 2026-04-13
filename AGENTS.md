@@ -34,13 +34,14 @@ mise run test:integration:prod   # Integration tests against production
 The integration tests spin up local servers automatically, but for manual testing:
 
 ```bash
-# Terminal 1: Static file server
+# Terminal 1: Static file server (HTTPS + HTTP/2)
 npm run dev:static
 
 # Terminal 2: Cloudflare Worker (wrangler)
 npm run dev:worker
 
-# Test at http://localhost:8787
+# Static site: https://localhost
+# Worker: http://localhost:8787
 ```
 
 ## Project Structure

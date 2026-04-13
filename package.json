@@ -5,7 +5,7 @@
     "build": "node _scripts/build.mjs",
     "test": "npx --no-install playwright test",
     "dev:worker": "wrangler dev",
-    "dev:static": "cd _site && python -m http.server 4000"
+    "dev:static": "caddy run --config Caddyfile"
   },
   "dependencies": {
     "pjax": "^0.2.8",
