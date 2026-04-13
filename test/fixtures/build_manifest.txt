@@ -15,7 +15,6 @@ blog/
 [pages]
 four-line-fridays.*
 index.*
-rails-performance-workshop.*
 retainer.*
 rpw_checkout_success.*
 status.*
@@ -36,6 +35,5 @@ worker.js
 https://www.speedshop.co/
 https://www.speedshop.co/assets/files/TuneWikiEdu.pdf
 https://www.speedshop.co/blog/
-https://www.speedshop.co/rails-performance-workshop.html
 https://www.speedshop.co/retainer.html
 https://www.speedshop.co/rpw_checkout_success.html
