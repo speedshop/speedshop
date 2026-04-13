@@ -16,18 +16,35 @@ caddy = "2.11.2"
 
 [tasks.setup]
 description = "Install dependencies and git hooks"
-run = """
+run = '''
 bundle install
 npm install --ignore-scripts
 hk install
-"""
+mise_path="$(command -v mise)"
+cat > .git/hooks/pre-commit <<'EOF'
+#!/bin/sh
+test "${HK:-1}" = "0" || exec "__MISE_PATH__" exec -- hk run pre-commit "$@"
+EOF
+MISE_PATH="$mise_path" python - <<'PY'
+import os
+from pathlib import Path
+path = Path('.git/hooks/pre-commit')
+path.write_text(path.read_text().replace('__MISE_PATH__', os.environ['MISE_PATH']))
+PY
+chmod +x .git/hooks/pre-commit
+'''
 
 [tasks.build]
 description = "Build the site"
 run = "bundle exec jekyll build"
 
 [tasks.dev]
-description = "Start the local development stack"
+description = "Start the local development stack and follow logs"
+depends = ["build"]
+run = "pitchfork start -l --force && pitchfork logs jekyll static worker --tail"
+
+[tasks."dev:bg"]
+description = "Start the local development stack in the background"
 depends = ["build"]
 run = "pitchfork start -l --force"
 
@@ -69,7 +86,7 @@ printf 'Starting Caddy static server...\n'
 caddy run --config Caddyfile > /tmp/caddy.log 2>&1 &
 
 for i in {1..20}; do
-  if curl --silent --show-error --output /dev/null https://localhost/ 2>/dev/null; then
+  if curl --silent --show-error --output /dev/null https://localhost:4000/ 2>/dev/null; then
     echo "Caddy ready"
     break
   fi
@@ -78,7 +95,7 @@ for i in {1..20}; do
 done
 
 # Verify local HTTPS + HTTP/2
-http_version=$(curl --silent --show-error --output /dev/null --write-out '%{http_version}' --http2 https://localhost/)
+http_version=$(curl --silent --show-error --output /dev/null --write-out '%{http_version}' --http2 https://localhost:4000/)
 if [ "$http_version" != "2" ]; then
   echo "Error: Expected HTTP/2 from local Caddy server, got HTTP/$http_version"
   cat /tmp/caddy.log
@@ -100,7 +117,7 @@ for i in {1..20}; do
 done
 
 # Verify servers are running
-if ! curl --silent --show-error --output /dev/null https://localhost/ 2>/dev/null; then
+if ! curl --silent --show-error --output /dev/null https://localhost:4000/ 2>/dev/null; then
   echo "Error: Caddy not responding"
   cat /tmp/caddy.log
   exit 1

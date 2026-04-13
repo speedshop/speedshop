@@ -24,6 +24,7 @@ module TestHelper
       end
     end
 
+    wait_for_expected_site_files!
     @site_built = true
   end
 
@@ -32,6 +33,22 @@ module TestHelper
 
     start_site_server!
     @local_base_url
+  end
+
+  def self.wait_for_expected_site_files!
+    expected = [
+      File.join(SITE_DIR, "sitemap.xml"),
+      File.join(SITE_DIR, "llms.txt"),
+      File.join(SITE_DIR, "llms-full.txt")
+    ]
+
+    100.times do
+      return if expected.all? { |path| File.exist?(path) }
+      sleep 0.1
+    end
+
+    missing = expected.reject { |path| File.exist?(path) }
+    raise "Timed out waiting for generated site files: #{missing.join(", ")}"
   end
 
   def self.start_site_server!

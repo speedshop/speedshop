@@ -40,8 +40,9 @@ npm run dev:static
 # Terminal 2: Cloudflare Worker (wrangler)
 npm run dev:worker
 
-# Static site: https://localhost
+# Static site: https://localhost:4000
 # Worker: http://localhost:8787
+# Worker origin proxy: http://localhost:4001
 ```
 
 ## Project Structure
