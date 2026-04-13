@@ -28,7 +28,14 @@ if [[ $# -ne 1 ]]; then
 fi
 
 command="$1"
-temp_home="$(mktemp -d)"
+cleanup_home=0
+if [[ -n "${CANONICAL_ENV_HOME:-}" ]]; then
+  temp_home="$CANONICAL_ENV_HOME"
+else
+  temp_home="$(mktemp -d)"
+  cleanup_home=1
+fi
+mkdir -p "$temp_home"
 
 declare -a docker_args=(
   run --rm
@@ -38,7 +45,9 @@ declare -a docker_args=(
 )
 
 cleanup() {
-  rm -rf "$temp_home"
+  if [[ "$cleanup_home" -eq 1 ]]; then
+    rm -rf "$temp_home"
+  fi
 }
 trap cleanup EXIT
 

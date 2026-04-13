@@ -9,6 +9,7 @@ permissions:
 env:
   DEVCONTAINER_IMAGE: speedshop-devcontainer
   DEVCONTAINER_PLATFORM: linux/amd64
+  CANONICAL_ENV_HOME: ${{ github.workspace }}/.cache/canonical-home
 
 jobs:
   lint:
@@ -17,6 +18,12 @@ jobs:
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
         persist-credentials: false
+    - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+      with:
+        path: .cache/canonical-home
+        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
+        restore-keys: |
+          ${{ runner.os }}-canonical-home-v1-
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
@@ -42,6 +49,12 @@ jobs:
         persist-credentials: false
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
+        path: .cache/canonical-home
+        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
+        restore-keys: |
+          ${{ runner.os }}-canonical-home-v1-
+    - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+      with:
         path: vendor/bundle
         key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.devcontainer/Dockerfile') }}
         restore-keys: |
@@ -65,6 +78,12 @@ jobs:
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
         persist-credentials: false
+    - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+      with:
+        path: .cache/canonical-home
+        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
+        restore-keys: |
+          ${{ runner.os }}-canonical-home-v1-
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
