@@ -22,7 +22,6 @@ exclude:
    - client_notes
    - .client_notes
    - card
-   - Procfile
    - wercker.yml
    - Gemfile
    - Gemfile.lock
