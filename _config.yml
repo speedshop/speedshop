@@ -39,5 +39,7 @@ exclude:
    - package.json
    - package-lock.json
    - playwright.config.cjs
+   - hk.pkl
+   - pitchfork.toml
    - node_modules
    - .terraform

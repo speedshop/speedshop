@@ -23,6 +23,10 @@ url = "https://awscli.amazonaws.com/AWSCLIV2-2.34.1.pkg"
 [tools.awscli."platforms.macos-x64"]
 url = "https://awscli.amazonaws.com/AWSCLIV2-2.34.1.pkg"
 
+[[tools.hk]]
+version = "1.42.0"
+backend = "aqua:jdx/hk"
+
 [[tools.node]]
 version = "22.6.0"
 backend = "core:node"
@@ -93,6 +97,10 @@ url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/377167038"
 checksum = "sha256:c97542f2800f446e788d9f74237856d995421ad1bb3cc8324286840c5f272d3a"
 url = "https://github.com/jgm/pandoc/releases/download/3.9.0.2/pandoc-3.9.0.2-windows-x86_64.zip"
 url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/377166311"
+
+[[tools.pitchfork]]
+version = "2.6.0"
+backend = "aqua:jdx/pitchfork"
 
 [[tools.python]]
 version = "3.12.0"

@@ -1,0 +1,24 @@
+[daemons.jekyll]
+run = "bundle exec jekyll build -w --future --unpublished --drafts --trace --config _config.yml,_config_dev.yml"
+retry = 0
+ready_delay = 3
+auto_bump_port = false
+port_bump_attempts = 10
+
+[daemons.static]
+run = "python -m http.server 4000 --directory _site"
+retry = 0
+ready_port = 4000
+expected_port = [4000]
+auto_bump_port = false
+port_bump_attempts = 10
+depends = ["jekyll"]
+
+[daemons.worker]
+run = "./node_modules/.bin/wrangler dev --port 8787"
+retry = 0
+ready_http = "http://localhost:8787/"
+expected_port = [8787]
+auto_bump_port = false
+port_bump_attempts = 10
+depends = ["static"]

@@ -10,13 +10,29 @@ python = "3.12.0"
 pandoc = "3.9.0.2"
 terraform = "1.14.6"
 awscli = "2.34.1"
+hk = "1.42.0"
+pitchfork = "2.6.0"
 
 [tasks.setup]
-description = "Install all dependencies"
+description = "Install dependencies and git hooks"
 run = """
 bundle install
 npm install --ignore-scripts
+hk install
 """
+
+[tasks.build]
+description = "Build the site"
+run = "bundle exec jekyll build"
+
+[tasks.dev]
+description = "Start the local development stack"
+depends = ["build"]
+run = "pitchfork start -l --force"
+
+[tasks."dev:stop"]
+description = "Stop the local development stack"
+run = "pitchfork stop jekyll static worker"
 
 [tasks.lint]
 description = "Run all linters"
