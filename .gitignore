@@ -20,3 +20,4 @@ holidays.ics
 # Playwright test output
 test-results/
 playwright-report/
+.wrangler/

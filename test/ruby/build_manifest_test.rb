@@ -6,13 +6,20 @@ class BuildManifestTest < Minitest::Test
   SITE_DIR = File.expand_path("../../_site", __dir__)
   MANIFEST_PATH = File.expand_path("../fixtures/build_manifest.txt", __dir__)
 
+  def setup
+    TestHelper.ensure_site_built!
+  end
+
   def test_sitemap_static_pages_unchanged
     sitemap_path = File.join(SITE_DIR, "sitemap.xml")
 
     doc = REXML::Document.new(File.read(sitemap_path))
     urls = doc.elements.collect("urlset/url/loc") { |e| e.text }
 
-    actual = urls.reject { |url| url.match?(%r{/blog/[^/]+/$}) }.sort
+    actual = urls
+      .reject { |url| url.match?(%r{/blog/[^/]+/$}) }
+      .map { |url| normalize_sitemap_url(url) }
+      .sort
     expected = manifest[:sitemap].sort
 
     assert_equal expected, actual,
@@ -92,6 +99,12 @@ class BuildManifestTest < Minitest::Test
     end
 
     result
+  end
+
+  def normalize_sitemap_url(url)
+    url
+      .sub("https://localhost:4000", "https://www.speedshop.co")
+      .sub("https://127.0.0.1:4000", "https://www.speedshop.co")
   end
 
   def allowed_root_files

@@ -15,7 +15,6 @@ GEM
       http_parser.rb (~> 0)
     eventmachine (1.2.7)
     ffi (1.17.1)
-    foreman (0.88.1)
     forwardable-extended (2.6.0)
     google-protobuf (4.30.2)
       bigdecimal
@@ -130,7 +129,6 @@ DEPENDENCIES
   cgi
   concurrent-ruby
   csv
-  foreman
   jekyll (= 4.3.3)
   jekyll-sitemap
   logger

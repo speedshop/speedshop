@@ -4,7 +4,7 @@ require "uri"
 require "json"
 
 class SiteTest < Minitest::Test
-  BASE_URL = ENV.fetch("BASE_URL", "http://localhost:4000")
+  BASE_URL = ENV.fetch("BASE_URL", "https://localhost:4000")
 
   def get(path, headers = {})
     uri = URI.parse("#{BASE_URL}#{path}")

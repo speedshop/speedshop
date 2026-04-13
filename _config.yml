@@ -22,7 +22,6 @@ exclude:
    - client_notes
    - .client_notes
    - card
-   - Procfile
    - wercker.yml
    - Gemfile
    - Gemfile.lock
@@ -39,5 +38,8 @@ exclude:
    - package.json
    - package-lock.json
    - playwright.config.cjs
+   - Caddyfile
+   - hk.pkl
+   - pitchfork.toml
    - node_modules
    - .terraform
