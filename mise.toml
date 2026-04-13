@@ -1,5 +1,8 @@
 env_file = ".env"
 
+[settings.ruby]
+compile = false
+
 [tools]
 # Source of truth for this repo's shared toolchain.
 # Explicit exception: deploy may temporarily use .client_notes/.ruby-version
