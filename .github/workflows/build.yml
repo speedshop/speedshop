@@ -7,8 +7,7 @@ permissions:
   contents: read
 
 env:
-  CANONICAL_IMAGE_CACHE_KEY: ${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
-  DEVCONTAINER_IMAGE: speedshop-devcontainer-${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
+  DEVCONTAINER_IMAGE: speedshop-devcontainer
   DEVCONTAINER_PLATFORM: linux/amd64
   CANONICAL_ENV_HOME: ${{ github.workspace }}/.cache/canonical-home
 
@@ -25,7 +24,7 @@ jobs:
       id: canonical_image_cache
       with:
         path: .cache/canonical-image/${{ env.DEVCONTAINER_IMAGE }}.tar.gz
-        key: ${{ runner.os }}-canonical-image-v1-${{ env.CANONICAL_IMAGE_CACHE_KEY }}
+        key: ${{ runner.os }}-canonical-image-v1-${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
     - name: Build and archive canonical container
       if: steps.canonical_image_cache.outputs.cache-hit != 'true'
       run: |
