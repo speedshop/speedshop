@@ -21,13 +21,13 @@ jobs:
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: .cache/canonical-home
-        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
+        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', 'mise.lock', '.github/canonical-env.Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-canonical-home-v1-
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.devcontainer/Dockerfile') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.github/canonical-env.Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-gems-
     - name: Run linter in canonical container
@@ -49,13 +49,13 @@ jobs:
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: .cache/canonical-home
-        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
+        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', 'mise.lock', '.github/canonical-env.Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-canonical-home-v1-
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.devcontainer/Dockerfile') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.github/canonical-env.Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-gems-
     - name: Build site in canonical container
@@ -79,13 +79,13 @@ jobs:
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: .cache/canonical-home
-        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
+        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', 'mise.lock', '.github/canonical-env.Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-canonical-home-v1-
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.devcontainer/Dockerfile') }}
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.github/canonical-env.Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-gems-
     - name: Run CI test suite in canonical container

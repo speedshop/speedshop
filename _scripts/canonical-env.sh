@@ -3,6 +3,7 @@ set -euo pipefail
 
 image="${DEVCONTAINER_IMAGE:-speedshop-devcontainer}"
 platform="${DEVCONTAINER_PLATFORM:-linux/amd64}"
+dockerfile="${CANONICAL_ENV_DOCKERFILE:-.github/canonical-env.Dockerfile}"
 ruby_version="${CANONICAL_ENV_RUBY_VERSION:-$(awk -F'"' '/^ruby = / { print $2; exit }' mise.toml)}"
 
 declare -a env_names=()
@@ -55,7 +56,7 @@ trap cleanup EXIT
 docker build \
   --platform "$platform" \
   --build-arg "RUBY_VERSION=$ruby_version" \
-  -f .devcontainer/Dockerfile \
+  -f "$dockerfile" \
   -t "$image" \
   .
 
