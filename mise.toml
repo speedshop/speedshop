@@ -80,7 +80,7 @@ set -e
 cleanup() {
   echo "Cleaning up..."
   pkill -f 'caddy run --config Caddyfile' 2>/dev/null || true
-  pkill -f 'wrangler dev --port 8787' 2>/dev/null || true
+  pkill -f 'wrangler dev --config workers/wrangler.toml --port 8787' 2>/dev/null || true
 }
 trap cleanup EXIT
 
@@ -107,7 +107,7 @@ fi
 
 # Start Cloudflare worker using local node_modules
 echo "Starting Cloudflare worker..."
-./node_modules/.bin/wrangler dev --port 8787 > /tmp/wrangler.log 2>&1 &
+./node_modules/.bin/wrangler dev --config workers/wrangler.toml --port 8787 > /tmp/wrangler.log 2>&1 &
 
 # Wait for wrangler to be ready
 for i in {1..20}; do

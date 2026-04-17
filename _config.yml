@@ -28,12 +28,12 @@ exclude:
    - assets/js/main.js
    - mise.toml
    - mise.lock
-   - wrangler.toml
    - test
    - AGENTS.md
-   - main.tf
-   - variables.tf
-   - versions.tf
+   - infra
+   - infra/**
+   - workers
+   - workers/**
    - Rakefile
    - package.json
    - package-lock.json

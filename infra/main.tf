@@ -132,7 +132,7 @@ resource "cloudflare_ruleset" "blog_legacy_redirects" {
 resource "cloudflare_worker_script" "card_worker" {
   account_id = var.cloudflare_account_id
   name       = "card-worker"
-  content    = file("${path.module}/worker.js")
+  content    = file("${path.module}/../workers/worker.js")
   module     = true
 }
 
@@ -151,7 +151,7 @@ resource "cloudflare_worker_route" "card_route" {
 resource "cloudflare_worker_script" "agent_worker" {
   account_id = var.cloudflare_account_id
   name       = "agent-worker"
-  content    = file("${path.module}/agent-worker.js")
+  content    = file("${path.module}/../workers/agent-worker.js")
   module     = true
 }
 

@@ -4,7 +4,7 @@
   "scripts": {
     "build": "node _scripts/build.mjs",
     "test": "npx --no-install playwright test",
-    "dev:worker": "wrangler dev",
+    "dev:worker": "wrangler dev --config workers/wrangler.toml",
     "dev:static": "caddy run --config Caddyfile"
   },
   "dependencies": {
