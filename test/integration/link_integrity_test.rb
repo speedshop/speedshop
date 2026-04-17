@@ -3,7 +3,6 @@ require "concurrent-ruby"
 require "minitest/autorun"
 require "net/http"
 require "nokogiri"
-require "pathname"
 require "uri"
 require_relative "../test_helper"
 

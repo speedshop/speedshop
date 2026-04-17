@@ -62,6 +62,7 @@ jobs:
         CLIENT_NOTES_PATH: .client_notes
         DEPLOY_RUBY: ${{ steps.deploy_ruby.outputs.value }}
         DEPLOY_RUBY_SOURCE: ${{ steps.deploy_ruby.outputs.source }}
+        CANONICAL_ENV_RUBY_VERSION: ${{ steps.deploy_ruby.outputs.value }}
         S3_BUCKET: www.speedshop.co
       run: |
         ./_scripts/canonical-env.sh \
@@ -75,20 +76,19 @@ jobs:
           '
             set -euo pipefail
             mise trust --yes /workspaces/speedshop/mise.toml
-            mise install ruby@${DEPLOY_RUBY}
-            mise exec ruby@${DEPLOY_RUBY} -- bundle config set --global path /workspaces/speedshop/vendor/bundle
+            mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle
             mise install node pandoc awscli
-            mise exec ruby@${DEPLOY_RUBY} -- npm ci
-            mise exec ruby@${DEPLOY_RUBY} -- bundle install --jobs 4 --retry 3
+            mise exec -- npm ci
+            mise exec -- bundle install --jobs 4 --retry 3
 
             if [ "${DEPLOY_RUBY_SOURCE}" = "mise.toml" ]; then
-              mise exec ruby@${DEPLOY_RUBY} -- bundle exec rake validate:ruby_version
+              mise exec -- bundle exec rake validate:ruby_version
             fi
 
-            mise exec ruby@${DEPLOY_RUBY} -- bundle exec jekyll build
-            mise exec ruby@${DEPLOY_RUBY} -- bundle exec rake validate:generated_data
-            mise exec ruby@${DEPLOY_RUBY} -- bundle exec ruby _scripts/s3_deploy.rb
-            mise exec ruby@${DEPLOY_RUBY} -- aws s3 sync card/ s3://www.speedshop.co/card/ --cache-control "max-age=86400"
+            mise exec -- bundle exec jekyll build
+            mise exec -- bundle exec rake validate:generated_data
+            mise exec -- bundle exec ruby _scripts/s3_deploy.rb
+            mise exec -- aws s3 sync card/ s3://www.speedshop.co/card/ --cache-control "max-age=86400"
           '
     - name: Cloudflare Purge Cache
       uses: jakejarvis/cloudflare-purge-action@eee6dba0236093358f25bb1581bd615dc8b3d8e3 # v0.3.0

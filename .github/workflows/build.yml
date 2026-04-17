@@ -35,7 +35,6 @@ jobs:
         ./_scripts/canonical-env.sh '
           set -euo pipefail
           mise trust --yes /workspaces/speedshop/mise.toml
-          mise install ruby
           mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle
           mise exec -- bundle install --jobs 4 --retry 3
           mise run lint
@@ -64,7 +63,6 @@ jobs:
         ./_scripts/canonical-env.sh '
           set -euo pipefail
           mise trust --yes /workspaces/speedshop/mise.toml
-          mise install ruby
           mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle
           mise install node pandoc
           mise exec -- npm ci
@@ -97,7 +95,6 @@ jobs:
         ./_scripts/canonical-env.sh --env CI '
           set -euo pipefail
           mise trust --yes /workspaces/speedshop/mise.toml
-          mise install ruby
           mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle
           mise install node pandoc
           mise exec -- npm ci

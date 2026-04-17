@@ -6,5 +6,5 @@
   "remoteUser": "vscode",
   "updateRemoteUserUID": true,
   "shutdownAction": "stopCompose",
-  "postCreateCommand": "bash -lc 'set -euo pipefail && mise trust --yes /workspaces/speedshop/mise.toml && mise install ruby && mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle && mise install node python pandoc terraform awscli && mise exec -- npm ci && mise exec -- bundle install --jobs 4 --retry 3 && mise exec -- npx --no-install playwright install chromium'"
+  "postCreateCommand": "bash -lc 'set -euo pipefail && mise trust --yes /workspaces/speedshop/mise.toml && mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle && mise install node python pandoc terraform awscli && mise exec -- npm ci && mise exec -- bundle install --jobs 4 --retry 3 && mise exec -- npx --no-install playwright install chromium'"
 }
