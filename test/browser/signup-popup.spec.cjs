@@ -141,7 +141,7 @@ test.describe('Newsletter signup popup', () => {
       };
     });
 
-    await page.goto('/blog/100-ms-to-glass-with-rails-and-turbolinks/');
+    await page.goto('/blog/100-ms-to-glass-with-rails-and-turbolinks/', { waitUntil: 'domcontentloaded' });
 
     const popup = page.locator('#innocuous');
 
@@ -153,16 +153,14 @@ test.describe('Newsletter signup popup', () => {
     await expect(popup).toBeHidden();
 
     // Navigate via pjax to another post
-    const otherPostLink = page.locator('a[href*="/blog/"]').first();
-    if (await otherPostLink.count() > 0) {
-      await otherPostLink.click();
+    const otherPostLink = page.locator('a[href="/blog/announcing-apocrypha/"]').first();
+    await expect(otherPostLink).toHaveCount(1);
 
-      // Wait for pjax navigation
-      await page.waitForTimeout(1000);
+    await otherPostLink.click({ noWaitAfter: true });
+    await expect(page).toHaveURL(/\/blog\/announcing-apocrypha\/$/);
 
-      // Popup should NOT reappear because cookie is set
-      await expect(popup).toBeHidden();
-    }
+    // Popup should NOT reappear because cookie is set
+    await expect(page.locator('#innocuous')).toBeHidden();
   });
 
 });
