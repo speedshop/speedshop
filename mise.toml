@@ -59,6 +59,10 @@ run = "pitchfork stop jekyll static worker"
 description = "Run all linters"
 run = "bundle exec standardrb"
 
+[tasks."test:quick"]
+description = "Run the fast local test suite"
+run = "bundle exec rake test"
+
 [tasks."test:ruby"]
 description = "Run Ruby unit tests"
 run = "bundle exec rake test"

@@ -7,7 +7,7 @@ hooks {
         check = "mise run lint"
       }
       ["test"] {
-        check = "mise run test"
+        check = "mise run test:quick"
       }
     }
   }
