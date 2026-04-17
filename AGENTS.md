@@ -55,8 +55,8 @@ test/
   ruby/           # Unit tests for plugins
   browser/        # Playwright E2E tests
   integration/    # HTTP integration tests
-agent-worker.js   # Cloudflare Worker for content negotiation
-worker.js         # Cloudflare Worker for /card endpoint
+workers/agent-worker.js   # Cloudflare Worker for content negotiation
+workers/worker.js         # Cloudflare Worker for /card endpoint
 ```
 
 ## Agent-Ready Documentation
@@ -71,6 +71,6 @@ This site implements the [Mintlify agent-ready pattern](https://www.mintlify.com
 ## Key Files
 
 - `mise.toml` - Task runner configuration
-- `wrangler.toml` - Cloudflare Worker local dev config
-- `main.tf` - Terraform infrastructure (S3, Cloudflare)
+- `workers/wrangler.toml` - Cloudflare Worker local dev config
+- `infra/main.tf` - Terraform infrastructure (S3, Cloudflare)
 - `_config.yml` - Jekyll configuration

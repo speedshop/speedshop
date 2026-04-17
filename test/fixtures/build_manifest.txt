@@ -21,14 +21,12 @@ status.*
 vertical_debug.*
 
 [files]
-agent-worker.js
 feed.xml
 holidays.ics
 llms-full.txt
 llms.txt
 robots.txt
 sitemap.xml
-worker.js
 
 [sitemap]
 # Static pages in sitemap (blog posts are allowed dynamically)

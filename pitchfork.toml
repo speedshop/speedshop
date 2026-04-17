@@ -15,7 +15,7 @@ port_bump_attempts = 10
 depends = ["jekyll"]
 
 [daemons.worker]
-run = "./node_modules/.bin/wrangler dev --port 8787"
+run = "./node_modules/.bin/wrangler dev --config workers/wrangler.toml --port 8787"
 retry = 0
 ready_http = "http://localhost:8787/"
 expected_port = [8787]
