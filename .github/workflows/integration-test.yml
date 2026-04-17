@@ -47,7 +47,6 @@ jobs:
         ./_scripts/canonical-env.sh --env BASE_URL '
           set -euo pipefail
           mise trust --yes /workspaces/speedshop/mise.toml
-          ./_scripts/install-mise-ruby.sh
           mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle
           mise exec -- bundle install --jobs 4 --retry 3
           mise exec -- bundle exec ruby test/integration/site_test.rb

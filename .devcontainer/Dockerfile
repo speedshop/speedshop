@@ -1,4 +1,5 @@
-FROM ubuntu:24.04
+ARG RUBY_VERSION=4.0.2
+FROM ruby:${RUBY_VERSION}
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
@@ -9,44 +10,28 @@ ARG MISE_VERSION=v2026.3.10
 
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
-    DEBIAN_FRONTEND=${DEBIAN_FRONTEND}
+    DEBIAN_FRONTEND=${DEBIAN_FRONTEND} \
+    MISE_DISABLE_TOOLS=ruby
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        autoconf \
-        bison \
-        build-essential \
-        ca-certificates \
-        curl \
-        file \
-        git \
         jq \
-        libasound2t64 \
-        libatk-bridge2.0-0t64 \
-        libatk1.0-0t64 \
-        libatspi2.0-0t64 \
-        libbz2-dev \
+        libasound2 \
+        libatk-bridge2.0-0 \
+        libatk1.0-0 \
+        libatspi2.0-0 \
         libcairo2 \
-        libcups2t64 \
-        libdb-dev \
+        libcups2 \
         libdbus-1-3 \
         libdrm2 \
-        libffi-dev \
         libfontconfig1 \
         libfreetype6 \
         libgbm1 \
-        libgdbm-dev \
-        libglib2.0-0t64 \
-        libgmp-dev \
-        liblzma-dev \
-        libncurses-dev \
+        libglib2.0-0 \
         libnspr4 \
-        lmodern \
         libnss3 \
         libpango-1.0-0 \
-        libreadline-dev \
         librsvg2-bin \
-        libssl-dev \
         libx11-6 \
         libxcb1 \
         libxcomposite1 \
@@ -54,25 +39,18 @@ RUN apt-get update \
         libxext6 \
         libxfixes3 \
         libxkbcommon0 \
-        libxrandr2 \
-        libyaml-dev \
-        pkg-config \
-        procps \
-        patch \
-        rustc \
         sudo \
+        lmodern \
         texlive-fonts-recommended \
         texlive-latex-base \
         texlive-latex-recommended \
         texlive-xetex \
         unzip \
-        uuid-dev \
         xvfb \
         xfonts-cyrillic \
         xfonts-scalable \
         xz-utils \
         zip \
-        zlib1g-dev \
         fonts-freefont-ttf \
         fonts-ipafont-gothic \
         fonts-liberation \
@@ -95,19 +73,6 @@ RUN case "${TARGETARCH}" in \
     esac \
     && curl -fsSL "https://github.com/jdx/mise/releases/download/${MISE_VERSION}/${asset}" -o /usr/local/bin/mise \
     && chmod +x /usr/local/bin/mise
-
-RUN cat <<'EOF' >/usr/local/bin/asdf
-#!/usr/bin/env bash
-set -euo pipefail
-
-if [[ "${1:-}" == "reshim" ]]; then
-  exec mise reshim
-fi
-
-echo "This container uses mise instead of asdf; only 'asdf reshim' is supported." >&2
-exit 1
-EOF
-RUN chmod +x /usr/local/bin/asdf
 
 WORKDIR /workspaces/speedshop
 USER ${USERNAME}
