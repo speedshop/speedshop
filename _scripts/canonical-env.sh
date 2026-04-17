@@ -52,12 +52,14 @@ cleanup() {
 }
 trap cleanup EXIT
 
-docker build \
-  --platform "$platform" \
-  --build-arg "RUBY_VERSION=$ruby_version" \
-  -f .devcontainer/Dockerfile \
-  -t "$image" \
-  .
+if ! docker image inspect "$image" >/dev/null 2>&1; then
+  docker build \
+    --platform "$platform" \
+    --build-arg "RUBY_VERSION=$ruby_version" \
+    -f .devcontainer/Dockerfile \
+    -t "$image" \
+    .
+fi
 
 if (( ${#env_names[@]} > 0 )); then
   for env_name in "${env_names[@]}"; do
