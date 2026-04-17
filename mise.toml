@@ -61,7 +61,6 @@ run = "bundle exec standardrb"
 
 [tasks."test:ruby"]
 description = "Run Ruby unit tests"
-depends = ["lint"]
 run = "bundle exec rake test"
 
 [tasks."test:browser"]
