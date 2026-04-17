@@ -7,17 +7,54 @@ permissions:
   contents: read
 
 env:
-  DEVCONTAINER_IMAGE: speedshop-devcontainer
+  CANONICAL_IMAGE_CACHE_KEY: ${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
+  DEVCONTAINER_IMAGE: speedshop-devcontainer-${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
   DEVCONTAINER_PLATFORM: linux/amd64
   CANONICAL_ENV_HOME: ${{ github.workspace }}/.cache/canonical-home
 
 jobs:
-  lint:
+  prepare:
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
         persist-credentials: false
+    - name: Ensure image cache directory exists
+      run: mkdir -p .cache/canonical-image
+    - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+      id: canonical_image_cache
+      with:
+        path: .cache/canonical-image/${{ env.DEVCONTAINER_IMAGE }}.tar.gz
+        key: ${{ runner.os }}-canonical-image-v1-${{ env.CANONICAL_IMAGE_CACHE_KEY }}
+    - name: Build and archive canonical container
+      if: steps.canonical_image_cache.outputs.cache-hit != 'true'
+      run: |
+        docker build \
+          --platform "$DEVCONTAINER_PLATFORM" \
+          --build-arg "RUBY_VERSION=$(awk -F'"' '/^ruby = / { print $2; exit }' mise.toml)" \
+          -f .devcontainer/Dockerfile \
+          -t "$DEVCONTAINER_IMAGE" \
+          .
+        docker save "$DEVCONTAINER_IMAGE" | gzip > ".cache/canonical-image/${DEVCONTAINER_IMAGE}.tar.gz"
+    - uses: actions/upload-artifact@v4
+      with:
+        name: canonical-image
+        path: .cache/canonical-image/${{ env.DEVCONTAINER_IMAGE }}.tar.gz
+        if-no-files-found: error
+
+  lint:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      with:
+        persist-credentials: false
+    - uses: actions/download-artifact@v4
+      with:
+        name: canonical-image
+        path: .cache/canonical-image
+    - name: Load canonical container
+      run: gunzip -c ".cache/canonical-image/${DEVCONTAINER_IMAGE}.tar.gz" | docker load
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: .cache/canonical-home
@@ -41,11 +78,18 @@ jobs:
         '
 
   build:
+    needs: prepare
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
         persist-credentials: false
+    - uses: actions/download-artifact@v4
+      with:
+        name: canonical-image
+        path: .cache/canonical-image
+    - name: Load canonical container
+      run: gunzip -c ".cache/canonical-image/${DEVCONTAINER_IMAGE}.tar.gz" | docker load
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: .cache/canonical-home
@@ -71,11 +115,18 @@ jobs:
         '
 
   test:
+    needs: prepare
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
         persist-credentials: false
+    - uses: actions/download-artifact@v4
+      with:
+        name: canonical-image
+        path: .cache/canonical-image
+    - name: Load canonical container
+      run: gunzip -c ".cache/canonical-image/${DEVCONTAINER_IMAGE}.tar.gz" | docker load
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: .cache/canonical-home
