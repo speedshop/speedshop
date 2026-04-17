@@ -96,5 +96,18 @@ RUN case "${TARGETARCH}" in \
     && curl -fsSL "https://github.com/jdx/mise/releases/download/${MISE_VERSION}/${asset}" -o /usr/local/bin/mise \
     && chmod +x /usr/local/bin/mise
 
+RUN cat <<'EOF' >/usr/local/bin/asdf
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "${1:-}" == "reshim" ]]; then
+  exec mise reshim
+fi
+
+echo "This container uses mise instead of asdf; only 'asdf reshim' is supported." >&2
+exit 1
+EOF
+RUN chmod +x /usr/local/bin/asdf
+
 WORKDIR /workspaces/speedshop
 USER ${USERNAME}

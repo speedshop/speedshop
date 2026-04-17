@@ -75,7 +75,7 @@ jobs:
           '
             set -euo pipefail
             mise trust --yes /workspaces/speedshop/mise.toml
-            mise install ruby@${DEPLOY_RUBY}
+            ./_scripts/install-mise-ruby.sh ruby@${DEPLOY_RUBY}
             mise exec ruby@${DEPLOY_RUBY} -- bundle config set --global path /workspaces/speedshop/vendor/bundle
             mise install node pandoc awscli
             mise exec ruby@${DEPLOY_RUBY} -- npm ci
