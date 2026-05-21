@@ -311,7 +311,8 @@ class LinkIntegrityTest < Minitest::Test
       "medium.com",
       "docs.shopify.com",
       "blog.twitter.com",
-      "www.rubyvideo.dev"
+      "www.rubyvideo.dev",
+      "webuild.envato.com"
     ].include?(host)
   end
 

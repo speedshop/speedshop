@@ -120,6 +120,26 @@ namespace :validate do
       errors << "holidays.ics not found in _site"
     end
 
+    # Validate Four Line Fridays archive when private client notes are available.
+    four_line_fridays_file = File.join(site_dir, "four-line-fridays.html")
+    if File.exist?(four_line_fridays_file)
+      content = File.read(four_line_fridays_file)
+      archive_json = content[%r{<script id="four-line-archive-data" type="application/json">(.*?)</script>}m, 1]
+
+      if archive_json.nil?
+        errors << "four-line-fridays.html: Archive JSON script tag is missing"
+      else
+        archive = JSON.parse(archive_json)
+        if ENV["CLIENT_NOTES_PATH"] && Dir.exist?(ENV["CLIENT_NOTES_PATH"]) && archive["line_count"].to_i.zero?
+          errors << "four-line-fridays.html: FLF archive is empty despite CLIENT_NOTES_PATH being set"
+        else
+          puts "Validated four-line-fridays.html"
+        end
+      end
+    else
+      errors << "four-line-fridays.html not found in _site"
+    end
+
     if errors.any?
       abort <<~ERROR
         Data validation failed with #{errors.length} error(s):
