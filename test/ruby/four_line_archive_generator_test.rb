@@ -4,6 +4,7 @@ require_relative "../../_plugins/four_line_archive_generator"
 
 class FourLineArchiveGeneratorTest < Minitest::Test
   FIXTURE_CLIENT_NOTES_PATH = File.expand_path("../fixtures/client_notes", __dir__)
+  CURRENT_LAYOUT_CLIENT_NOTES_PATH = File.expand_path("../fixtures/current_client_notes", __dir__)
 
   def test_default_payload_defaults_to_empty_archive
     result = Speedshop::FourLineArchiveGenerator.default_payload
@@ -34,5 +35,17 @@ class FourLineArchiveGeneratorTest < Minitest::Test
     linked_line = result["lines"].find { |line| line["line_text"] == "First line link with context." }
     assert_match(/^2026-01-03-/, linked_line["id"])
     assert_includes linked_line["line_html"], "<a href=\"https://example.com/one\""
+  end
+
+  def test_generate_extracts_archive_from_current_client_notes_layout
+    result = Speedshop::FourLineArchiveGenerator.generate(client_notes_path: CURRENT_LAYOUT_CLIENT_NOTES_PATH)
+
+    assert_equal 1, result["issue_count"]
+    assert_equal 4, result["line_count"]
+
+    linked_line = result["lines"].find { |line| line["line_text"] == "Second current-layout line with a link." }
+    refute_nil linked_line
+    assert_equal "2026-01-17", linked_line["issue_date"]
+    assert_includes linked_line["line_html"], "<a href=\"https://example.com/current\""
   end
 end
