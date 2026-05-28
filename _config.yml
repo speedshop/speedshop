@@ -36,6 +36,7 @@ exclude:
    - mise.toml
    - mise.lock
    - test
+   - tmp
    - AGENTS.md
    - infra
    - infra/**

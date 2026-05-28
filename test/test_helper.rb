@@ -1,4 +1,3 @@
-require "bundler"
 require "fileutils"
 require "net/http"
 require "rbconfig"
@@ -19,9 +18,7 @@ module TestHelper
     FileUtils.rm_rf(SITE_DIR)
 
     Dir.chdir(ROOT_DIR) do
-      Bundler.with_unbundled_env do
-        system("bundle", "exec", "jekyll", "build", "--quiet", exception: true)
-      end
+      system("jekyll", "build", "--quiet", exception: true)
     end
 
     wait_for_expected_site_files!
