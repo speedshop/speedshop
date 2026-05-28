@@ -1,5 +1,7 @@
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="@nateberkopec">
-<meta name="twitter:image" content="{% if page.image %}{{ site.url | append: '/assets/posts/img/' | append: page.image }}{% else %}{{ site.url | append: '/assets/img/' | append: 'opengraph.jpg' }}{% endif %}">
-<meta name="twitter:title" content="{% if page.title %}{{ page.title | escape }}{% else %}{{ site.title | escape }}{% endif %}">
-<meta name="twitter:description" content="{{ page.summary | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
+<meta name="twitter:site" content="{{ seo_twitter_handle }}">
+<meta name="twitter:creator" content="{{ seo_twitter_handle }}">
+<meta name="twitter:title" content="{{ seo_title | escape }}">
+<meta name="twitter:description" content="{{ seo_social_description | escape }}">
+<meta name="twitter:image" content="{{ seo_image_url }}">
+<meta name="twitter:image:alt" content="{{ seo_image_alt | escape }}">

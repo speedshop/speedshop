@@ -1,56 +1,137 @@
+{% assign seo_org_id = site.url | append: "/#organization" %}
+{% assign seo_website_id = site.url | append: "/#website" %}
+{% assign seo_person_id = seo_author_url | append: "#person" %}
+{% assign seo_page_id = seo_canonical_url | append: "#webpage" %}
+{% assign seo_image_id = seo_image_url | append: "#primaryimage" %}
+{% assign seo_modified_time = page.last_modified_at | default: page.date %}
 <script type="application/ld+json">
 {
-  "@context": "http://schema.org",
-  {% if page.readtime %}
-    "@type": "TechArticle",
-    "dependencies": "Ruby on Rails",
-    "proficiencyLevel": "Expert",
-    "wordcount": {{ page.wordcount }},
-  {% elsif page.price %}
-    "@type": "Product",
-    "name": "{{ page.productName }}",
-    "offers": {
-      "@type": "Offer",
-      "price": {{ page.price }},
-      "priceCurrency": "USD",
-      "seller": {
-        "@type": "Organization",
-        "name": "Speedshop"
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": {{ seo_person_id | jsonify }},
+      "name": {{ seo_author_name | jsonify }},
+      "url": {{ seo_author_url | jsonify }},
+      "sameAs": [
+        "https://twitter.com/nateberkopec",
+        "https://github.com/nateberkopec"
+      ]
+    },
+    {
+      "@type": "Organization",
+      "@id": {{ seo_org_id | jsonify }},
+      "name": "Speedshop",
+      "url": {{ site.url | append: "/" | jsonify }},
+      "logo": {
+        "@type": "ImageObject",
+        "url": {{ "/assets/img/speedshop_s_big.png" | absolute_url | jsonify }},
+        "width": 497,
+        "height": 497
+      },
+      "founder": {
+        "@id": {{ seo_person_id | jsonify }}
       }
     },
-    "brand": "The Speedshop",
-  {% else %}
-    "@type": "WebPage",
-  {% endif %}
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": "{{ page.url | absolute_url }}"
-  },
-  {% if page.title %}
-    "headline": "{{ page.title }}",
-  {% endif %}
-  {% if page.image %}
-    "image": ["{{ page.image | absolute_url }}"],
-  {% endif %}
-  {% if page.date %}
-    "datePublished": "{{ page.date }}",
-  {% endif %}
-  {% if page.summary %}
-    "description": "{{ page.summary | strip_html | normalize_whitespace | truncate: 160 | escape }}",
-  {% endif %}
-  "publisher": {
-    "@type": "Organization",
-    "name": "Speedshop",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://speedshop.co/assets/img/speedshop_s_big.png",
-      "width": 497,
-      "height": 497
+    {
+      "@type": "WebSite",
+      "@id": {{ seo_website_id | jsonify }},
+      "url": {{ site.url | append: "/" | jsonify }},
+      "name": "Speedshop",
+      "description": {{ site.description | strip_html | normalize_whitespace | jsonify }},
+      "publisher": {
+        "@id": {{ seo_org_id | jsonify }}
+      },
+      "inLanguage": {{ seo_lang | jsonify }}
+    },
+    {% if page.layout == "post" %}
+    {
+      "@type": "BlogPosting",
+      "@id": {{ seo_canonical_url | append: "#article" | jsonify }},
+      "url": {{ seo_canonical_url | jsonify }},
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": {{ seo_page_id | jsonify }}
+      },
+      "isPartOf": {
+        "@id": {{ seo_website_id | jsonify }}
+      },
+      "author": {
+        "@id": {{ seo_person_id | jsonify }}
+      },
+      "publisher": {
+        "@id": {{ seo_org_id | jsonify }}
+      },
+      "headline": {{ seo_title | jsonify }},
+      "name": {{ seo_title | jsonify }},
+      "description": {{ seo_description | jsonify }},
+      "image": {
+        "@type": "ImageObject",
+        "@id": {{ seo_image_id | jsonify }},
+        "url": {{ seo_image_url | jsonify }},
+        "contentUrl": {{ seo_image_url | jsonify }}{% if seo_image_width %},
+        "width": {{ seo_image_width }}{% endif %}{% if seo_image_height %},
+        "height": {{ seo_image_height }}{% endif %}{% if seo_image_type %},
+        "encodingFormat": {{ seo_image_type | jsonify }}{% endif %}
+      },
+      "datePublished": {{ page.date | date_to_xmlschema | jsonify }},
+      "dateModified": {{ seo_modified_time | date_to_xmlschema | jsonify }}{% if page.wordcount %},
+      "wordCount": {{ page.wordcount }}{% endif %},
+      "inLanguage": {{ seo_lang | jsonify }}
     }
-  },
-  "author": {
-    "@type": "Person",
-    "name": "Nate Berkopec"
-  }
+    {% elsif page.price %}
+    {
+      "@type": "Service",
+      "@id": {{ seo_canonical_url | append: "#service" | jsonify }},
+      "url": {{ seo_canonical_url | jsonify }},
+      "name": {{ page.productName | default: seo_title | jsonify }},
+      "description": {{ seo_description | jsonify }},
+      "provider": {
+        "@id": {{ seo_org_id | jsonify }}
+      },
+      "image": {
+        "@type": "ImageObject",
+        "@id": {{ seo_image_id | jsonify }},
+        "url": {{ seo_image_url | jsonify }},
+        "contentUrl": {{ seo_image_url | jsonify }}{% if seo_image_width %},
+        "width": {{ seo_image_width }}{% endif %}{% if seo_image_height %},
+        "height": {{ seo_image_height }}{% endif %}{% if seo_image_type %},
+        "encodingFormat": {{ seo_image_type | jsonify }}{% endif %}
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": {{ page.price | jsonify }},
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "url": {{ seo_canonical_url | jsonify }}
+      },
+      "inLanguage": {{ seo_lang | jsonify }}
+    }
+    {% else %}
+    {
+      "@type": "WebPage",
+      "@id": {{ seo_page_id | jsonify }},
+      "url": {{ seo_canonical_url | jsonify }},
+      "name": {{ seo_title | jsonify }},
+      "description": {{ seo_description | jsonify }},
+      "isPartOf": {
+        "@id": {{ seo_website_id | jsonify }}
+      },
+      "publisher": {
+        "@id": {{ seo_org_id | jsonify }}
+      },
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "@id": {{ seo_image_id | jsonify }},
+        "url": {{ seo_image_url | jsonify }},
+        "contentUrl": {{ seo_image_url | jsonify }}{% if seo_image_width %},
+        "width": {{ seo_image_width }}{% endif %}{% if seo_image_height %},
+        "height": {{ seo_image_height }}{% endif %}{% if seo_image_type %},
+        "encodingFormat": {{ seo_image_type | jsonify }}{% endif %}
+      },
+      "inLanguage": {{ seo_lang | jsonify }}
+    }
+    {% endif %}
+  ]
 }
 </script>

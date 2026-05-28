@@ -1,1 +1,19 @@
-<meta property="og:image" content="{% if page.image %}{{ site.url | append: '/assets/posts/img/' | append: page.image }}{% else %}{{ site.url | append: '/assets/img/' | append: 'opengraph.jpg' }}{% endif %}" >
+<meta property="og:site_name" content="Speedshop">
+<meta property="og:locale" content="{{ seo_locale | escape }}">
+<meta property="og:type" content="{% if page.layout == "post" %}article{% else %}website{% endif %}">
+<meta property="og:url" content="{{ seo_canonical_url }}">
+<meta property="og:title" content="{{ seo_title | escape }}">
+<meta property="og:description" content="{{ seo_social_description | escape }}">
+<meta property="og:image" content="{{ seo_image_url }}">
+<meta property="og:image:secure_url" content="{{ seo_image_url }}">
+{% if seo_image_type %}<meta property="og:image:type" content="{{ seo_image_type }}">{% endif %}
+{% if seo_image_width %}<meta property="og:image:width" content="{{ seo_image_width }}">{% endif %}
+{% if seo_image_height %}<meta property="og:image:height" content="{{ seo_image_height }}">{% endif %}
+<meta property="og:image:alt" content="{{ seo_image_alt | escape }}">
+{% if page.layout == "post" %}
+<meta property="article:author" content="{{ seo_author_url }}">
+{% if page.date %}<meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}">{% endif %}
+{% assign seo_modified_time = page.last_modified_at | default: page.date %}
+{% if seo_modified_time %}<meta property="article:modified_time" content="{{ seo_modified_time | date_to_xmlschema }}">{% endif %}
+<meta property="article:section" content="Ruby on Rails Performance">
+{% endif %}
