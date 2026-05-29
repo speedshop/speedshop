@@ -8,21 +8,59 @@ module Jekyll
       0xCD, 0xCE, 0xCF
     ].freeze
 
+    MIME_TYPES = {
+      ".gif" => "image/gif",
+      ".jpg" => "image/jpeg",
+      ".jpeg" => "image/jpeg",
+      ".png" => "image/png",
+      ".webp" => "image/webp"
+    }.freeze
+
     def image_dimensions(input)
-      path = input.to_s
-      return "" if path.empty? || path.start_with?("http://", "https://")
-
-      site = @context.registers[:site]
-      full_path = File.join(site.source, path.sub(%r{\A/}, ""))
-      return "" unless File.exist?(full_path)
-
-      width, height = read_dimensions(full_path)
+      width, height = dimensions_for(input)
       return "" unless width && height
 
       "width=\"#{width}\" height=\"#{height}\""
     end
 
+    def image_width(input)
+      dimensions_for(input)&.first
+    end
+
+    def image_height(input)
+      dimensions_for(input)&.last
+    end
+
+    def image_mime_type(input)
+      path = input.to_s.split("?", 2).first.downcase
+      MIME_TYPES[File.extname(path)]
+    end
+
+    def share_image_path(input)
+      path = input.to_s.strip
+      return "/assets/img/opengraph.jpg" if path.empty?
+      return path if remote_url?(path) || path.start_with?("/")
+      return "/#{path}" if path.include?("/")
+
+      "/assets/posts/img/#{path}"
+    end
+
     private
+
+    def dimensions_for(input)
+      path = input.to_s
+      return nil if path.empty? || remote_url?(path)
+
+      site = @context.registers[:site]
+      full_path = File.join(site.source, path.sub(%r{\A/}, ""))
+      return nil unless File.exist?(full_path)
+
+      read_dimensions(full_path)
+    end
+
+    def remote_url?(path)
+      path.start_with?("http://", "https://")
+    end
 
     def read_dimensions(path)
       File.open(path, "rb") do |io|

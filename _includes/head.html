@@ -1,13 +1,35 @@
+{% assign seo_title = page.title | default: site.title | strip_html | normalize_whitespace %}
+{% if seo_title contains "Speedshop" %}
+  {% assign seo_title_tag = seo_title %}
+{% else %}
+  {% capture seo_title_tag %}{{ seo_title }} | Speedshop{% endcapture %}
+{% endif %}
+{% assign seo_description_source = page.summary | default: site.description %}
+{% assign seo_description = seo_description_source | strip_html | normalize_whitespace | truncate: 160 %}
+{% assign seo_social_description = seo_description_source | strip_html | normalize_whitespace | truncate: 200 %}
+{% assign seo_canonical_url = page.url | absolute_url %}
+{% assign seo_image_path = page.image | share_image_path %}
+{% assign seo_image_url = seo_image_path | absolute_url %}
+{% assign seo_image_width = seo_image_path | image_width %}
+{% assign seo_image_height = seo_image_path | image_height %}
+{% assign seo_image_type = seo_image_path | image_mime_type %}
+{% assign seo_image_alt = page.image_alt | default: seo_title | strip_html | normalize_whitespace | truncate: 420 %}
+{% assign seo_author_name = site.author.name | default: "Nate Berkopec" %}
+{% assign seo_author_url = site.author.url | default: "https://www.nateberkopec.com/" %}
+{% assign seo_twitter_handle = site.twitter.username | default: "nateberkopec" | prepend: "@" %}
+{% assign seo_locale = page.locale | default: site.locale | default: "en_US" %}
+{% assign seo_lang = page.lang | default: site.lang | default: "en" %}
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>{% if page.title %}{{ page.title | escape }}{% else %}{{ site.title | escape }}{% endif %}</title>
-  <meta name="description" content="{{ page.summary | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
+  <title>{{ seo_title_tag | escape }}</title>
+  <meta name="description" content="{{ seo_description | escape }}">
+  <meta name="author" content="{{ seo_author_name | escape }}">
   <!-- INLINE_CSS -->
 
-  <link rel="canonical" href="{{ page.url | prepend: site.url }}">
-  <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | prepend: site.url }}">
+  <link rel="canonical" href="{{ seo_canonical_url }}">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | absolute_url }}">
 
   <script src="/assets/js/app.js" async></script>
 

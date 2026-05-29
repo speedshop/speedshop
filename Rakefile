@@ -4,6 +4,7 @@ require "rake/testtask"
 Rake::TestTask.new(:test) do |t|
   t.libs << "test/ruby"
   t.test_files = FileList["test/ruby/**/*_test.rb"]
+  t.warning = false
 end
 
 desc "Run built-site link integrity checks"
