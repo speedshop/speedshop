@@ -55,6 +55,7 @@ trap cleanup EXIT
 if ! docker image inspect "$image" >/dev/null 2>&1; then
   docker build \
     --platform "$platform" \
+    --target ci \
     --build-arg "RUBY_VERSION=$ruby_version" \
     -f .devcontainer/Dockerfile \
     -t "$image" \

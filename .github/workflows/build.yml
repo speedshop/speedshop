@@ -30,6 +30,7 @@ jobs:
       run: |
         docker build \
           --platform "$DEVCONTAINER_PLATFORM" \
+          --target ci \
           --build-arg "RUBY_VERSION=$(awk -F'"' '/^ruby = / { print $2; exit }' mise.toml)" \
           -f .devcontainer/Dockerfile \
           -t "$DEVCONTAINER_IMAGE" \
