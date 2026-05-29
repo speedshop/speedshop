@@ -1,11 +1,8 @@
 ARG RUBY_VERSION=4.0.2
-FROM ruby:${RUBY_VERSION}
+FROM ruby:${RUBY_VERSION} AS ci
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
-ARG USERNAME=vscode
-ARG USER_UID=1001
-ARG USER_GID=${USER_UID}
 ARG MISE_VERSION=v2026.3.10
 
 ENV LANG=C.UTF-8 \
@@ -15,7 +12,7 @@ ENV LANG=C.UTF-8 \
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        jq \
+        fonts-liberation \
         libasound2 \
         libatk-bridge2.0-0 \
         libatk1.0-0 \
@@ -39,32 +36,13 @@ RUN apt-get update \
         libxext6 \
         libxfixes3 \
         libxkbcommon0 \
-        sudo \
+        libxrandr2 \
         lmodern \
         texlive-fonts-recommended \
         texlive-latex-base \
         texlive-latex-recommended \
         texlive-xetex \
-        unzip \
-        xvfb \
-        xfonts-cyrillic \
-        xfonts-scalable \
-        xz-utils \
-        zip \
-        fonts-freefont-ttf \
-        fonts-ipafont-gothic \
-        fonts-liberation \
-        fonts-noto-color-emoji \
-        fonts-tlwg-loma-otf \
-        fonts-unifont \
-        fonts-wqy-zenhei \
     && rm -rf /var/lib/apt/lists/*
-
-RUN if ! getent group ${USER_GID} >/dev/null; then groupadd --gid ${USER_GID} ${USERNAME}; fi \
-    && if ! id -u ${USERNAME} >/dev/null 2>&1; then useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME}; fi \
-    && usermod -aG sudo ${USERNAME} \
-    && echo "${USERNAME} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} \
-    && chmod 0440 /etc/sudoers.d/${USERNAME}
 
 RUN case "${TARGETARCH}" in \
         amd64) asset="mise-${MISE_VERSION}-linux-x64" ;; \
@@ -75,4 +53,22 @@ RUN case "${TARGETARCH}" in \
     && chmod +x /usr/local/bin/mise
 
 WORKDIR /workspaces/speedshop
+
+FROM ci AS devcontainer
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG USERNAME=vscode
+ARG USER_UID=1001
+ARG USER_GID=${USER_UID}
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN if ! getent group ${USER_GID} >/dev/null; then groupadd --gid ${USER_GID} ${USERNAME}; fi \
+    && if ! id -u ${USERNAME} >/dev/null 2>&1; then useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME}; fi \
+    && usermod -aG sudo ${USERNAME} \
+    && echo "${USERNAME} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} \
+    && chmod 0440 /etc/sudoers.d/${USERNAME}
+
 USER ${USERNAME}
