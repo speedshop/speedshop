@@ -1,13 +1,13 @@
 ---
 layout: post
-title: "Office Of Transformative Works Performance Audit"
+title: "Organization for Transformative Works Performance Audit"
 date: 2026-05-29 0:00:00
 summary: "A Rails performance audit report for the Organization for Transformative Works and Archive of Our Own."
 readtime: 6131 words / 25 minutes
 wordcount: 6131
 ---
 
-What follows is the complete text of an audit report I produced for the Organization of Transformative Works, a non-profit which was for many years run one of the largest fan-fiction archives on the Internet.
+What follows is the complete text of an audit report I produced for the Organization for Transformative Works, a non-profit which was for many years run one of the largest fan-fiction archives on the Internet.
 
 This was produced as part of my [Ruby on Rails performance retainer service](https://www.speedshop.co/retainer.html). Since the app is open source, OTW has kindly agreed to let me publish the report online for all to see.
 
@@ -412,7 +412,7 @@ end
 
 There are also a handful of places in views where you inspect `user.roles` directly, e.g. `@user.roles.any?`. I'd replace all these with `has_role?` and then make sure the association is loaded.
 
-### Recommendation: Timeout Autocompletes, add a hard LIMIT, and consider LRU caches around common 3+ char words
+### Recommendation: Timeout Autocompletes, add a hard LIMIT, and consider LRU caches around common 3+ char words. Cost: 2 Benefit: 4
 
 `AutocompleteSource.autocomplete_lookup` is a very performance sensitive method that powers all the various autocomplete controllers. It routinely has a p95 of 2sec+.
 
