@@ -195,6 +195,37 @@ class SiteTest < Minitest::Test
     assert_includes response["content-type"], "application/json"
   end
 
+  def test_yuki_card_json_format
+    skip "Card endpoint requires production Cloudflare worker" unless production?
+
+    response = get("/card/yuki?format=json")
+    assert_equal "200", response.code
+    assert_includes response["content-type"], "application/json"
+
+    data = JSON.parse(response.body)
+    assert_equal "Yuki Nishijima", data["name"]
+    assert_equal "yuki.nishijima@speedshop.co", data["email"]
+  end
+
+  def test_yuki_card_vcard_extension
+    skip "Card endpoint requires production Cloudflare worker" unless production?
+
+    response = get("/card/yuki.vcf")
+    assert_equal "200", response.code
+    assert_includes response["content-type"], "text/vcard"
+    assert_includes response.body, "Yuki Nishijima"
+    assert_includes response.body, "yuki.nishijima@speedshop.co"
+  end
+
+  def test_yuki_card_accepts_header_html
+    skip "Card endpoint requires production Cloudflare worker" unless production?
+
+    response = get("/card/yuki", {"Accept" => "text/html"})
+    assert_equal "200", response.code
+    assert_includes response["content-type"], "text/html"
+    assert_includes response.body, "Yuki Nishijima"
+  end
+
   # Basic site tests
 
   def test_homepage_loads

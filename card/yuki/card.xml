@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<businessCard>
+  <name>
+    <first>Yuki</first>
+    <last>Nishijima</last>
+  </name>
+  <title>Rails Performance Consultant</title>
+  <organization>Speedshop</organization>
+  <email>yuki.nishijima@speedshop.co</email>
+  <website>https://speedshop.co</website>
+  <note>Helping Rails apps go fast.</note>
+</businessCard>

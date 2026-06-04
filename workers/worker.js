@@ -1,38 +1,74 @@
 /**
- * Welcome to Cloudflare Workers! This is your first worker.
+ * Business card content negotiation worker.
  *
- * - Run "npm run dev" in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run "npm run deploy" to publish your worker
- *
- * Learn more at https://developers.cloudflare.com/workers/
+ * Serves different business card formats at /card and /card/:person.
  */
 
 const FORMATS = {
-  json:    { key: "card/card.json",  type: "application/json" },
-  html:    { key: "card/card.html",  type: "text/html" },
-  vcard:   { key: "card/card.vcf",   type: "text/vcard" },
-  xml:     { key: "card/card.xml",   type: "application/xml" },
-  yaml:    { key: "card/card.yaml",  type: "application/x-yaml" },
-  qrcode:  { key: "card/card.svg",   type: "image/svg+xml" },
-  jpeg:    { key: "card/card.jpeg",  type: "image/jpeg" },
-  wav:     { key: "card/card.wav",   type: "audio/wav" },
-  help:    { key: null,         type: "text/plain" },
-  default: { key: "card/card.txt",   type: "text/plain" }
+  json: { ext: "json", type: "application/json" },
+  html: { ext: "html", type: "text/html" },
+  vcard: { ext: "vcf", type: "text/vcard" },
+  xml: { ext: "xml", type: "application/xml" },
+  yaml: { ext: "yaml", type: "application/x-yaml" },
+  qrcode: { ext: "svg", type: "image/svg+xml" },
+  jpeg: { ext: "jpeg", type: "image/jpeg" },
+  wav: { ext: "wav", type: "audio/wav" },
+  help: { ext: null, type: "text/plain" },
+  default: { ext: "txt", type: "text/plain" }
 };
 
-const S3_BASE_URL = "https://www.speedshop.co";
+const EXTENSION_FORMATS = {
+  json: "json",
+  html: "html",
+  vcf: "vcard",
+  xml: "xml",
+  yaml: "yaml",
+  yml: "yaml",
+  svg: "qrcode",
+  jpeg: "jpeg",
+  jpg: "jpeg",
+  wav: "wav",
+  txt: "default"
+};
+
+const PEOPLE = {
+  nate: { name: "Nate", path: "card" },
+  yuki: { name: "Yuki", path: "card/yuki" }
+};
+
+const DEFAULT_PERSON = "nate";
+const S3_BASE_URL = "http://www.speedshop.co.s3-website-us-east-1.amazonaws.com";
 
 const COMMON_HEADERS = {
   "Cache-Control": "public, max-age=3600",
   "Vary": "Accept"
 };
 
-function determineFormat(request) {
+function parseCardRoute(request) {
+  const pathname = new URL(request.url).pathname;
+  const match = pathname.match(/^\/card(?:\/([^/.]+))?(?:\.([a-z0-9]+))?\/?$/i);
+
+  if (!match) return null;
+
+  let person = (match[1] || DEFAULT_PERSON).toLowerCase();
+  const extension = match[2]?.toLowerCase();
+
+  if (person === "card" && extension) person = DEFAULT_PERSON;
+  if (!PEOPLE[person]) return { person, formatFromExtension: null, validPerson: false };
+
+  return {
+    person,
+    formatFromExtension: extension ? EXTENSION_FORMATS[extension] : null,
+    validPerson: true
+  };
+}
+
+function determineFormat(request, route) {
   const formatParam = new URL(request.url).searchParams.get("format");
   const accept = request.headers.get("Accept") || "";
 
   if (formatParam && FORMATS[formatParam]) return formatParam;
+  if (route?.formatFromExtension) return route.formatFromExtension;
   if (accept.includes("application/json")) return "json";
   if (accept.includes("text/html")) return "html";
   if (accept.includes("text/vcard") || accept.includes("text/x-vcard")) return "vcard";
@@ -42,6 +78,11 @@ function determineFormat(request) {
   if (accept.includes("image/jpeg")) return "jpeg";
   if (accept.includes("audio/wav")) return "wav";
   return "default";
+}
+
+function keyFor(person, format) {
+  const formatConfig = FORMATS[format];
+  return `${PEOPLE[person].path}/card.${formatConfig.ext}`;
 }
 
 function handleOptionsRequest() {
@@ -72,15 +113,23 @@ function handleOptionsRequest() {
 }
 
 function handleHelpRequest() {
-  const helpText = `Available formats:
-/card                (text)
-/card?format=json    (JSON)
-/card?format=html    (HTML)
-/card?format=vcard   (vCard)
-/card?format=wav     (Audio)
-/card?format=qrcode  (QR Code)
-/card?format=xml     (XML)
-/card?format=yaml    (YAML)`;
+  const helpText = `Available people:
+/card                 (Nate)
+/card/yuki            (Yuki)
+
+Available formats:
+/card                 (text)
+/card?format=json     (JSON)
+/card?format=html     (HTML)
+/card?format=vcard    (vCard)
+/card?format=wav      (Audio)
+/card?format=qrcode   (SVG)
+/card?format=xml      (XML)
+/card?format=yaml     (YAML)
+
+Extensions also work:
+/card.vcf
+/card/yuki.vcf`;
 
   return new Response(helpText, {
     headers: {
@@ -90,56 +139,63 @@ function handleHelpRequest() {
   });
 }
 
-async function handleWavRequest(key) {
-  const res = await fetch(`${S3_BASE_URL}/${key}`);
-  const audio = await res.arrayBuffer();
-
-  return new Response(audio, {
-    headers: {
-      ...COMMON_HEADERS,
-      "Content-Type": "audio/wav",
-      "Content-Encoding": "identity",
-      "Accept-Ranges": "bytes"
-    }
-  });
-}
-
-async function handleStandardRequest(key, contentType) {
+async function handleCardRequest(person, format) {
+  const { type } = FORMATS[format];
+  const key = keyFor(person, format);
   const response = await fetch(`${S3_BASE_URL}/${key}`);
   if (!response.ok) throw new Error(`Upstream ${response.status}`);
-  const body = await response.text();
 
-  return new Response(body, {
-    headers: {
-      ...COMMON_HEADERS,
-      "Content-Type": contentType
-    }
-  });
+  const headers = {
+    ...COMMON_HEADERS,
+    "Content-Type": type
+  };
+
+  if (format === "wav") {
+    headers["Content-Encoding"] = "identity";
+    headers["Accept-Ranges"] = "bytes";
+  }
+
+  return new Response(response.body, { headers });
 }
 
 export default {
   async fetch(request) {
-    const url = new URL(request.url);
+    const route = parseCardRoute(request);
 
-    if (request.method === "OPTIONS" && url.pathname === "/card") {
+    if (!route) {
+      return new Response("Not found", {
+        status: 404,
+        headers: {
+          ...COMMON_HEADERS,
+          "Content-Type": "text/plain"
+        }
+      });
+    }
+
+    if (!route.validPerson) {
+      return new Response(`Unknown business card: ${route.person}`, {
+        status: 404,
+        headers: {
+          ...COMMON_HEADERS,
+          "Content-Type": "text/plain"
+        }
+      });
+    }
+
+    if (request.method === "OPTIONS") {
       return handleOptionsRequest();
     }
 
-    const format = determineFormat(request);
-    const { key, type } = FORMATS[format];
+    const format = determineFormat(request, route);
 
     try {
       if (format === "help") {
         return handleHelpRequest();
       }
 
-      if (format === "wav") {
-        return handleWavRequest(key);
-      }
-
-      return await handleStandardRequest(key, type);
+      return await handleCardRequest(route.person, format);
     } catch (err) {
-      return new Response(`Error loading business card format (${format}): ${err.message}`, {
+      return new Response(`Error loading ${PEOPLE[route.person].name}'s business card format (${format}): ${err.message}`, {
         status: 500,
         headers: {
           ...COMMON_HEADERS,
@@ -148,4 +204,4 @@ export default {
       });
     }
   }
-}
+};
