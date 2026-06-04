@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Yuki Nishijima business card</title>
+  <desc id="desc">Business card for Yuki Nishijima, Rails Performance Consultant at Speedshop.</desc>
+  <rect width="1024" height="1024" fill="#f9f9f9"/>
+  <rect x="128" y="272" width="768" height="480" rx="32" fill="#ffffff" stroke="#dddddd" stroke-width="4"/>
+  <text x="512" y="430" text-anchor="middle" font-family="Times-Roman" font-size="64" fill="#222222">Yuki Nishijima</text>
+  <text x="512" y="510" text-anchor="middle" font-family="Times-Roman" font-size="36" fill="#666666">Rails Performance Consultant</text>
+  <text x="512" y="600" text-anchor="middle" font-family="Times-Roman" font-size="34" fill="#0066cc">yuki.nishijima@speedshop.co</text>
+  <text x="512" y="660" text-anchor="middle" font-family="Times-Roman" font-size="34" fill="#0066cc">speedshop.co</text>
+</svg>

@@ -1,0 +1,4 @@
+name = "card-worker"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+account_id = "15cd2c430b5d9f374541478e01428c1a"

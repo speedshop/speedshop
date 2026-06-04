@@ -1,0 +1,10 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Nishijima;Yuki;;;
+FN:Yuki Nishijima
+ORG:Speedshop
+TITLE:Rails Performance Consultant
+EMAIL;TYPE=INTERNET;TYPE=WORK:yuki.nishijima@speedshop.co
+URL;TYPE=WORK:https://speedshop.co
+NOTE:Makes Ruby on Rails apps fast.
+END:VCARD
