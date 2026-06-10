@@ -17,6 +17,7 @@ four-line-fridays.*
 index.*
 retainer.*
 rpw_checkout_success.*
+slack.*
 status.*
 vertical_debug.*
 
@@ -35,3 +36,4 @@ https://www.speedshop.co/assets/files/TuneWikiEdu.pdf
 https://www.speedshop.co/blog/
 https://www.speedshop.co/retainer.html
 https://www.speedshop.co/rpw_checkout_success.html
+https://www.speedshop.co/slack.html
