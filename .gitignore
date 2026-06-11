@@ -22,3 +22,6 @@ holidays.ics
 test-results/
 playwright-report/
 .wrangler/
+
+# CI canonical-env home and image cache
+.cache/
