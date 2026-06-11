@@ -129,6 +129,27 @@ test.describe('Newsletter signup popup', () => {
     await expect(popup).toHaveCount(0);
   });
 
+  test('popup initializes after pjax navigation from a non-post page to a post', async ({ page }) => {
+    // Set up timeout fast-forward
+    await page.addInitScript(() => {
+      const originalSetTimeout = window.setTimeout;
+      window.setTimeout = function(fn, delay, ...args) {
+        if (delay === 60000) {
+          return originalSetTimeout(fn, 100, ...args);
+        }
+        return originalSetTimeout(fn, delay, ...args);
+      };
+    });
+
+    await page.goto('/blog/', { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => document.querySelector('[data-pjax-state]') !== null);
+    await expect(page.locator('#innocuous')).toHaveCount(0);
+
+    await page.locator('a[href="/blog/announcing-apocrypha/"]').first().click({ noWaitAfter: true });
+    await expect(page).toHaveURL(/\/blog\/announcing-apocrypha\/$/);
+    await expect(page.locator('#innocuous')).toBeVisible({ timeout: 5000 });
+  });
+
   test('popup reappears after pjax navigation to new post', async ({ page }) => {
     // Set up timeout fast-forward
     await page.addInitScript(() => {
