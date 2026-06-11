@@ -14,7 +14,7 @@ test.describe('Quicklink + Pjax', () => {
       requestById.set(params.requestId, {
         url: params.request.url,
         type: params.type,
-        purpose: params.request.headers?.Purpose || params.request.headers?.purpose || null,
+        purpose: prefetchPurpose(params.request.headers),
         initiator: params.initiator?.type || null,
       });
     });
@@ -82,7 +82,52 @@ test.describe('Quicklink + Pjax', () => {
 
     expect(networkBackedRetainerRequests).toHaveLength(0);
   });
+
+  test('does not prefetch hash links for the current page while scrolling', async ({ page }) => {
+    const requestById = new Map();
+
+    await page.setViewportSize({ width: 1280, height: 900 });
+
+    const client = await page.context().newCDPSession(page);
+    await client.send('Network.enable');
+    await client.send('Network.setCacheDisabled', { cacheDisabled: true });
+
+    client.on('Network.requestWillBeSent', (params) => {
+      requestById.set(params.requestId, {
+        url: params.request.url,
+        type: params.type,
+        purpose: prefetchPurpose(params.request.headers),
+        initiator: params.initiator?.type || null,
+      });
+    });
+
+    await page.goto('/blog/performance-lessons-from-ao3/');
+    await page.waitForFunction(() => document.querySelector('[data-pjax-state]') !== null);
+
+    // quicklink runs after the browser is idle, then discovers more links as we scroll.
+    await page.waitForTimeout(3000);
+    for (let i = 0; i < 8; i += 1) {
+      await page.mouse.wheel(0, 800);
+      await page.waitForTimeout(250);
+    }
+    await page.waitForTimeout(1000);
+
+    const currentPageUrl = new URL(page.url());
+    currentPageUrl.hash = '';
+
+    const currentPagePrefetches = Array.from(requestById.values()).filter((request) => {
+      const requestUrl = new URL(request.url);
+      requestUrl.hash = '';
+      return requestUrl.href === currentPageUrl.href && isPrefetchRequest(request);
+    });
+
+    expect(currentPagePrefetches).toHaveLength(0);
+  });
 });
+
+function prefetchPurpose(headers) {
+  return headers?.Purpose || headers?.purpose || headers?.['Sec-Purpose'] || headers?.['sec-purpose'] || null;
+}
 
 function isPrefetchRequest(request) {
   return (
