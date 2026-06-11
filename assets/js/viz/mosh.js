@@ -41,7 +41,10 @@ vec3 q=p-vec3(0.,B,0.);q.xz*=rt(TH);
 vec3 pp=q;pp.xz*=rt(-TP);pp+=vec3(0.,BP,0.);
 mv=prj(p,ro)-prj(pp,ro);
 }
-vec4 prev=texture2D(P,fc/R-mv*R.y/(2.*R));
+vec2 dpx=mv*R.y*.5;
+float dm=length(dpx);
+if(dm>0.&&dm<1.)dpx/=dm;
+vec4 prev=texture2D(P,(fc-dpx)/R);
 float st=min(1.,prev.a+.005);
 vec3 col=prev.rgb*.9985;
 float n=hs(floor(fc/8.)+floor(T*30.)*.37);
