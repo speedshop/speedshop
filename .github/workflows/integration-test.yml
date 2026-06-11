@@ -28,6 +28,13 @@ jobs:
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
         persist-credentials: false
+    - name: Determine Ruby version
+      id: ruby
+      run: |
+        echo "version=$(awk -F'"' '/^ruby = / { print $2; exit }' mise.toml)" >> "$GITHUB_OUTPUT"
+    - uses: ./.github/actions/canonical-image
+      with:
+        ruby-version: ${{ steps.ruby.outputs.version }}
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: .cache/canonical-home

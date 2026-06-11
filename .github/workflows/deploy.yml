@@ -42,6 +42,9 @@ jobs:
         echo "Using Ruby $ruby_version from $ruby_source"
         echo "value=$ruby_version" >> "$GITHUB_OUTPUT"
         echo "source=$ruby_source" >> "$GITHUB_OUTPUT"
+    - uses: ./.github/actions/canonical-image
+      with:
+        ruby-version: ${{ steps.deploy_ruby.outputs.value }}
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: .cache/canonical-home
