@@ -7,8 +7,9 @@ import { boot as vizBoot } from './viz/core.js';
 
 function init() {
   // Initialize PJAX for smooth page transitions
+  // CSS is purged per-page, so the inline style must be swapped along with the body.
   new Pjax({
-    selectors: ["body"],
+    selectors: ["style#inline-css", "body"],
     cacheBust: false,
   });
 

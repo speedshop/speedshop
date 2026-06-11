@@ -32,6 +32,7 @@ test.describe('Quicklink + Pjax', () => {
     await page.waitForFunction(() => document.querySelector('[data-pjax-state]') !== null);
 
     const bodyBeforeClick = await page.locator('body').innerHTML();
+    const inlineCssBeforeClick = await page.locator('style#inline-css').textContent();
 
     // quicklink prefetch runs in requestIdleCallback (2s timeout by default)
     await page.waitForTimeout(3000);
@@ -61,6 +62,11 @@ test.describe('Quicklink + Pjax', () => {
     const bodyAfterClick = await page.locator('body').innerHTML();
     expect(bodyAfterClick).not.toEqual(bodyBeforeClick);
     expect(loadEventsAfterClick).toBe(0);
+
+    // CSS is purged per-page, so pjax must swap in the new page's inline style.
+    await expect(page.locator('style#inline-css')).toHaveCount(1);
+    const inlineCssAfterClick = await page.locator('style#inline-css').textContent();
+    expect(inlineCssAfterClick).not.toEqual(inlineCssBeforeClick);
 
     const retainerRequestsAfterClick = requests().filter((request) =>
       RETAINER_URL_PATTERN.test(request.url)
