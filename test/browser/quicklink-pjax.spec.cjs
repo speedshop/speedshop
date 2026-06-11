@@ -26,17 +26,21 @@ async function installPjaxEventRecorder(page) {
   return events;
 }
 
-async function startNetworkTracker(page) {
+async function startNetworkTracker(page, { cacheDisabled = false } = {}) {
   const requestById = new Map();
 
   const client = await page.context().newCDPSession(page);
   await client.send('Network.enable');
 
+  if (cacheDisabled) {
+    await client.send('Network.setCacheDisabled', { cacheDisabled: true });
+  }
+
   client.on('Network.requestWillBeSent', (params) => {
     requestById.set(params.requestId, {
       url: params.request.url,
       type: params.type,
-      purpose: params.request.headers?.Purpose || params.request.headers?.purpose || null,
+      purpose: prefetchPurpose(params.request.headers),
       initiator: params.initiator?.type || null,
     });
   });
@@ -254,7 +258,38 @@ test.describe('Quicklink + Pjax', () => {
     );
     expect(prefetchedFirstPost.length).toBeGreaterThan(0);
   });
+
+  test('does not prefetch hash links for the current page while scrolling', async ({ page }) => {
+    const requests = await startNetworkTracker(page, { cacheDisabled: true });
+
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/blog/performance-lessons-from-ao3/');
+    await waitForPjaxReady(page);
+
+    // quicklink runs after the browser is idle, then discovers more links as we scroll.
+    await page.waitForTimeout(3000);
+    for (let i = 0; i < 8; i += 1) {
+      await page.mouse.wheel(0, 800);
+      await page.waitForTimeout(250);
+    }
+    await page.waitForTimeout(1000);
+
+    const currentPageUrl = new URL(page.url());
+    currentPageUrl.hash = '';
+
+    const currentPagePrefetches = requests().filter((request) => {
+      const requestUrl = new URL(request.url);
+      requestUrl.hash = '';
+      return requestUrl.href === currentPageUrl.href && isPrefetchRequest(request);
+    });
+
+    expect(currentPagePrefetches).toHaveLength(0);
+  });
 });
+
+function prefetchPurpose(headers) {
+  return headers?.Purpose || headers?.purpose || headers?.['Sec-Purpose'] || headers?.['sec-purpose'] || null;
+}
 
 function isPrefetchRequest(request) {
   return (

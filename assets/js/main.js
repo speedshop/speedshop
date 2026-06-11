@@ -21,13 +21,28 @@ function init() {
     }
   });
 
+  var resetQuicklink = null;
+
+  function isCurrentPageLink(uri) {
+    var url = new URL(uri, window.location.href);
+    return url.origin === window.location.origin && url.pathname === window.location.pathname && url.search === window.location.search;
+  }
+
+  function initQuicklink() {
+    if (resetQuicklink) {
+      resetQuicklink();
+    }
+
+    resetQuicklink = quicklinkListen({
+      ignores: [isCurrentPageLink],
+    });
+  }
+
   // Initialize quicklink for prefetching
-  quicklinkListen();
+  initQuicklink();
 
   // Re-initialize quicklink after PJAX navigation
-  document.addEventListener('pjax:complete', function () {
-    quicklinkListen();
-  });
+  document.addEventListener('pjax:complete', initQuicklink);
 
   // Signup popup functionality
   function signup() {
