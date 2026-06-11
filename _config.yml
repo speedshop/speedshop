@@ -33,6 +33,7 @@ exclude:
    - Gemfile
    - Gemfile.lock
    - assets/js/main.js
+   - assets/js/viz/core.js
    - mise.toml
    - mise.lock
    - test
