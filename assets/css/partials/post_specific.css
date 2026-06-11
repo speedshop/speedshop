@@ -25,8 +25,8 @@
   }
 
   & h2 {
-    background: black;
-    color: white;
+    background: var(--color-secondary);
+    color: var(--color-initial);
     padding: var(--rhythm-main) 1rem;
     margin-left: -1rem;
     margin-bottom: var(--rhythm-main);
@@ -304,7 +304,7 @@
 .mailchimp {
   & .email {
     font-size: 1.6rem;
-    background: #FFF;
+    background: var(--color-initial);
     width: 250px;
   }
 }
@@ -318,7 +318,7 @@ div.innocuous {
   box-shadow: -10px -10px 20px rgba(0,0,0,0.15), 0 6px 6px rgba(0,0,0,0.20);
   bottom: -4px;
   right: -4px;
-  background-color: #fff;
+  background-color: var(--color-initial);
   border-top-left-radius: 6px;
   display: none;
 }
@@ -333,7 +333,7 @@ a.innocuous-close {
   letter-spacing: 1px;
   font-size: 1.2rem;
   text-transform: uppercase;
-  color: #00e;
+  color: var(--color-primary);
   cursor: pointer;
   user-select: none;
 }
@@ -372,12 +372,12 @@ div.innocuous input[type='email'] {
 }
 
 div.innocuous input[type='submit'] {
-  background-color: #0000EE;
-  color: #fff;
+  background-color: var(--color-primary);
+  color: var(--color-initial);
   max-width: 10rem;
   letter-spacing: 1px;
   font-size: .9rem;
-  border-color: #0000EE;
+  border-color: var(--color-primary);
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
 }

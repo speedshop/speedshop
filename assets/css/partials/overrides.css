@@ -5,7 +5,7 @@ a:visited {
 }
 
 .button:visited {
-  color: #FFF;
+  color: var(--color-initial);
 }
 
 ol {
@@ -79,7 +79,7 @@ a {
 }
 
 hr {
-  border-top: 0.1rem solid black;
+  border-top: 0.1rem solid var(--color-secondary);
 }
 
 /* Grid */
