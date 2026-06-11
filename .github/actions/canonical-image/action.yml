@@ -1,0 +1,48 @@
+name: Canonical image
+description: Restore the canonical devcontainer image from the cache, building and caching it on a miss
+
+inputs:
+  ruby-version:
+    description: Ruby version baked into the image
+    required: true
+  image:
+    description: Docker image tag for the canonical container
+    required: false
+    default: speedshop-devcontainer
+  platform:
+    description: Docker platform for the canonical container
+    required: false
+    default: linux/amd64
+
+runs:
+  using: composite
+  steps:
+  - name: Ensure image cache directory exists
+    shell: bash
+    run: mkdir -p .cache/canonical-image
+  # The tarball is stored uncompressed; actions/cache zstd-compresses it on
+  # save and restore, so gzipping here would only slow down `docker load`.
+  - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+    with:
+      path: .cache/canonical-image/${{ inputs.image }}.tar
+      key: ${{ runner.os }}-canonical-image-v2-${{ hashFiles('.devcontainer/Dockerfile') }}-ruby-${{ inputs.ruby-version }}
+  - name: Load or build canonical image
+    shell: bash
+    env:
+      CANONICAL_IMAGE: ${{ inputs.image }}
+      CANONICAL_PLATFORM: ${{ inputs.platform }}
+      CANONICAL_RUBY_VERSION: ${{ inputs.ruby-version }}
+    run: |
+      tarball=".cache/canonical-image/${CANONICAL_IMAGE}.tar"
+      if [ -f "$tarball" ]; then
+        docker load < "$tarball"
+      else
+        docker build \
+          --platform "$CANONICAL_PLATFORM" \
+          --target ci \
+          --build-arg "RUBY_VERSION=$CANONICAL_RUBY_VERSION" \
+          -f .devcontainer/Dockerfile \
+          -t "$CANONICAL_IMAGE" \
+          .
+        docker save "$CANONICAL_IMAGE" > "$tarball"
+      fi
