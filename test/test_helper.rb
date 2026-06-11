@@ -1,3 +1,4 @@
+require "digest"
 require "fileutils"
 require "net/http"
 require "rbconfig"
@@ -12,8 +13,31 @@ module TestHelper
   CONFIGURED_BASE_URL = ENV["BASE_URL"]
   DEFAULT_LOCAL_HOST = "127.0.0.1"
 
+  # Lives inside _site so Jekyll's cleaner deletes it on any build this
+  # helper didn't perform (such as the dev stack's `jekyll build -w`, whose
+  # drafts and dev config must not leak into tests), forcing a rebuild.
+  BUILD_FINGERPRINT_FILE = File.join(SITE_DIR, ".build-fingerprint")
+
   def self.ensure_site_built!
     return if @site_built
+
+    build_site! unless site_fresh?
+
+    wait_for_expected_site_files!
+    @site_built = true
+  end
+
+  # Reuse a previous build (e.g. from an earlier rake task in the same
+  # `mise run test` chain) when the sources that produced it are unchanged.
+  def self.site_fresh?
+    File.exist?(BUILD_FINGERPRINT_FILE) &&
+      File.read(BUILD_FINGERPRINT_FILE) == source_fingerprint
+  end
+
+  def self.build_site!
+    # Fingerprint the sources before building so an edit made while Jekyll
+    # runs invalidates the result.
+    fingerprint = source_fingerprint
 
     FileUtils.rm_rf(SITE_DIR)
 
@@ -22,7 +46,32 @@ module TestHelper
     end
 
     wait_for_expected_site_files!
-    @site_built = true
+    File.write(BUILD_FINGERPRINT_FILE, fingerprint) if fingerprint
+  end
+
+  # Digest of HEAD plus the path and content of every dirty or untracked
+  # file. nil when git is unavailable, so the fingerprint is never written
+  # and every run rebuilds, matching the old behavior.
+  def self.source_fingerprint
+    head = git_capture("rev-parse", "HEAD")
+    status = git_capture("status", "--porcelain=v1", "-z", "--untracked-files=all")
+    return unless head && status
+
+    digest = Digest::SHA256.new
+    digest << head << status
+
+    status.split("\0").each do |entry|
+      path = File.join(ROOT_DIR, entry[3..].to_s)
+      digest << Digest::SHA256.file(path).digest if File.file?(path)
+    end
+
+    digest.hexdigest
+  end
+
+  def self.git_capture(*args)
+    output = IO.popen(["git", "-C", ROOT_DIR, *args]) { |io| io.read }
+
+    output if $?.success?
   end
 
   def self.base_url
