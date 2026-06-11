@@ -52,11 +52,6 @@ function init() {
     signup();
   });
 
-  // Homepage logo visualization. main.js owns all the DOM and lifecycle
-  // specifics: where the canvas lives, desktop/reduced-motion media queries,
-  // visibility, resize, and pjax mount/unmount. The engine (viz/core.js)
-  // only knows how to resize, start, and stop itself on the canvas it is
-  // handed. The variant module fetch is kicked off in <head> (window.vizP).
   function viz() {
     var desktop = matchMedia('(min-width: 769px)');
     var reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -90,7 +85,6 @@ function init() {
       vizBoot(canvas, moduleP, function () {
         canvas.style.opacity = 1;
       }).then(function (engine) {
-        // Discard if pjax swapped the body while the module was loading.
         if (!engine || !document.contains(canvas)) {
           return;
         }

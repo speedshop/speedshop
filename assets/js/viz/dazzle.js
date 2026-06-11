@@ -1,5 +1,3 @@
-// Dazzle Interference: screen-space vs object-space B/W camo; the S is
-// visible only as pattern shear, with a leaked white keyframe every ~18s.
 export const make = ({ gl, mkProg, PRE, MARCH }) => {
   const prog = mkProg(PRE + `
 float mp(vec3 p){vec3 q=p;q.xz*=rt(T*.3);return lg(q);}` + MARCH + `

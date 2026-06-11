@@ -1,7 +1,3 @@
-// Shared core for the homepage logo visualizations (assets/js/viz/*).
-// Builds a signed distance field of the Speedshop S from its SVG path data at
-// runtime, then raymarches it in a fragment shader. No mesh, no library, no
-// downloaded assets. Kept compact: these bytes ship verbatim (.prettierignore).
 const N = 512;
 
 const PRE = `precision highp float;
@@ -53,7 +49,6 @@ const buildSDF = () => {
     x.fill();
   }
   const a = x.getImageData(0, 0, N, N).data;
-  // Two-pass chamfer distance transform, forward then backward.
   const dt = (d) => {
     for (const s of [1, -1]) {
       const lo = s > 0 ? 0 : N - 1, hi = s > 0 ? N : -1;
@@ -85,9 +80,6 @@ const buildSDF = () => {
   return sdf;
 };
 
-// The engine knows only the canvas it was handed. Mounting, page events,
-// pjax, and media queries are the caller's job (main.js); the instance
-// exposes resize/start/stop and nothing else.
 const run = (canvas, make, onFirstFrame) => {
   const gl = canvas.getContext('webgl', { antialias: false, alpha: false });
   if (!gl) return null;
@@ -110,7 +102,6 @@ const run = (canvas, make, onFirstFrame) => {
     const at = gl.getAttribLocation(pr, 'p');
     gl.enableVertexAttribArray(at);
     gl.vertexAttribPointer(at, 2, gl.FLOAT, false, 0, 0);
-    // Cache uniform locations once; per-frame lookups are wasted CPU.
     pr.u = {};
     for (let i = gl.getProgramParameter(pr, gl.ACTIVE_UNIFORMS) - 1; i >= 0; i--) {
       const nm = gl.getActiveUniform(pr, i).name;
@@ -118,7 +109,6 @@ const run = (canvas, make, onFirstFrame) => {
     }
     return pr;
   };
-  // Textures are pinned to fixed units so frames never rebind them.
   const mkTex = (unit, filt, wrap) => {
     const tex = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0 + unit);
@@ -137,7 +127,6 @@ const run = (canvas, make, onFirstFrame) => {
 
   let W = 0, H = 0, frameId = null, shown = false, still = false;
   const t0 = performance.now();
-  // Layout reads happen only here (on caller events), never in the frame loop.
   const resize = () => {
     const w = (canvas.clientWidth / 2) | 0, h = (canvas.clientHeight / 2) | 0;
     if (w < 1 || (w === W && h === H)) return;
@@ -164,8 +153,6 @@ const run = (canvas, make, onFirstFrame) => {
       frameId = null;
     }
   };
-  // start(true) renders a single static frame (reduced motion); start(false)
-  // runs the loop. Safe to call repeatedly with either value.
   const start = (asStill) => {
     still = !!asStill;
     if (frameId === null) frameId = requestAnimationFrame(frame);
@@ -173,7 +160,5 @@ const run = (canvas, make, onFirstFrame) => {
   return { resize, start, stop };
 };
 
-// Build a visualization instance on the given canvas from a variant module
-// promise. Resolves to the instance, or null when WebGL is unavailable.
 export const boot = (canvas, moduleP, onFirstFrame) =>
   moduleP.then((m) => run(canvas, m.make, onFirstFrame));

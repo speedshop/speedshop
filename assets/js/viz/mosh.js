@@ -1,6 +1,3 @@
-// I-Frame Funeral: 2s of clean spinning chrome per cycle, then the S is only
-// ever re-projected from the previous frame along its true motion vectors,
-// macroblock-quantized, until the next keyframe snaps in.
 export const make = ({ gl, mkProg, mkTex, PRE, MARCH }) => {
   const sim = mkProg(PRE + `
 uniform float K,TH,TP,B,BP;uniform sampler2D P;
@@ -58,7 +55,6 @@ void main(){gl_FragColor=vec4(texture2D(P,gl_FragCoord.xy/R).rgb,1.);}`);
   return {
     staticT: 15.708,
     resize(W, H) {
-      // Ping-pong feedback textures live on units 1 and 2.
       for (let i = 0; i < 2; i++) {
         const tex = mkTex(1 + i, gl.NEAREST, gl.CLAMP_TO_EDGE);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W, H, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
