@@ -157,28 +157,33 @@ layout: default
   <canvas id="sslogocanvas" style="display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 500ms"></canvas>
 </div>
 
-<script type="module" async="">
+<script>
   // One logo visualization per visit, fetched async (desktop only) from
   // /assets/js/viz/. The canvas fades in once the first frame renders.
-  const load = () => {
-    const viz = ['dazzle', 'mosh', 'xerox'][(Math.random() * 3) | 0];
-    import('/assets/js/viz/core.js');
-    import(`/assets/js/viz/${viz}.js`);
-  };
-  const dm = matchMedia('(min-width: 769px)');
-  let loaded = false;
-  const once = (e) => {
-    if (e.matches && !loaded) {
+  // Deliberately a classic script: pjax only re-executes untyped scripts
+  // after a body swap, and module evaluation is cached across navigations,
+  // so the modules export start() for us to call each time.
+  (() => {
+    const load = () => {
+      const viz = ['dazzle', 'mosh', 'xerox'][(Math.random() * 3) | 0];
+      import('/assets/js/viz/core.js');
+      import(`/assets/js/viz/${viz}.js`).then((m) => m.start());
+    };
+    const dm = matchMedia('(min-width: 769px)');
+    let loaded = false;
+    const once = (e) => {
+      if (e.matches && !loaded) {
+        loaded = true;
+        load();
+      }
+    };
+    if (dm.matches) {
       loaded = true;
       load();
+    } else if (dm.addEventListener) {
+      dm.addEventListener('change', once);
+    } else {
+      dm.addListener(once);
     }
-  };
-  if (dm.matches) {
-    loaded = true;
-    load();
-  } else if (dm.addEventListener) {
-    dm.addEventListener('change', once);
-  } else {
-    dm.addListener(once);
-  }
+  })();
 </script>

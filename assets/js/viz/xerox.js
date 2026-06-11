@@ -5,7 +5,7 @@
 // prefers-color-scheme: dark starts on the dark phase instead.
 import { run } from './core.js';
 
-run(({ gl, mkProg, mkTex, PRE, MARCH, SH }) => {
+export const start = () => run(({ gl, mkProg, mkTex, PRE, MARCH, SH }) => {
   const scene = mkProg(PRE + `
 float mp(vec3 p){
 vec3 q=p-vec3(0.,.4,0.);

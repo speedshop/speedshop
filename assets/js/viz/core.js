@@ -87,7 +87,9 @@ const buildSDF = () => {
 
 export const run = (make) => {
   const canvas = document.getElementById('sslogocanvas');
-  const gl = canvas && canvas.getContext('webgl', { antialias: false, alpha: false });
+  if (!canvas || canvas.dataset.viz) return;
+  canvas.dataset.viz = '1';
+  const gl = canvas.getContext('webgl', { antialias: false, alpha: false });
   if (!gl) return;
 
   const compile = (type, src) => {
@@ -174,12 +176,31 @@ export const run = (make) => {
       stop();
     }
   };
-  const listen = (q, f) => (q.addEventListener ? q.addEventListener('change', f) : q.addListener(f));
+  const offs = [];
+  const on = (t, e, f) => {
+    t.addEventListener(e, f);
+    offs.push(() => t.removeEventListener(e, f));
+  };
+  const listen = (q, f) => {
+    if (q.addEventListener) {
+      q.addEventListener('change', f);
+      offs.push(() => q.removeEventListener('change', f));
+    } else {
+      q.addListener(f);
+      offs.push(() => q.removeListener(f));
+    }
+  };
   listen(dm, sync);
   listen(rm, sync);
-  document.addEventListener('visibilitychange', sync);
-  addEventListener('resize', sync);
-  addEventListener('pagehide', stop);
-  document.addEventListener('pjax:send', stop, { once: true });
+  on(document, 'visibilitychange', sync);
+  on(window, 'resize', sync);
+  on(window, 'pagehide', stop);
+  // pjax swaps the body out from under us: stop drawing and drop every
+  // listener so this instance (and its canvas) can be collected. The
+  // re-executed bootstrap starts a fresh instance on the new canvas.
+  document.addEventListener('pjax:send', () => {
+    stop();
+    for (const f of offs) f();
+  }, { once: true });
   sync();
 };

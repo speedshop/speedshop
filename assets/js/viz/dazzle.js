@@ -2,7 +2,7 @@
 // visible only as pattern shear, with a leaked white keyframe every ~18s.
 import { run } from './core.js';
 
-run(({ gl, mkProg, PRE, MARCH }) => {
+export const start = () => run(({ gl, mkProg, PRE, MARCH }) => {
   const prog = mkProg(PRE + `
 float mp(vec3 p){vec3 q=p;q.xz*=rt(T*.3);return lg(q);}` + MARCH + `
 float dz(vec2 p,float seed){

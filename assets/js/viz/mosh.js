@@ -3,7 +3,7 @@
 // macroblock-quantized, until the next keyframe snaps in.
 import { run } from './core.js';
 
-run(({ gl, mkProg, mkTex, PRE, MARCH }) => {
+export const start = () => run(({ gl, mkProg, mkTex, PRE, MARCH }) => {
   const sim = mkProg(PRE + `
 uniform float K,TH,TP,B,BP;uniform sampler2D P;
 float mp(vec3 p){vec3 q=p-vec3(0.,B,0.);q.xz*=rt(TH);return lg(q);}` + MARCH + `
