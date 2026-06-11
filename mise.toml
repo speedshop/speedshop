@@ -1,4 +1,5 @@
-env_file = ".env"
+[env._]
+file = ".env"
 
 [settings.ruby]
 compile = false
