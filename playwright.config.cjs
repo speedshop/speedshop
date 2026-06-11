@@ -4,10 +4,10 @@ const { defineConfig } = require('@playwright/test');
 module.exports = defineConfig({
   testDir: './test/browser',
   testMatch: '**/*.spec.cjs',
-  fullyParallel: false,
+  fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: 1,
+  workers: process.env.CI ? 2 : undefined,
   reporter: 'list',
 
   use: {
