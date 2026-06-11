@@ -52,12 +52,81 @@ function init() {
     signup();
   });
 
-  // Homepage logo visualization (no-op on pages without the canvas)
-  vizBoot();
+  // Homepage logo visualization. main.js owns all the DOM and lifecycle
+  // specifics: where the canvas lives, desktop/reduced-motion media queries,
+  // visibility, resize, and pjax mount/unmount. The engine (viz/core.js)
+  // only knows how to resize, start, and stop itself on the canvas it is
+  // handed. The variant module fetch is kicked off in <head> (window.vizP).
+  function viz() {
+    var desktop = matchMedia('(min-width: 769px)');
+    var reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    var inst = null;
 
-  document.addEventListener('pjax:complete', function () {
-    vizBoot();
-  });
+    function listenMedia(q, f) {
+      if (q.addEventListener) {
+        q.addEventListener('change', f);
+      } else {
+        q.addListener(f);
+      }
+    }
+
+    function update() {
+      inst.resize();
+      if (desktop.matches && document.visibilityState !== 'hidden') {
+        inst.start(reduced.matches);
+      } else {
+        inst.stop();
+      }
+    }
+
+    function mount() {
+      var canvas = document.getElementById('sslogocanvas');
+      if (!canvas || canvas.dataset.viz || !window.vizLoad || !desktop.matches) {
+        return;
+      }
+      canvas.dataset.viz = '1';
+      var moduleP = window.vizP || window.vizLoad();
+      window.vizP = null;
+      vizBoot(canvas, moduleP, function () {
+        canvas.style.opacity = 1;
+      }).then(function (engine) {
+        // Discard if pjax swapped the body while the module was loading.
+        if (!engine || !document.contains(canvas)) {
+          return;
+        }
+        inst = engine;
+        update();
+      });
+    }
+
+    function sync() {
+      if (inst) {
+        update();
+      } else {
+        mount();
+      }
+    }
+
+    listenMedia(desktop, sync);
+    listenMedia(reduced, sync);
+    document.addEventListener('visibilitychange', sync);
+    window.addEventListener('resize', sync);
+    window.addEventListener('pagehide', function () {
+      if (inst) {
+        inst.stop();
+      }
+    });
+    document.addEventListener('pjax:send', function () {
+      if (inst) {
+        inst.stop();
+        inst = null;
+      }
+    });
+    document.addEventListener('pjax:complete', sync);
+    mount();
+  }
+
+  viz();
 
   document.documentElement.addEventListener('click', function (event) {
     if (event.target.id === "innocuous-close") {

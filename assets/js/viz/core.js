@@ -85,12 +85,12 @@ const buildSDF = () => {
   return sdf;
 };
 
-const run = (make) => {
-  const canvas = document.getElementById('sslogocanvas');
-  if (!canvas || canvas.dataset.viz) return;
-  canvas.dataset.viz = '1';
+// The engine knows only the canvas it was handed. Mounting, page events,
+// pjax, and media queries are the caller's job (main.js); the instance
+// exposes resize/start/stop and nothing else.
+const run = (canvas, make, onFirstFrame) => {
   const gl = canvas.getContext('webgl', { antialias: false, alpha: false });
-  if (!gl) return;
+  if (!gl) return null;
 
   const compile = (type, src) => {
     const sh = gl.createShader(type);
@@ -135,11 +135,9 @@ const run = (make) => {
 
   const viz = make({ gl, mkProg, mkTex, PRE, MARCH, SH });
 
-  let W = 0, H = 0, frameId = null, shown = false;
+  let W = 0, H = 0, frameId = null, shown = false, still = false;
   const t0 = performance.now();
-  const dm = matchMedia('(min-width: 769px)');
-  const rm = matchMedia('(prefers-reduced-motion: reduce)');
-  // Layout reads happen only here (on events), never in the frame loop.
+  // Layout reads happen only here (on caller events), never in the frame loop.
   const resize = () => {
     const w = (canvas.clientWidth / 2) | 0, h = (canvas.clientHeight / 2) | 0;
     if (w < 1 || (w === W && h === H)) return;
@@ -153,11 +151,10 @@ const run = (make) => {
   const frame = (now) => {
     frameId = null;
     if (W < 1) return;
-    const still = rm.matches;
     viz.draw(still ? viz.staticT : (now - t0) / 1000, still);
     if (!shown) {
       shown = true;
-      canvas.style.opacity = 1;
+      if (onFirstFrame) onFirstFrame();
     }
     if (!still) frameId = requestAnimationFrame(frame);
   };
@@ -167,66 +164,16 @@ const run = (make) => {
       frameId = null;
     }
   };
-  const sync = () => {
-    resize();
-    const on = dm.matches && document.visibilityState !== 'hidden';
-    if (on && frameId === null) {
-      frameId = requestAnimationFrame(frame);
-    } else if (!on) {
-      stop();
-    }
+  // start(true) renders a single static frame (reduced motion); start(false)
+  // runs the loop. Safe to call repeatedly with either value.
+  const start = (asStill) => {
+    still = !!asStill;
+    if (frameId === null) frameId = requestAnimationFrame(frame);
   };
-  const offs = [];
-  const on = (t, e, f) => {
-    t.addEventListener(e, f);
-    offs.push(() => t.removeEventListener(e, f));
-  };
-  const listen = (q, f) => {
-    if (q.addEventListener) {
-      q.addEventListener('change', f);
-      offs.push(() => q.removeEventListener('change', f));
-    } else {
-      q.addListener(f);
-      offs.push(() => q.removeListener(f));
-    }
-  };
-  listen(dm, sync);
-  listen(rm, sync);
-  on(document, 'visibilitychange', sync);
-  on(window, 'resize', sync);
-  on(window, 'pagehide', stop);
-  // pjax swaps the body out from under us: stop drawing and drop every
-  // listener so this instance (and its canvas) can be collected. The
-  // re-executed bootstrap starts a fresh instance on the new canvas.
-  document.addEventListener('pjax:send', () => {
-    stop();
-    for (const f of offs) f();
-  }, { once: true });
-  sync();
+  return { resize, start, stop };
 };
 
-// Entry point, bundled into app.js. The variant module fetch is kicked off
-// ASAP by an inline <head> script (window.vizP); we consume that promise or
-// start our own (pjax return visits, mobile-to-desktop resizes).
-export const boot = () => {
-  const canvas = document.getElementById('sslogocanvas');
-  if (!canvas || canvas.dataset.viz || !window.vizLoad) return;
-  const go = () => {
-    const p = window.vizP || window.vizLoad();
-    window.vizP = null;
-    p.then((m) => run(m.make));
-  };
-  const dm = matchMedia('(min-width: 769px)');
-  if (dm.matches) {
-    go();
-    return;
-  }
-  const f = (e) => {
-    if (!e.matches) return;
-    if (dm.removeEventListener) dm.removeEventListener('change', f);
-    else dm.removeListener(f);
-    go();
-  };
-  if (dm.addEventListener) dm.addEventListener('change', f);
-  else dm.addListener(f);
-};
+// Build a visualization instance on the given canvas from a variant module
+// promise. Resolves to the instance, or null when WebGL is unavailable.
+export const boot = (canvas, moduleP, onFirstFrame) =>
+  moduleP.then((m) => run(canvas, m.make, onFirstFrame));
