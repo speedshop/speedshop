@@ -1,7 +1,8 @@
 // Xerox of a Xerox: the scene quantized to 1 bit through a Bayer matrix three
 // times — one drifting plate per channel. Sunburst is composited after the
-// degradation so it always spins. prefers-color-scheme: dark inverts to a
-// white S on black.
+// degradation so it always spins. Polarity alternates every 12s generation
+// (black S on white, then white S on black, equal time each);
+// prefers-color-scheme: dark starts on the dark phase instead.
 import { run } from './core.js';
 
 run(({ gl, mkProg, mkTex, PRE, MARCH, SH }) => {
@@ -60,7 +61,9 @@ vec3 col=vec3(
 step(th,plate(tuv+px*vec2(sin(T*.6),cos(T*.83)),g)),
 step(th,plate(tuv+px*vec2(sin(T*.71+2.1),cos(T*.55+1.3)),g)),
 step(th,plate(tuv+px*vec2(sin(T*.64+4.2),cos(T*.77+2.6)),g)));
-float inv=abs(step(11.8,cyc)-DK);
+float inv=mod(floor(T/12.),2.);
+inv=abs(inv-step(11.8,cyc));
+inv=abs(inv-DK);
 col=mix(col,1.-col,inv);
 gl_FragColor=vec4(col,1.);}`);
   // Scrolltext texture (unit 1): real text, rendered once, sine-displaced.
