@@ -2,6 +2,7 @@ require "fileutils"
 require "json"
 
 require_relative "four_line_archive_generator"
+require_relative "sla_reply_histogram"
 
 module Speedshop
   module GenerateDataDefaults
@@ -18,7 +19,19 @@ module Speedshop
           "last_90_days" => 0,
           "last_6_months" => 0
         },
-        "days" => {}
+        "days" => {},
+        "reply_histogram" => {
+          "count" => 0,
+          "bin_width_hours" => 0,
+          "max_hours" => nil,
+          "percentiles" => {
+            "p50" => nil,
+            "p75" => nil,
+            "p95" => nil,
+            "p99" => nil
+          },
+          "bins" => []
+        }
       }
     end
 
@@ -60,7 +73,16 @@ module Speedshop
       payload["days"] = Hash(payload["days"] || {}).each_with_object({}) do |(date, status), filtered_days|
         filtered_days[date] = status if date >= visible_start_date
       end
+      payload["reply_histogram"] ||= Speedshop::GenerateDataDefaults.sla_status.fetch("reply_histogram")
 
+      File.write(path, "#{JSON.pretty_generate(payload)}\n")
+    end
+
+    def merge_reply_histogram!(path, stats)
+      return unless File.exist?(path)
+
+      payload = JSON.parse(File.read(path))
+      payload["reply_histogram"] = stats
       File.write(path, "#{JSON.pretty_generate(payload)}\n")
     end
   end
@@ -76,6 +98,7 @@ Jekyll::Hooks.register :site, :after_init do |site|
   availability_path = File.join(data_dir, "availability.json")
   four_line_archive_path = File.join(data_dir, "four_line_archive.json")
   holidays_path = File.join(site.source, "holidays.ics")
+  histogram_path = File.join(site.source, Speedshop::SlaReplyHistogram::DEFAULT_OUTPUT_PATH)
 
   fallback_client_notes_path = File.expand_path("../client_notes", site.source)
   archive_source_path = if client_notes_path && Dir.exist?(client_notes_path)
@@ -93,6 +116,7 @@ Jekyll::Hooks.register :site, :after_init do |site|
     File.write(sla_status_path, "#{JSON.pretty_generate(Speedshop::GenerateDataDefaults.sla_status)}\n") unless File.exist?(sla_status_path)
     File.write(availability_path, "#{JSON.pretty_generate(Speedshop::GenerateDataDefaults.availability)}\n") unless File.exist?(availability_path)
     File.write(holidays_path, Speedshop::GenerateDataDefaults.holidays_ics) unless File.exist?(holidays_path)
+    Speedshop::SlaReplyHistogram.write_placeholder(histogram_path)
     Speedshop::SlaStatusData.normalize_file!(sla_status_path)
     next
   end
@@ -115,5 +139,11 @@ Jekyll::Hooks.register :site, :after_init do |site|
     end
   end
 
+  histogram_stats = Speedshop::SlaReplyHistogram.generate(
+    client_notes_path: client_notes_path,
+    output_path: histogram_path,
+    cutoff_date: Speedshop::SlaStatusData::CUTOFF_DATE
+  )
+  Speedshop::SlaStatusData.merge_reply_histogram!(sla_status_path, histogram_stats)
   Speedshop::SlaStatusData.normalize_file!(sla_status_path)
 end
