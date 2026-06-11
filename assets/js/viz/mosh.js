@@ -1,9 +1,7 @@
 // I-Frame Funeral: 2s of clean spinning chrome per cycle, then the S is only
 // ever re-projected from the previous frame along its true motion vectors,
 // macroblock-quantized, until the next keyframe snaps in.
-import { run } from './core.js';
-
-export const start = () => run(({ gl, mkProg, mkTex, PRE, MARCH }) => {
+export const make = ({ gl, mkProg, mkTex, PRE, MARCH }) => {
   const sim = mkProg(PRE + `
 uniform float K,TH,TP,B,BP;uniform sampler2D P;
 float mp(vec3 p){vec3 q=p-vec3(0.,B,0.);q.xz*=rt(TH);return lg(q);}` + MARCH + `
@@ -98,4 +96,4 @@ void main(){gl_FragColor=vec4(texture2D(P,gl_FragCoord.xy/R).rgb,1.);}`);
       cur = 1 - cur;
     },
   };
-});
+};

@@ -31,6 +31,15 @@
   <link rel="canonical" href="{{ seo_canonical_url }}">
   <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | absolute_url }}">
 
+  <script>
+    // Homepage logo visualization loader. Defined on every page so pjax
+    // navigations to the homepage can start a viz; the eager fetch below
+    // only happens on the homepage itself, as early as possible.
+    window.vizLoad = function () {
+      return import('/assets/js/viz/' + ['dazzle', 'mosh', 'xerox'][(Math.random() * 3) | 0] + '.js');
+    };
+    {% if page.url == "/" %}window.vizP = matchMedia('(min-width: 769px)').matches ? window.vizLoad() : null;{% endif %}
+  </script>
   <script src="/assets/js/app.js" async></script>
 
   {% include icons.html %}

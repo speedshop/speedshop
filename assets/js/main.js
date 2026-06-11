@@ -3,6 +3,7 @@
 
 import Pjax from 'pjax';
 import { listen as quicklinkListen } from 'quicklink';
+import { boot as vizBoot } from './viz/core.js';
 
 function init() {
   // Initialize PJAX for smooth page transitions
@@ -49,6 +50,13 @@ function init() {
 
   document.addEventListener('pjax:complete', function () {
     signup();
+  });
+
+  // Homepage logo visualization (no-op on pages without the canvas)
+  vizBoot();
+
+  document.addEventListener('pjax:complete', function () {
+    vizBoot();
   });
 
   document.documentElement.addEventListener('click', function (event) {

@@ -3,9 +3,7 @@
 // degradation so it always spins. Polarity alternates every 12s generation
 // (black S on white, then white S on black, equal time each);
 // prefers-color-scheme: dark starts on the dark phase instead.
-import { run } from './core.js';
-
-export const start = () => run(({ gl, mkProg, mkTex, PRE, MARCH, SH }) => {
+export const make = ({ gl, mkProg, mkTex, PRE, MARCH, SH }) => {
   const scene = mkProg(PRE + `
 float mp(vec3 p){
 vec3 q=p-vec3(0.,.4,0.);
@@ -109,4 +107,4 @@ gl_FragColor=vec4(col,1.);}`);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     },
   };
-});
+};

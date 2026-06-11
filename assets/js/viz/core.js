@@ -4,7 +4,7 @@
 // downloaded assets. Kept compact: these bytes ship verbatim (.prettierignore).
 const N = 512;
 
-export const PRE = `precision highp float;
+const PRE = `precision highp float;
 uniform float T;uniform vec2 R;uniform sampler2D D;
 mat2 rt(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}
 float hs(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5);}
@@ -17,7 +17,7 @@ float lg(vec3 p){
 vec2 w=vec2(sd2(p.xy),abs(p.z)-.18);
 return(min(max(w.x,w.y),0.)+length(max(w,0.)))*.7;}`;
 
-export const MARCH = `
+const MARCH = `
 vec3 nm(vec3 p){
 vec2 e=vec2(.006,0.);
 return normalize(vec3(mp(p+e.xyy)-mp(p-e.xyy),mp(p+e.yxy)-mp(p-e.yxy),mp(p+e.yyx)-mp(p-e.yyx)));}
@@ -30,7 +30,7 @@ t+=d;
 if(t>mx)return-1.;}
 return-1.;}`;
 
-export const SH = `
+const SH = `
 float sh(vec3 p,vec3 l){
 float r=1.,t=.06;
 for(int i=0;i<20;i++){
@@ -85,7 +85,7 @@ const buildSDF = () => {
   return sdf;
 };
 
-export const run = (make) => {
+const run = (make) => {
   const canvas = document.getElementById('sslogocanvas');
   if (!canvas || canvas.dataset.viz) return;
   canvas.dataset.viz = '1';
@@ -203,4 +203,30 @@ export const run = (make) => {
     for (const f of offs) f();
   }, { once: true });
   sync();
+};
+
+// Entry point, bundled into app.js. The variant module fetch is kicked off
+// ASAP by an inline <head> script (window.vizP); we consume that promise or
+// start our own (pjax return visits, mobile-to-desktop resizes).
+export const boot = () => {
+  const canvas = document.getElementById('sslogocanvas');
+  if (!canvas || canvas.dataset.viz || !window.vizLoad) return;
+  const go = () => {
+    const p = window.vizP || window.vizLoad();
+    window.vizP = null;
+    p.then((m) => run(m.make));
+  };
+  const dm = matchMedia('(min-width: 769px)');
+  if (dm.matches) {
+    go();
+    return;
+  }
+  const f = (e) => {
+    if (!e.matches) return;
+    if (dm.removeEventListener) dm.removeEventListener('change', f);
+    else dm.removeListener(f);
+    go();
+  };
+  if (dm.addEventListener) dm.addEventListener('change', f);
+  else dm.addListener(f);
 };
