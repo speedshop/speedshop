@@ -31,7 +31,7 @@ if(t>0.){vec3 p=ro+rd*t;col=chrome(p,nm(p),rd);}
 gl_FragColor=vec4(col,0.);
 return;
 }
-vec2 bc=(floor(fc/16.)+.5)*16.;
+vec2 bc=(floor(fc/8.)+.5)*8.;
 vec3 rd=normalize(vec3((2.*bc-R)/R.y,-1.8));
 float t=cst(ro,rd);
 vec2 mv=vec2(0.);
@@ -44,9 +44,9 @@ mv=prj(p,ro)-prj(pp,ro);
 vec4 prev=texture2D(P,fc/R-mv*R.y/(2.*R));
 float st=min(1.,prev.a+.005);
 vec3 col=prev.rgb*.9985;
-float n=hs(floor(fc/16.)+floor(T*30.)*.37);
+float n=hs(floor(fc/8.)+floor(T*30.)*.37);
 if(n>.994&&st>.05&&dot(col,col)>.02){
-col=.5+.5*cos(6.2832*hs(floor(fc/16.)+floor(T*30.))+vec3(0.,2.1,4.2));
+col=.5+.5*cos(6.2832*hs(floor(fc/8.)+floor(T*30.))+vec3(0.,2.1,4.2));
 }
 gl_FragColor=vec4(col,st);}`);
   const show = mkProg(`precision highp float;
