@@ -34,6 +34,14 @@ sitemap: false
 
       <div class="status-calendar" id="status-calendar"></div>
 
+      <div class="status-section sla-histogram-section">
+        <h3>Hours Until Reply</h3>
+        <p>I clear my inbox to zero once per day and track the time this occurs. The chart below graphs the time between inbox zero events, and so represents the worst possible reply latency you could have received that day. Often I respond faster than this, but I don't track individual replies (yet). Business hours are 5:00-13:00 Japan time; weekends and Japanese holidays excluded.</p>
+        <object class="sla-histogram" data="/assets/generated/sla-reply-histogram.svg" type="image/svg+xml" width="900" height="420" aria-label="Histogram of business hours until reply with p50, p75, p95, p99, and 24-hour SLA lines">
+          <img src="/assets/generated/sla-reply-histogram.svg" alt="Histogram of business hours until reply with p50, p75, p95, p99, and 24-hour SLA lines">
+        </object>
+      </div>
+
       <p class="status-updated">Last updated: {{ site.data.sla_status.generated_at }}</p>
 
       <div class="status-section">

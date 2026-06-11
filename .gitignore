@@ -15,6 +15,7 @@ node_modules
 
 # Generated build data artifacts
 _data/
+assets/generated/
 holidays.ics
 
 # Playwright test output
