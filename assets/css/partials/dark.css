@@ -1,0 +1,75 @@
+/* Dark mode - follows system preference, no toggle */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --color-initial: #000;
+    --color-primary: #9e9eff;
+    --color-secondary: #fff;
+    --color-tertiary: #1a1a1a;
+    --color-quaternary: #555;
+    --color-quinary: #333;
+  }
+
+  body {
+    background-color: var(--color-initial);
+  }
+
+  a:visited {
+    color: #d0adf0;
+  }
+
+  .post .toc {
+    background: var(--color-tertiary);
+
+    & a {
+      color: #bbb;
+    }
+  }
+
+  .highlight {
+    filter: invert(1) hue-rotate(180deg);
+  }
+
+  .hero {
+    background-color: var(--color-tertiary);
+  }
+
+  .hero-content {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+
+  #viz canvas {
+    filter: invert(1);
+  }
+
+  .summary {
+    background: var(--color-quinary);
+  }
+
+  div.innocuous {
+    border-color: var(--color-quaternary);
+  }
+
+  div.innocuous h4,
+  div.innocuous p {
+    color: #ccc;
+  }
+
+  img[src$="speedshop_s.svg"] {
+    filter: brightness(0) invert(1);
+  }
+
+  .calendar-month h4,
+  .status-updated,
+  .stat-label,
+  .four-line-result-count,
+  .four-line-no-results,
+  .four-line-meta {
+    color: #999;
+  }
+
+  .four-line-result {
+    border-top-color: var(--color-quinary);
+  }
+}
