@@ -12,6 +12,7 @@ node_modules
 .DS_Store
 .terraform.lock.hcl
 .env
+mise.lock
 
 # Generated build data artifacts
 _data/
