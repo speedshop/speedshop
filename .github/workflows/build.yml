@@ -28,7 +28,7 @@ jobs:
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: .cache/canonical-home
-        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
+        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', '.devcontainer/Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-canonical-home-v1-
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
@@ -63,7 +63,7 @@ jobs:
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: .cache/canonical-home
-        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
+        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', '.devcontainer/Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-canonical-home-v1-
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
@@ -100,7 +100,7 @@ jobs:
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: .cache/canonical-home
-        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', 'mise.lock', '.devcontainer/Dockerfile') }}
+        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', '.devcontainer/Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-canonical-home-v1-
     - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
