@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
-    "esbuild": "^0.27.2",
+    "esbuild": "^0.28.1",
     "prettier": "^3.8.1",
     "purgecss": "^8.0.0",
     "wrangler": "^4.76.0"
