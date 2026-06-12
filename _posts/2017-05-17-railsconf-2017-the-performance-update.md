@@ -30,7 +30,7 @@ There was some discussion at the conference that, eventually, the load path cach
 
 I gave a workshop entitled "Front End Performance for Full-Stack Developers". The idea was to give an introduction to using Chrome's Developer Tools to profile and diagnose problems with first page load experiences.
 
-I thought it went *okay* - on conference wifi, many of the pages I had planned to use as examples suddenly had far far different load behaviors than what I had practiced with, so I felt a little lost! However, it must have gone *okay*, as [Richard](https://twitter.com/schneems) managed to [halve CodeTriage's paint times](https://github.com/codetriage/codetriage/pull/540) by marking his Javascript bundle as `async`.
+I thought it went *okay* - on conference wifi, many of the pages I had planned to use as examples suddenly had far far different load behaviors than what I had practiced with, so I felt a little lost! However, it must have gone *okay*, as Richard managed to [halve CodeTriage's paint times](https://github.com/codetriage/codetriage/pull/540) by marking his Javascript bundle as `async`.
 
 ## Application Server Performance
 
@@ -77,11 +77,11 @@ class NonThreadSafeMiddleware
 end
 ```
 
-A interesting way to surface these problems is to just `freeze` everything in all of your Rack middlewares. In the example above, `@state += 1` would now blow up and return a RuntimeError, rather than just silently adding incorrectly in a multithreaded app. That's exactly what [rack-freeze](https://github.com/ioquatix/rack-freeze) does (which is where the example above is from). [Hat-tip to @schneems](https://twitter.com/schneems) for bringing this up.
+A interesting way to surface these problems is to just `freeze` everything in all of your Rack middlewares. In the example above, `@state += 1` would now blow up and return a RuntimeError, rather than just silently adding incorrectly in a multithreaded app. That's exactly what [rack-freeze](https://github.com/ioquatix/rack-freeze) does (which is where the example above is from). Hat-tip to @schneems for bringing this up.
 
 ## snip_snip
 
-When talking to [Kevin Deisz](https://twitter.com/kddeisz) in the hallway (I don't recall what about), he told me about his gem called [`snip_snip`](https://github.com/kddeisz/snip_snip). Many of you have probably tried `bullet` at some point - [`bullet`](https://github.com/flyerhzm/bullet)'s job is to help you find N+1 queries in your app.
+When talking to Kevin Deisz in the hallway (I don't recall what about), he told me about his gem called [`snip_snip`](https://github.com/kddeisz/snip_snip). Many of you have probably tried `bullet` at some point - [`bullet`](https://github.com/flyerhzm/bullet)'s job is to help you find N+1 queries in your app.
 
 `snip_snip` is sort of similar, but it looks for database columns which you `SELECT`ed but didn't use. For example:
 
@@ -151,11 +151,11 @@ Basically, the number one problem I see when consulting on people's applications
 
 ## Performance Panel
 
-On the last day of the conference, Sam Saffron hosted a panel on performance with [Richard](https://twitter.com/schneems), [Eileen](https://twitter.com/eileencodes), [Rafael](https://twitter.com/rafaelfranca) and myself. [Here's the video.](http://confreaks.tv/videos/railsconf2017-panel-performance-performance)
+On the last day of the conference, Sam Saffron hosted a panel on performance with Richard, [Eileen](https://twitter.com/eileencodes), [Rafael](https://twitter.com/rafaelfranca) and myself. [Here's the video.](http://confreaks.tv/videos/railsconf2017-panel-performance-performance)
 
 Attenddee Savannah made this cool mind-mappy-thing:
 
-<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr">the penultimate talk: a panel on performance with <a href="https://twitter.com/nateberkopec">@nateberkopec</a> <a href="https://twitter.com/rafaelfranca">@rafaelfranca</a> <a href="https://twitter.com/samsaffron">@samsaffron</a> <a href="https://twitter.com/schneems">@schneems</a> <a href="https://twitter.com/eileencodes">@eileencodes</a> <a href="https://twitter.com/hashtag/railsconf?src=hash">#railsconf</a> <a href="https://t.co/srRe4ebPSW">pic.twitter.com/srRe4ebPSW</a></p>&mdash; savannah (@Savannahdworth) <a href="https://twitter.com/Savannahdworth/status/857735502274768896">April 27, 2017</a></blockquote>
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr">the penultimate talk: a panel on performance with <a href="https://twitter.com/nateberkopec">@nateberkopec</a> <a href="https://twitter.com/rafaelfranca">@rafaelfranca</a> <a href="https://twitter.com/samsaffron">@samsaffron</a> @schneems <a href="https://twitter.com/eileencodes">@eileencodes</a> <a href="https://twitter.com/hashtag/railsconf?src=hash">#railsconf</a> <a href="https://t.co/srRe4ebPSW">pic.twitter.com/srRe4ebPSW</a></p>&mdash; savannah (@Savannahdworth) <a href="https://web.archive.org/web/20220717220423/https://twitter.com/Savannahdworth/status/857735502274768896">April 27, 2017</a></blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ## More Performance Talks
