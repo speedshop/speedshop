@@ -97,7 +97,7 @@ Web applications are not like this. Fundamentally, 90% of them are simple CRUD a
 
 ### Ruby is Slow, so More Ruby is Slower
 
-{% marginnote_lazy hashtables.png|[Mike Perham](https://twitter.com/mperham/status/884126933255995392). And, ultimately, most of Ruby's internals boil down to hash tables, so...|true %}
+{% marginnote_lazy hashtables.png|[Mike Perham](https://web.archive.org/web/20190502061737/https://twitter.com/mperham/status/884126933255995392). And, ultimately, most of Ruby's internals boil down to hash tables, so...|true %}
 Ruby isn't a fast language. So, if you execute less of it, you'll have a faster benchmark result.
 
 Feature-rich frameworks like Rails have a *lot* of code, and execute a lot more on each request because they are *doing more stuff*.
