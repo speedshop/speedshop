@@ -484,6 +484,21 @@ header {
   margin: calc(var(--rhythm-main) * 2) 0;
 }
 
+.threadpilot-feature-row + .threadpilot-pricing-section {
+  margin-top: calc((var(--rhythm-main) * 2) - 1rem);
+}
+
+@media screen and (max-width: 639px) {
+  .threadpilot-feature-row {
+    gap: var(--rhythm-main);
+    margin-bottom: var(--rhythm-main);
+  }
+
+  .threadpilot-feature-row + .threadpilot-pricing-section {
+    margin-top: calc(var(--rhythm-main) * 2);
+  }
+}
+
 .threadpilot-pricing-list {
   display: flex;
   flex-direction: column;
