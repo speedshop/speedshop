@@ -349,12 +349,16 @@ header {
 }
 
 .threadpilot-hero {
-  margin-bottom: calc(var(--rhythm-main) * 2);
+  margin-bottom: 0;
   padding: var(--rhythm-main) 1rem;
 }
 
+.threadpilot-hero .row:last-child p {
+  margin-bottom: 0;
+}
+
 .threadpilot-logo-row {
-  margin-bottom: calc(var(--rhythm-main) * 2);
+  margin-bottom: var(--rhythm-main);
 }
 
 .threadpilot-centered {
@@ -365,7 +369,11 @@ header {
   padding-top: var(--rhythm-main);
 }
 
-.threadpilot-used-by-row,
+.threadpilot-used-by-row {
+  margin-bottom: 0;
+  padding-bottom: var(--rhythm-main);
+}
+
 .threadpilot-feature-row,
 .threadpilot-chart-row {
   margin-bottom: var(--rhythm-main);
