@@ -18,8 +18,10 @@ So, what does it mean that not much has changed in the Rails performance world?
 
 This tweet put me in an introspective mood this morning:
 
-<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">It is profoundly sad how Rails has institutionalized a &quot;nobody cares&quot; attitude toward performance. <a href="https://t.co/UhzvxyLjuz">https://t.co/UhzvxyLjuz</a></p>&mdash; Jeff Atwood (@codinghorror) <a href="https://twitter.com/codinghorror/status/1002448764630470656?ref_src=twsrc%5Etfw">June 1, 2018</a></blockquote>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<blockquote>
+<p>It is profoundly sad how Rails has institutionalized a &quot;nobody cares&quot; attitude toward performance. <a href="https://t.co/UhzvxyLjuz">https://t.co/UhzvxyLjuz</a></p>
+<p>&mdash; Jeff Atwood (@codinghorror), June 1, 2018</p>
+</blockquote>
 
 To summarize, Jeff's cofounder, Sam Saffron (who I interviewed for the CGRP), wrote a great, in-depth blog post about memory use in ActiveRecord. In short, Sam finds that ActiveRecord creates excessive amounts of objects, even when doing simple and supposedly "optimized" work. Sam posted a proof-of-concept patch which improves this quite a bit.
 
