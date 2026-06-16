@@ -299,8 +299,8 @@ main {
 
 .sales-testimonials {
   background-color: #DDD;
-  margin: 2em -100em;
-  padding: 2em 100em;
+  margin: var(--rhythm-main) -100em;
+  padding: var(--rhythm-main) 100em;
 }
 
 /* Simple button spinner */
@@ -348,6 +348,62 @@ header {
   margin-bottom: 7rem;
 }
 
+.threadpilot-hero {
+  margin-bottom: calc(var(--rhythm-main) * 2);
+  padding: var(--rhythm-main) 1rem;
+}
+
+.threadpilot-logo-row {
+  margin-bottom: calc(var(--rhythm-main) * 2);
+}
+
+.threadpilot-centered {
+  text-align: center;
+}
+
+.threadpilot-intro-row {
+  padding-top: var(--rhythm-main);
+}
+
+.threadpilot-used-by-row,
+.threadpilot-feature-row,
+.threadpilot-chart-row {
+  margin-bottom: var(--rhythm-main);
+}
+
+.threadpilot-chart-heading,
+.threadpilot-chart-note {
+  text-align: center;
+}
+
+.threadpilot-chart-note {
+  color: #666;
+}
+
+.threadpilot-chart {
+  display: block;
+  height: calc(var(--rhythm-main) * 6);
+  image-rendering: pixelated;
+  width: 100%;
+}
+
+.threadpilot-chart-caption {
+  color: #666;
+  font-size: 1.6rem;
+  height: calc(var(--rhythm-main) * 2);
+  line-height: var(--rhythm-main);
+  margin-top: 0;
+  overflow: hidden;
+}
+
+.threadpilot-chart-static {
+  color: #e45858;
+}
+
+.threadpilot-chart-adaptive {
+  color: #3b82f6;
+}
+
 .card {
   box-shadow: #ccc 2px 2px 10px 0px;
   border: 1px solid #bbb;
@@ -369,10 +425,10 @@ header {
 
 .threadpilot-button {
   border-radius: 0;
-  font-size: 2.4rem;
-  line-height: 1.2;
+  font-size: 2.2rem;
+  line-height: var(--rhythm-main);
   min-width: 24rem;
-  padding: 2rem 3rem;
+  padding: calc((var(--rhythm-main) - 0.2rem) / 2) 3rem;
 
   @media screen and (max-width: 639px) {
     width: 100%;
@@ -381,21 +437,21 @@ header {
 }
 
 .threadpilot-pricing-section {
-  margin: 6rem 0;
+  margin: calc(var(--rhythm-main) * 2) 0;
 }
 
 .threadpilot-pricing-list {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--rhythm-main);
 }
 
 .threadpilot-pricing-card {
   display: flex;
   align-items: flex-start;
-  gap: 3rem;
+  gap: var(--rhythm-main);
   margin-left: 0 !important;
-  padding: 3rem !important;
+  padding: calc(var(--rhythm-main) - 0.1rem) !important;
 
   @media screen and (max-width: 639px) {
     flex-direction: column;
@@ -420,15 +476,17 @@ header {
 }
 
 .threadpilot-pricing-card h3 {
-  font-size: 2.6rem;
-  margin-bottom: 1rem;
+  font-size: 2.4rem;
+  line-height: var(--rhythm-main);
+  margin-bottom: 0;
 }
 
 .threadpilot-price {
   font-family: 'Helvetica Neue', Inter, Roboto, 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
   font-size: 4rem;
   font-weight: 700;
-  margin-bottom: 2rem;
+  line-height: calc(var(--rhythm-main) * 2);
+  margin-bottom: var(--rhythm-main);
   text-align: right;
 
   @media screen and (max-width: 639px) {
@@ -448,6 +506,7 @@ header {
 
 .threadpilot-feature-card {
   margin-left: 0 !important;
+  padding: calc(var(--rhythm-main) - 0.1rem) !important;
 }
 
 @media screen and (max-width: 639px) {
@@ -456,7 +515,7 @@ header {
   }
 
   .threadpilot-feature-card {
-    margin: 0 0 2rem 0 !important;
+    margin: 0 0 var(--rhythm-main) 0 !important;
     width: 100%;
   }
 

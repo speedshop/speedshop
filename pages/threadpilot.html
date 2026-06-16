@@ -5,37 +5,37 @@ summary: "Threadpilot automatically adjusts your Ruby application's thread count
 permalink: /threadpilot.html
 ---
 
-<header class="fancy-ruby" style="padding-top:4rem">
+<header class="fancy-ruby threadpilot-hero">
   <div class="container container-narrow">
-    <div class="row" style="margin-bottom:6rem">
+    <div class="row threadpilot-logo-row">
       <div class="column column-20">
         {% include speedshop_wordmark.svg %}
       </div>
     </div>
 
     <div class="row">
-      <div class="column" style="text-align: center">
-        <p>For high-scale Ruby and Rails applications</p>
+      <div class="column threadpilot-centered">
+        <p>For high-throughput Ruby and Rails applications:</p>
       </div>
     </div>
 
     <div class="row">
-      <div class="column" style="text-align: center">
-        <h1>Stop guessing your thread counts.</h1>
-        <p>Automated tuning for Puma and Sidekiq, adjusted continuously at runtime as your workload changes.</p>
+      <div class="column threadpilot-centered">
+        <h1>Thread count?<br>Stop guessing.</h1>
+        <p>Thread-pool auto-tuning for <b>Puma</b> and <b>Sidekiq</b>,<br> adjusted dynamically at runtime.</p>
       </div>
     </div>
   </div>
 </header>
 
-<div class="container container-narrow">
-  <div class="row" style="padding: 2rem 0; text-align: center;">
-    <div class="column">
+<div class="container container-narrow threadpilot-page">
+  <div class="row threadpilot-intro-row">
+    <div class="column threadpilot-centered">
       <p>From @yuki24 (Ruby Core) and @nateberkopec (Puma maintainer, author Complete Guide to Rails Performance)</p>
     </div>
   </div>
-  <div class="row" style="padding-bottom: 2rem; text-align: center;">
-    <div class="column">
+  <div class="row threadpilot-used-by-row">
+    <div class="column threadpilot-centered">
       <p>Used by:</p>
       [CLIENT LOGOS: Recognizable names only.]
     </div>
@@ -128,7 +128,7 @@ permalink: /threadpilot.html
     </div>
   </div>
 
-  <div class="row threadpilot-feature-row" style="padding-bottom:2rem">
+  <div class="row threadpilot-feature-row">
     <div class="column card threadpilot-feature-card">
       <h4>Automatic tuning for Puma</h4>
       <p>Never set <code>threads 5, 5</code> ever again. High-IO and high-CPU workloads will instead get the optimal number based on their actual performance at runtime.</p>
@@ -138,7 +138,7 @@ permalink: /threadpilot.html
       <p>Sidekiq workloads in particular can vary significantly in their IO characteristics. PDF generation, CSV and JSON parsing can all need low thread counts as they bottleneck on CPU, but HTTP request to 3rd parties may want 25 thread or more. </p>
     </div>
   </div>
-  <div class="row threadpilot-feature-row" style="padding-bottom:2rem">
+  <div class="row threadpilot-feature-row">
     <div class="column card threadpilot-feature-card">
       <h4>Evaluated daily in synthetic benchmarks</h4>
       <p>Speedshop tests the Threadpilot implentation daily against a wide variety of synthetic benchmark scenarios so that our own algorithm performs optimally in all possible situations and workloads.</p>
@@ -167,43 +167,43 @@ permalink: /threadpilot.html
   <div class="sales-testimonials">
     <div class="row">
       <div class="column">
-        <h3 style="text-align:center; margin-bottom: 0.5rem;">Benchmark: Mixed Puma Workload Over 60 Minutes</h3>
-        <p style="text-align:center; font-size: 0.9em; color: #666; margin-bottom: 2rem;">
+        <h3 class="threadpilot-chart-heading">Benchmark: Mixed Puma Workload Over 60 Minutes</h3>
+        <p class="threadpilot-chart-note">
           Synthetic benchmark: alternating CPU-heavy and IO-heavy request phases. 8-core VM, PostgreSQL, Redis, 4 Puma workers.
         </p>
       </div>
     </div>
-    <div class="row" style="gap: 1rem; margin-bottom: 2rem;">
+    <div class="row threadpilot-chart-row">
       <div class="column">
         <div style="position:relative;">
-          <canvas id="chart-threads" style="width:100%; height:180px; image-rendering:pixelated;"></canvas>
-          <div style="font-size:0.8em; color:#666; margin-top:0.25rem;">
+          <canvas id="chart-threads" class="threadpilot-chart"></canvas>
+          <div class="threadpilot-chart-caption">
             <strong>Thread count over time</strong> —
-            <span style="color:#e45858;">Static (5 threads)</span> vs
-            <span style="color:#3b82f6;">Threadpilot (adaptive)</span>
+            <span class="threadpilot-chart-static">Static (5 threads)</span> vs
+            <span class="threadpilot-chart-adaptive">Threadpilot (adaptive)</span>
           </div>
         </div>
       </div>
     </div>
-    <div class="row" style="gap: 1rem; margin-bottom: 2rem;">
+    <div class="row threadpilot-chart-row">
       <div class="column">
         <div style="position:relative;">
-          <canvas id="chart-latency" style="width:100%; height:180px; image-rendering:pixelated;"></canvas>
-          <div style="font-size:0.8em; color:#666; margin-top:0.25rem;">
+          <canvas id="chart-latency" class="threadpilot-chart"></canvas>
+          <div class="threadpilot-chart-caption">
             <strong>p99 latency (ms)</strong> —
-            <span style="color:#e45858;">Static</span> vs
-            <span style="color:#3b82f6;">Threadpilot</span>.
+            <span class="threadpilot-chart-static">Static</span> vs
+            <span class="threadpilot-chart-adaptive">Threadpilot</span>.
             Lower is better.
           </div>
         </div>
       </div>
       <div class="column">
         <div style="position:relative;">
-          <canvas id="chart-throughput" style="width:100%; height:180px; image-rendering:pixelated;"></canvas>
-          <div style="font-size:0.8em; color:#666; margin-top:0.25rem;">
+          <canvas id="chart-throughput" class="threadpilot-chart"></canvas>
+          <div class="threadpilot-chart-caption">
             <strong>Throughput (req/s)</strong> —
-            <span style="color:#e45858;">Static</span> vs
-            <span style="color:#3b82f6;">Threadpilot</span>.
+            <span class="threadpilot-chart-static">Static</span> vs
+            <span class="threadpilot-chart-adaptive">Threadpilot</span>.
             Higher is better.
           </div>
         </div>
@@ -407,7 +407,7 @@ permalink: /threadpilot.html
   {% include threadpilot_pricing_comparison.html heading="Pricing" %}
 
   <div class="row">
-    <div class="column" style="text-align: center;">
+    <div class="column threadpilot-centered">
       <h3>Guarantee</h3>
       <p>If you're not seeing the benefit once you deploy Threadpilot and want your money back, we'll refund you immediately. No deadline, no questions.</p>
     </div>
