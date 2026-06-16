@@ -303,6 +303,15 @@ main {
   padding: var(--rhythm-main) 100em;
 }
 
+.sales-testimonials .row {
+  margin-bottom: var(--rhythm-main);
+}
+
+.sales-testimonials .row:last-child,
+.sales-testimonials p {
+  margin-bottom: 0;
+}
+
 /* Simple button spinner */
 button {
   &.loading {
@@ -389,6 +398,10 @@ header {
 .threadpilot-used-by-row {
   margin-bottom: 0;
   padding-bottom: var(--rhythm-main);
+}
+
+.threadpilot-product-row {
+  margin-top: var(--rhythm-main);
 }
 
 .threadpilot-feature-row {
@@ -539,6 +552,10 @@ header {
   margin: 0 !important;
   min-width: 0;
   padding: calc(var(--rhythm-main) - 0.1rem) !important;
+}
+
+.threadpilot-feature-card p:last-child {
+  margin-bottom: 0;
 }
 
 .fancy-ruby {
