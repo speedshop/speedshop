@@ -358,7 +358,24 @@ header {
 }
 
 .threadpilot-logo-row {
+  height: calc(var(--rhythm-main) * 2);
   margin-bottom: var(--rhythm-main);
+}
+
+.threadpilot-logo-row .column {
+  align-self: flex-end;
+  line-height: 0;
+  margin-bottom: 0;
+}
+
+.threadpilot-logo-row svg {
+  display: block;
+}
+
+@media screen and (max-width: 639px) {
+  .threadpilot-logo-row {
+    justify-content: flex-end;
+  }
 }
 
 .threadpilot-centered {
@@ -374,7 +391,13 @@ header {
   padding-bottom: var(--rhythm-main);
 }
 
-.threadpilot-feature-row,
+.threadpilot-feature-row {
+  gap: 1rem;
+  margin-bottom: 1rem;
+  margin-left: 0;
+  width: 100%;
+}
+
 .threadpilot-chart-row {
   margin-bottom: var(--rhythm-main);
 }
@@ -513,23 +536,9 @@ header {
 }
 
 .threadpilot-feature-card {
-  margin-left: 0 !important;
+  margin: 0 !important;
+  min-width: 0;
   padding: calc(var(--rhythm-main) - 0.1rem) !important;
-}
-
-@media screen and (max-width: 639px) {
-  .threadpilot-feature-row {
-    padding-bottom: 0 !important;
-  }
-
-  .threadpilot-feature-card {
-    margin: 0 0 var(--rhythm-main) 0 !important;
-    width: 100%;
-  }
-
-  .threadpilot-feature-row:last-of-type .threadpilot-feature-card:last-child {
-    margin-bottom: 0 !important;
-  }
 }
 
 .fancy-ruby {
