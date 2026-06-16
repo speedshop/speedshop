@@ -19,7 +19,6 @@ retainer.*
 rpw_checkout_success.*
 slack.*
 status.*
-vertical_debug.*
 
 [files]
 feed.xml
