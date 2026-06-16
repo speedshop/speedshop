@@ -8,6 +8,9 @@
     <main class="" aria-label="Content">
       {{ content }}
     </main>
+    {% if site.url contains 'localhost' %}
+      {% include vertical_debug_overlay.html %}
+    {% endif %}
   </body>
 
 </html>

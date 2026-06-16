@@ -23,6 +23,7 @@ markdown: kramdown
 kramdown:
   auto_ids: true
 encoding: utf-8
+vertical_debug: false
 exclude:
    - _h2o
    - _scripts
