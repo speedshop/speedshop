@@ -9,72 +9,72 @@ permalink: /retainer.html
 
 <div class="container">
   <div class="row" style="margin-top: 3.5rem">
-    <div id="viz">
-      <canvas id="demo" style="width: 100%; height: 400px; background: #fff;"></canvas>
-      <script>
-      (() => {
-          const c = document.getElementById('demo');
-          const x = c.getContext('2d');
-          c.width = c.offsetWidth;
-          c.height = c.offsetHeight;
-          let t = 0;
+    <div class="hero-content retainer-hero-content">
+      <img src="/assets/icons/speedshop_s.svg" alt="Speedshop">
+      <div id="viz" class="retainer-title-viz">
+        <canvas id="demo" aria-hidden="true"></canvas>
+        <h1>
+          Performance monitoring, roadmapping, and support.<br>100% managed by Speedshop.
+        </h1>
+        <script>
+        (() => {
+            const canvas = document.getElementById('demo');
+            const context = canvas.getContext('2d');
+            let t = 0;
 
-          function draw() {
-              t += 0.001; // Reduced from 0.01 to 0.001 (10x slower)
-              x.fillStyle = "#fff";
-              x.fillRect(0, 0, c.width, c.height);
+            function resize() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
 
-              const w = c.width,
-                  h = c.height;
-              const cx = w / 2,
-                  cy = h / 2;
+            function draw() {
+                t += 0.001;
+                context.fillStyle = "#fff";
+                context.fillRect(0, 0, canvas.width, canvas.height);
 
-              // 3D rotation matrices
-              const s = Math.sin(t),
-                  co = Math.cos(t);
-              const s2 = Math.sin(t * 0.7),
-                  co2 = Math.cos(t * 0.7);
+                const w = canvas.width,
+                    h = canvas.height;
+                const cx = w / 2,
+                    cy = h / 2;
 
-              for (let i = 0; i < 5000; i++) {
-                  let px = (i % 15) * 60 - 450;
-                  let py = Math.floor(i / 15) % 15 * 60 - 450;
-                  let pz = Math.floor(i / 225) * 40 - 500;
+                const s = Math.sin(t),
+                    co = Math.cos(t);
+                const s2 = Math.sin(t * 0.7),
+                    co2 = Math.cos(t * 0.7);
 
-                  // 3D rotation
-                  let rx = px * co - pz * s;
-                  let ry = py * co2 - (px * s + pz * co) * s2;
-                  let rz = (px * s + pz * co) * co2 + py * s2;
+                for (let i = 0; i < 5000; i++) {
+                    let px = (i % 15) * 60 - 450;
+                    let py = Math.floor(i / 15) % 15 * 60 - 450;
+                    let pz = Math.floor(i / 225) * 40 - 500;
 
-                  // Perspective projection
-                  let d = 600 / (rz + 600);
-                  let x1 = cx + rx * d;
-                  let y1 = cy + ry * d;
+                    let rx = px * co - pz * s;
+                    let ry = py * co2 - (px * s + pz * co) * s2;
+                    let rz = (px * s + pz * co) * co2 + py * s2;
 
-                  // Fractal pattern based on coordinates
-                  if ((Math.floor(px / 20) & Math.floor(py / 20) & Math.floor(pz / 20)) === 0) {
-                      const size = 2 + 3 * d;
-                      x.fillStyle = `rgba(0,0,0,${0.3*d})`;
-                      x.fillRect(x1 - size / 2, y1 - size / 2, size, size);
-                  }
-              }
+                    let d = 600 / (rz + 600);
+                    let x1 = cx + rx * d;
+                    let y1 = cy + ry * d;
 
-              requestAnimationFrame(draw);
-          }
+                    if ((Math.floor(px / 20) & Math.floor(py / 20) & Math.floor(pz / 20)) === 0) {
+                        const size = 2 + 3 * d;
+                        context.fillStyle = `rgba(0,0,0,${0.3*d})`;
+                        context.fillRect(x1 - size / 2, y1 - size / 2, size, size);
+                    }
+                }
 
-          window.addEventListener('resize', () => {
-              c.width = c.offsetWidth;
-              c.height = c.offsetHeight;
-          });
+                requestAnimationFrame(draw);
+            }
 
-          draw();
-      })();
-      </script>
-    </div>
-    <div class="hero-content">
-      <img src="/assets/icons/speedshop_s.svg" >
-      <h2>
-        Performance monitoring, roadmapping, and support.<br>100% managed by Speedshop.
-      </h2>
+            if (window.ResizeObserver) {
+                new ResizeObserver(resize).observe(canvas.parentElement);
+            }
+            window.addEventListener('resize', resize);
+
+            resize();
+            draw();
+        })();
+        </script>
+      </div>
     </div>
   </div>
 

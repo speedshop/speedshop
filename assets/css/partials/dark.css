@@ -39,7 +39,11 @@
     background-color: rgba(0, 0, 0, 0.7);
   }
 
-  #viz canvas {
+  .retainer-hero-content {
+    background: transparent;
+  }
+
+  .retainer-title-viz canvas {
     filter: invert(1);
   }
 
