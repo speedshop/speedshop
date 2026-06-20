@@ -16,6 +16,6 @@
     "esbuild": "^0.27.2",
     "prettier": "^3.8.1",
     "purgecss": "^8.0.0",
-    "wrangler": "^4.76.0"
+    "wrangler": "^4.103.0"
   }
 }
