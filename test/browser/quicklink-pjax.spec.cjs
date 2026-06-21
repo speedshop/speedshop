@@ -42,6 +42,9 @@ async function startNetworkTracker(page, { cacheDisabled = false } = {}) {
       type: params.type,
       purpose: prefetchPurpose(params.request.headers),
       initiator: params.initiator?.type || null,
+      xPjax: params.request.headers?.['X-PJAX'] ||
+        params.request.headers?.['x-pjax'] ||
+        null,
     });
   });
 
@@ -257,6 +260,39 @@ test.describe('Quicklink + Pjax', () => {
       FIRST_BLOG_POST_URL_PATTERN.test(request.url) && isPrefetchRequest(request)
     );
     expect(prefetchedFirstPost.length).toBeGreaterThan(0);
+  });
+
+  test('uses prefetched blog post HTML for pjax clicks from the blog index', async ({ page }) => {
+    const events = await installPjaxEventRecorder(page);
+    const requests = await startNetworkTracker(page);
+
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/blog/');
+    await waitForPjaxReady(page);
+
+    // The first several blog posts are visible, so the first post should be prefetched.
+    await page.waitForTimeout(3000);
+
+    const prefetchedFirstPost = requests().filter((request) =>
+      FIRST_BLOG_POST_URL_PATTERN.test(request.url) && isPrefetchRequest(request)
+    );
+    expect(prefetchedFirstPost.length).toBeGreaterThan(0);
+
+    const firstPostRequestCountBeforeClick = requests().filter((request) =>
+      FIRST_BLOG_POST_URL_PATTERN.test(request.url)
+    ).length;
+
+    await page.locator('a[href="/blog/performance-lessons-from-ao3/"]').first().click();
+    await expect(page).toHaveURL(FIRST_BLOG_POST_URL_PATTERN, { timeout: 5000 });
+    await expect(page.locator('body')).toContainText('Organization for Transformative Works Performance Audit');
+    expect(events.map((event) => event.name)).toEqual(['pjax:send', 'pjax:complete', 'pjax:success']);
+
+    const firstPostRequestsAfterClick = requests().filter((request) =>
+      FIRST_BLOG_POST_URL_PATTERN.test(request.url)
+    );
+    const extraFirstPostRequests = firstPostRequestsAfterClick.slice(firstPostRequestCountBeforeClick);
+
+    expect(extraFirstPostRequests).toHaveLength(0);
   });
 
   test('does not prefetch hash links for the current page while scrolling', async ({ page }) => {
