@@ -7,6 +7,10 @@ author:
   url: https://www.nateberkopec.com/
 twitter:
   username: nateberkopec
+structured_data:
+  site_name: Speedshop
+  blog_name: The Speedshop Ruby on Rails Performance Blog
+  blog_description: Ruby on Rails performance articles from Speedshop about profiling, optimization, scaling, memory, and web performance.
 description: >
   Speedshop is a Ruby on Rails performance consultancy that
   optimizes the full stack - frontend, backend and environment - to generate

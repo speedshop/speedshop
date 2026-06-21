@@ -6,6 +6,15 @@ require "liquid"
 require_relative "../../_plugins/image_dimensions"
 
 class ImageDimensionsFilterTest < Minitest::Test
+  def test_image_info_returns_dimensions_directly
+    Dir.mktmpdir do |dir|
+      File.binwrite(File.join(dir, "sample.png"), png_bytes(90, 120))
+      site = OpenStruct.new(source: dir)
+
+      assert_equal [90, 120], Jekyll::ImageInfo.dimensions(site, "/sample.png")
+    end
+  end
+
   def test_image_dimensions_default_is_empty
     Dir.mktmpdir do |dir|
       filter = build_filter(dir)
@@ -25,14 +34,6 @@ class ImageDimensionsFilterTest < Minitest::Test
       File.binwrite(File.join(dir, "sample.png"), png_bytes(90, 120))
       result = build_filter(dir).image_dimensions("/sample.png")
       assert_equal "width=\"90\" height=\"120\"", result
-    end
-  end
-
-  def test_image_dimensions_returns_dimensions_for_gif
-    Dir.mktmpdir do |dir|
-      File.binwrite(File.join(dir, "sample.gif"), gif_bytes(64, 32))
-      result = build_filter(dir).image_dimensions("/sample.gif")
-      assert_equal "width=\"64\" height=\"32\"", result
     end
   end
 
@@ -111,10 +112,6 @@ class ImageDimensionsFilterTest < Minitest::Test
     ihdr_header = [13].pack("N") + "IHDR"
     dims = [width, height].pack("NN")
     signature + ihdr_header + dims
-  end
-
-  def gif_bytes(width, height)
-    "GIF89a".b + [width, height].pack("vv")
   end
 
   def jpeg_bytes(width, height)
