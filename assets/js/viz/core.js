@@ -80,7 +80,7 @@ const buildSDF = () => {
   return sdf;
 };
 
-const run = (canvas, make, onFirstFrame) => {
+const runGL = (canvas, make, onFirstFrame) => {
   const gl = canvas.getContext('webgl', { antialias: false, alpha: false });
   if (!gl) return null;
 
@@ -123,7 +123,7 @@ const run = (canvas, make, onFirstFrame) => {
   mkTex(0, gl.LINEAR, gl.CLAMP_TO_EDGE);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, N, N, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, buildSDF());
 
-  const viz = make({ gl, mkProg, mkTex, PRE, MARCH, SH });
+  const viz = make({ canvas, gl, mkProg, mkTex, PRE, MARCH, SH });
 
   let W = 0, H = 0, frameId = null, shown = false, still = false;
   const t0 = performance.now();
@@ -160,5 +160,41 @@ const run = (canvas, make, onFirstFrame) => {
   return { resize, start, stop };
 };
 
+const run2D = (canvas, make, onFirstFrame) => {
+  const viz = make({ canvas });
+  if (!viz) return null;
+
+  let W = 0, H = 0, frameId = null, shown = false, still = false, t0 = 0;
+  const resize = () => {
+    const scale = Math.min(devicePixelRatio || 1, 1.25);
+    const w = Math.max(1, (canvas.clientWidth * scale) | 0);
+    const h = Math.max(1, (canvas.clientHeight * scale) | 0);
+    if (w === W && h === H) return;
+    W = canvas.width = w;
+    H = canvas.height = h;
+    if (viz.resize) viz.resize(W, H);
+  };
+  const frame = (now) => {
+    frameId = null;
+    resize();
+    viz.draw(still ? (viz.staticT || 0) : (now - t0) / 1000, still);
+    if (!shown) {
+      shown = true;
+      if (onFirstFrame) onFirstFrame();
+    }
+    if (!still) frameId = requestAnimationFrame(frame);
+  };
+  const stop = () => {
+    if (frameId !== null) cancelAnimationFrame(frameId);
+    frameId = null;
+  };
+  const start = (asStill) => {
+    still = !!asStill;
+    if (!t0) t0 = performance.now();
+    if (frameId === null) frameId = requestAnimationFrame(frame);
+  };
+  return { resize, start, stop };
+};
+
 export const boot = (canvas, moduleP, onFirstFrame) =>
-  moduleP.then((m) => run(canvas, m.make, onFirstFrame));
+  moduleP.then((m) => (m.canvas2d ? run2D : runGL)(canvas, m.make, onFirstFrame));
