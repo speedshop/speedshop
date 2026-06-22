@@ -84,8 +84,9 @@ test.describe('Quicklink + Pjax', () => {
     expect(prefetchesForRetainer.length).toBeGreaterThan(0);
     expect(prefetchesForRetainer.some((request) => /[?&]t=/.test(request.url))).toBe(false);
 
+    const pageOrigin = new URL(page.url()).origin;
     const externalPrefetches = requests().filter((request) =>
-      isPrefetchRequest(request) && new URL(request.url).host !== 'localhost:4000'
+      isPrefetchRequest(request) && new URL(request.url).origin !== pageOrigin
     );
     expect(externalPrefetches).toHaveLength(0);
 

@@ -81,8 +81,7 @@ test.describe('Newsletter signup popup', () => {
     await page.context().addCookies([{
       name: 'nateberkopecShowSignup',
       value: 'true',
-      domain: 'localhost',
-      path: '/',
+      url: 'http://127.0.0.1',
     }]);
 
     // Fast-forward the timeout
