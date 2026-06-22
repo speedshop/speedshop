@@ -4,6 +4,27 @@ const { test, expect } = require('@playwright/test');
 const VISUALIZATIONS = ['dazzle', 'xerox', 'ttt'];
 
 test.describe('Homepage visualization', () => {
+  test('keeps the wordmark inside the content column with larger default fonts', async ({ page }) => {
+    await page.setViewportSize({ width: 1394, height: 1110 });
+    await page.goto('/?viz=ttt');
+    await page.addStyleTag({ content: 'html { font-size: 125% !important; }' });
+
+    const bounds = await page.evaluate(() => {
+      const svg = document.querySelector('.home-wordmark svg');
+      const column = document.querySelector('.home-page .column');
+      const bar = document.querySelector('#big-black-bar');
+
+      return {
+        svgRight: svg.getBoundingClientRect().right,
+        columnRight: column.getBoundingClientRect().right,
+        barLeft: bar.getBoundingClientRect().left,
+      };
+    });
+
+    expect(bounds.svgRight).toBeLessThanOrEqual(bounds.columnRight);
+    expect(bounds.svgRight).toBeLessThanOrEqual(bounds.barLeft);
+  });
+
   for (const name of VISUALIZATIONS) {
     test(`loads ${name} from the viz query parameter without boot errors`, async ({ page }) => {
       const errors = [];
