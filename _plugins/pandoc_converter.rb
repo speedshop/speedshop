@@ -1,6 +1,8 @@
 require "fileutils"
 
 Jekyll::Hooks.register :site, :post_write do |site|
+  next if ENV["SKIP_PANDOC"] == "1"
+
   post_paths = Dir["#{site.dest}/**/*"].select { |p| p.end_with?(".html") }
   next if post_paths.empty?
 

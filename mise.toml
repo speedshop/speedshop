@@ -56,6 +56,10 @@ run = "pitchfork start -l --force"
 description = "Stop the local development stack"
 run = "pitchfork stop jekyll static worker"
 
+[tasks.serve]
+description = "Serve the local development stack with HTTPS"
+run = "pitchfork start -l --force && pitchfork logs jekyll static worker --tail"
+
 [tasks.lint]
 description = "Run all linters"
 run = "bundle exec standardrb"
