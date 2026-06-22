@@ -16,3 +16,10 @@
   --rhythm-side: 1.65rem;
   --rhythm-mobile: 2.1rem;
 }
+
+@media (max-width: 544px) {
+  :root {
+    --rhythm-main: var(--rhythm-mobile);
+    --rhythm-side: calc(var(--rhythm-mobile) / 2);
+  }
+}

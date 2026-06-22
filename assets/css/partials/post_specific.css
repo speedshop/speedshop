@@ -34,9 +34,9 @@
   }
 
   & h3 {
-    margin-top: calc(var(--rhythm-main) * 1.5); /* 1.5 units top */
-    margin-bottom: calc(var(--rhythm-main) / 2); /* 0.5 units bottom = 2 units total */
-    line-height: 1.65; /* 4.0rem * 1.65 = 6.6rem (2 rhythm units) */
+    margin-top: var(--rhythm-main);
+    margin-bottom: var(--rhythm-main);
+    line-height: var(--rhythm-main);
   }
 
   & h4 {
@@ -52,8 +52,8 @@
   }
 
   & h6 {
-    margin-top: calc(var(--rhythm-main) / 2); /* 0.5 units top */
-    margin-bottom: 0; /* 0 bottom = 0.5 units total */
+    margin-top: var(--rhythm-main);
+    margin-bottom: 0;
     line-height: 2.2; /* 1.5rem * 2.2 = 3.3rem (1 rhythm unit) */
   }
 
@@ -135,17 +135,17 @@
     }
 
     & h3 {
-      font-size: 1.9rem;
-      line-height: 1.105; /* 1.9rem * 1.105 = 2.1rem (1 rhythm unit) */
-      margin-top: calc(var(--rhythm-mobile) * 1.5); /* 1.5 units top */
-      margin-bottom: calc(var(--rhythm-mobile) / 2); /* 0.5 units bottom = 3 units total */
+      font-size: 2.1rem;
+      line-height: var(--rhythm-main);
+      margin-top: var(--rhythm-main);
+      margin-bottom: var(--rhythm-main);
     }
 
     & h4 {
       font-size: 1.6rem;
       line-height: 1.3125; /* 1.6rem * 1.3125 = 2.1rem (1 rhythm unit) */
-      margin-top: calc(var(--rhythm-mobile) * 1.5); /* 1.5 units top */
-      margin-bottom: calc(var(--rhythm-mobile) / 2); /* 0.5 units bottom = 3 units total */
+      margin-top: var(--rhythm-main);
+      margin-bottom: 0;
     }
 
     & h5 {
@@ -290,8 +290,8 @@
       & h4 {
         font-size: 1.6rem;
         line-height: 1.3125; /* 1.6rem * 1.3125 = 2.1rem (1 rhythm unit) */
-        margin-top: calc(var(--rhythm-mobile) * 1.5); /* 1.5 units top */
-        margin-bottom: calc(var(--rhythm-mobile) / 2); /* 0.5 units bottom = 3 units total */
+        margin-top: var(--rhythm-main);
+        margin-bottom: 0;
       }
 
       & p {
