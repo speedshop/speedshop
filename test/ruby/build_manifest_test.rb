@@ -90,25 +90,6 @@ class BuildManifestTest < Minitest::Test
     @manifest ||= parse_manifest
   end
 
-  def ignored_root_entries
-    @ignored_root_entries ||= begin
-      stdout, status = Open3.capture2(
-        "git", "status", "--porcelain", "--ignored", "--untracked-files=normal", "--", ".",
-        chdir: ROOT_DIR
-      )
-      raise "Failed to list ignored source paths" unless status.success?
-
-      stdout.lines.filter_map do |line|
-        next unless line.start_with?("?? ", "!! ")
-
-        path = line[3..].strip
-        next if path.delete_suffix("/").include?("/")
-
-        path.delete_suffix("/")
-      end.uniq
-    end
-  end
-
   def parse_manifest
     result = {directories: [], pages: [], files: [], forbidden_paths: [], sitemap: []}
     current_section = nil
