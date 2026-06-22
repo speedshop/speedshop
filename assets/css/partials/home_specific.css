@@ -1,5 +1,55 @@
 /* Home Specific */
 
+.home-page .margin-top-xl {
+  margin-top: calc(var(--rhythm-main) * 6);
+}
+
+.home-wordmark {
+  height: calc(var(--rhythm-main) * 2);
+}
+
+.home-wordmark svg {
+  display: block;
+  height: 100%;
+  width: auto;
+}
+
+.home-person-photo {
+  height: calc(var(--rhythm-main) * 4) !important;
+}
+
+.home-page .cta-links {
+  align-items: flex-start;
+  line-height: var(--rhythm-main);
+  min-height: calc(var(--rhythm-main) * 2);
+}
+
+.home-page .cta-links .button {
+  height: var(--rhythm-main);
+  line-height: calc(var(--rhythm-main) - 0.2rem);
+}
+
+@media (max-width: 768px) {
+  .home-page .margin-top-xl {
+    margin-top: var(--rhythm-main);
+  }
+
+  .home-person-photo {
+    height: calc(var(--rhythm-main) * 6) !important;
+  }
+
+  .home-page .cta-links .button {
+    height: calc(var(--rhythm-main) * 2);
+    line-height: calc((var(--rhythm-main) * 2) - 0.2rem);
+  }
+}
+
+@media (max-height: 450px) {
+  .home-page .margin-top-xl {
+    margin-top: 0;
+  }
+}
+
 video#logo-vid {
   min-width: 640px;
   position: absolute;
