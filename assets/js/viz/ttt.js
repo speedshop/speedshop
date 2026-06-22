@@ -5,7 +5,7 @@ const R = (n) => {
   const x = Math.sin(n * 78.233) * 43758.5453;
   return x - Math.floor(x);
 };
-const C = ['#8fb7ff', '#ff8a3d', '#b38cff', '#ffd166'];
+const C = ['#ffd166', '#ff6b6b', '#06d6a0', '#ff9f43'];
 const pts = (seed, n, lo = 0.15, hi = 0.85) => Array.from({ length: n }, (_, i) => lo + (hi - lo) * (0.5 + 0.45 * Math.sin(seed + i * 0.8) + 0.22 * (R(seed * 7 + i) - 0.5)));
 const chart = (kind, seed, n = 16) => {
   const w = 128;
@@ -16,17 +16,17 @@ const chart = (kind, seed, n = 16) => {
   const x = c.getContext('2d');
   x.fillStyle = 'rgba(10,12,18,.96)';
   x.fillRect(0, 0, w, h);
-  x.fillStyle = `rgba(${45 + kind * 13 % 80},${35 + kind * 7 % 70},${70 + kind * 17 % 120},.16)`;
+  x.fillStyle = `rgba(${30 + kind * 13 % 100},${20 + kind * 7 % 80},${10 + kind * 17 % 60},.16)`;
   x.fillRect(0, 0, w, h);
   for (let i = 0; i < 170; i++) {
     x.fillStyle = `rgba(255,255,255,${R(seed + i) * 0.06})`;
     x.fillRect(R(i + seed) * w, R(i + seed + 2) * h, 1, 1);
   }
-  x.strokeStyle = 'rgba(170,190,230,.2)';
+  x.strokeStyle = 'rgba(240,210,170,.2)';
   x.strokeRect(0.5, 0.5, w - 1, h - 1);
-  x.fillStyle = 'rgba(170,190,230,.05)';
+  x.fillStyle = 'rgba(240,210,170,.05)';
   for (let y = 20; y < h; y += 13) x.fillRect(0, y, w, 1);
-  x.strokeStyle = 'rgba(255,120,30,.85)';
+  x.strokeStyle = 'rgba(255,160,80,.85)';
   x.setLineDash([4, 3]);
   x.beginPath();
   x.moveTo(16, 34 + R(seed) * 22);
@@ -110,7 +110,7 @@ const chart = (kind, seed, n = 16) => {
     case 9:
     case 14:
       for (let yy = 0; yy < 5; yy++) for (let xx = 0; xx < 12; xx++) {
-        x.fillStyle = R(seed + yy * 9 + xx) > 0.8 ? C[1] : `rgba(120,160,255,${0.1 + R(seed + xx * yy) * 0.3})`;
+        x.fillStyle = R(seed + yy * 9 + xx) > 0.8 ? C[1] : `rgba(255,200,150,${0.1 + R(seed + xx * yy) * 0.3})`;
         x.fillRect(18 + xx * 8, 25 + yy * 10, 6, 7);
       }
       break;
@@ -253,7 +253,7 @@ export const make = ({ canvas }) => {
   };
 
   const logo = (t) => {
-    const s = Math.min(W, H) * 0.58;
+    const s = Math.min(W, H) * 0.84;
     ctx.save();
     ctx.translate(W * 0.5, H * 0.48);
     ctx.scale(s / 72.5, s / 72.5);
@@ -285,8 +285,8 @@ export const make = ({ canvas }) => {
 
   const finish = () => {
     const g = ctx.createRadialGradient(W * 0.38, H * 0.36, 0, W * 0.38, H * 0.36, Math.max(W, H));
-    g.addColorStop(0, 'rgba(150,165,200,.16)');
-    g.addColorStop(0.55, 'rgba(255,120,45,.08)');
+    g.addColorStop(0, 'rgba(255,180,120,.16)');
+    g.addColorStop(0.55, 'rgba(255,80,90,.08)');
     g.addColorStop(1, 'rgba(0,0,0,.9)');
     ctx.globalCompositeOperation = 'source-over';
     ctx.fillStyle = g;
