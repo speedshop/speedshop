@@ -5,6 +5,8 @@
 #   dir/        - directory (contents not checked by this test)
 #   page.*      - page with format variants (.html, .md, .pdf, .epub)
 #   file.ext    - exact file
+#   path/       - forbidden directory path relative to _site
+#   file.ext    - forbidden file path relative to _site
 #
 # Sitemap section uses full URLs
 
@@ -27,6 +29,12 @@ llms-full.txt
 llms.txt
 robots.txt
 sitemap.xml
+
+[forbidden_paths]
+agent-worker.js
+infra/
+worker.js
+workers/
 
 [sitemap]
 # Static pages in sitemap (blog posts are allowed dynamically)

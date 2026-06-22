@@ -1,3 +1,4 @@
+require "bundler"
 require "digest"
 require "fileutils"
 require "net/http"
@@ -8,7 +9,7 @@ require "uri"
 
 module TestHelper
   ROOT_DIR = File.expand_path("..", __dir__)
-  SITE_DIR = File.expand_path("../_site", __dir__)
+  SITE_DIR = File.join(Dir.tmpdir, "speedshop-test-site-#{Process.pid}")
   SERVER_SCRIPT = File.join(ROOT_DIR, "test", "integration", "server.rb")
   CONFIGURED_BASE_URL = ENV["BASE_URL"]
   DEFAULT_LOCAL_HOST = "127.0.0.1"
@@ -42,7 +43,13 @@ module TestHelper
     FileUtils.rm_rf(SITE_DIR)
 
     Dir.chdir(ROOT_DIR) do
-      system("jekyll", "build", "--quiet", exception: true)
+      Bundler.with_unbundled_env do
+        system(
+          RbConfig.ruby, "-S", "bundle", "exec", "jekyll", "build", "--quiet",
+          "--destination", SITE_DIR,
+          exception: true
+        )
+      end
     end
 
     wait_for_expected_site_files!
