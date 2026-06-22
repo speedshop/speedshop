@@ -4,7 +4,7 @@
 require "fileutils"
 
 module SpeedshopDevOnlyPages
-  OUTPUT_PATHS = ["vertical_debug.html"].freeze
+  OUTPUT_PATHS = ["type_specimen.html", "vertical_debug.html"].freeze
 
   def self.enabled?(site)
     site.config["vertical_debug"]
