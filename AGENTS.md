@@ -48,15 +48,18 @@ npm run dev:worker
 ## Project Structure
 
 ```
+pages/            # Jekyll pages (HTML, XML)
 _posts/           # Blog posts (Markdown)
 _plugins/         # Jekyll plugins (Ruby)
 _site/            # Generated output (git-ignored)
+infra/            # Terraform infrastructure
+workers/          # Cloudflare Workers
+workers/agent-worker.js   # Cloudflare Worker for content negotiation
+workers/worker.js         # Cloudflare Worker for /card endpoint
 test/
   ruby/           # Unit tests for plugins
   browser/        # Playwright E2E tests
   integration/    # HTTP integration tests
-workers/agent-worker.js   # Cloudflare Worker for content negotiation
-workers/worker.js         # Cloudflare Worker for /card endpoint
 ```
 
 ## Agent-Ready Documentation

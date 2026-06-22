@@ -29,7 +29,6 @@ kramdown:
 encoding: utf-8
 vertical_debug: false
 exclude:
-   - _h2o
    - _scripts
    - client_notes
    - .client_notes
@@ -40,9 +39,14 @@ exclude:
    - assets/js/main.js
    - assets/js/viz/core.js
    - mise.toml
+   - mise.lock
+   - wrangler.toml
    - test
    - tmp
    - AGENTS.md
+   - main.tf
+   - variables.tf
+   - versions.tf
    - infra
    - infra/**
    - workers

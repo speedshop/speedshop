@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "build": "node _scripts/build.mjs",
-    "test": "npx --no-install playwright test",
+    "test": "npx --no-install playwright test --config test/playwright.config.cjs",
     "dev:worker": "wrangler dev --config workers/wrangler.toml",
     "dev:static": "caddy run --config Caddyfile"
   },

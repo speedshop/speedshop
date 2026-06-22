@@ -7,10 +7,11 @@ vendor/
 *.tfvars
 *.tfstate
 *.tfstate.*
-.terraform
+infra/.terraform
+infra/.terraform.lock.hcl
 node_modules
+tmp/
 .DS_Store
-.terraform.lock.hcl
 .env
 mise.lock
 
