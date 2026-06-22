@@ -2,7 +2,7 @@
 const { defineConfig } = require('@playwright/test');
 
 module.exports = defineConfig({
-  testDir: './test/browser',
+  testDir: './browser',
   testMatch: '**/*.spec.cjs',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
