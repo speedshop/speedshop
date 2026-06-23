@@ -196,5 +196,8 @@ const run2D = (canvas, make, onFirstFrame) => {
   return { resize, start, stop };
 };
 
-export const boot = (canvas, moduleP, onFirstFrame) =>
-  moduleP.then((m) => (m.canvas2d ? run2D : runGL)(canvas, m.make, onFirstFrame));
+export const boot = (canvas, moduleP, onFirstFrame, shouldBoot) =>
+  moduleP.then((m) => {
+    if (shouldBoot && !shouldBoot()) return null;
+    return (m.canvas2d ? run2D : runGL)(canvas, m.make, onFirstFrame);
+  });
