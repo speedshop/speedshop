@@ -99,6 +99,45 @@ function init() {
     }
   }
 
+  function afterNextPaint(callback) {
+    var cancelled = false;
+    var firstFrame = null;
+    var secondFrame = null;
+    var timeout = null;
+
+    if (window.requestAnimationFrame) {
+      firstFrame = requestAnimationFrame(function () {
+        firstFrame = null;
+        secondFrame = requestAnimationFrame(function () {
+          secondFrame = null;
+          if (!cancelled) {
+            callback();
+          }
+        });
+      });
+    } else {
+      timeout = setTimeout(function () {
+        timeout = null;
+        if (!cancelled) {
+          callback();
+        }
+      }, 0);
+    }
+
+    return function () {
+      cancelled = true;
+      if (firstFrame !== null) {
+        cancelAnimationFrame(firstFrame);
+      }
+      if (secondFrame !== null) {
+        cancelAnimationFrame(secondFrame);
+      }
+      if (timeout !== null) {
+        clearTimeout(timeout);
+      }
+    };
+  }
+
   var resetQuicklink = null;
 
   function initQuicklink() {
@@ -219,7 +258,10 @@ function init() {
   function viz() {
     var desktop = matchMedia('(min-width: 769px)');
     var reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    var canvas = null;
     var inst = null;
+    var bootCancel = null;
+    var bootToken = 0;
 
     function listenMedia(q, f) {
       if (q.addEventListener) {
@@ -229,7 +271,40 @@ function init() {
       }
     }
 
+    function stopBoot() {
+      bootToken += 1;
+      if (bootCancel) {
+        bootCancel();
+        bootCancel = null;
+      }
+    }
+
+    function unmount() {
+      stopBoot();
+      if (inst) {
+        inst.stop();
+        inst = null;
+      }
+      if (canvas) {
+        delete canvas.dataset.viz;
+        canvas = null;
+      }
+    }
+
+    function isCurrent(nextCanvas, token) {
+      return token === bootToken && canvas === nextCanvas && document.contains(nextCanvas);
+    }
+
     function update() {
+      if (!inst) {
+        return;
+      }
+
+      if (!canvas || !document.contains(canvas)) {
+        unmount();
+        return;
+      }
+
       inst.resize();
       if (desktop.matches && document.visibilityState !== 'hidden') {
         inst.start(reduced.matches);
@@ -239,21 +314,56 @@ function init() {
     }
 
     function mount() {
-      var canvas = document.getElementById('sslogocanvas');
-      if (!canvas || canvas.dataset.viz || !window.vizLoad || !desktop.matches) {
+      var nextCanvas = document.getElementById('sslogocanvas');
+      if (!nextCanvas || !window.vizLoad || !desktop.matches) {
+        unmount();
         return;
       }
+
+      if (inst && canvas === nextCanvas) {
+        update();
+        return;
+      }
+
+      if (canvas && canvas !== nextCanvas) {
+        unmount();
+      }
+
+      if (nextCanvas.dataset.viz || bootCancel) {
+        return;
+      }
+
+      canvas = nextCanvas;
       canvas.dataset.viz = '1';
+      var token = bootToken;
       var moduleP = window.vizP || window.vizLoad();
       window.vizP = null;
-      vizBoot(canvas, moduleP, function () {
-        canvas.style.opacity = 1;
-      }).then(function (engine) {
-        if (!engine || !document.contains(canvas)) {
+
+      bootCancel = afterNextPaint(function () {
+        bootCancel = null;
+        if (!isCurrent(nextCanvas, token)) {
           return;
         }
-        inst = engine;
-        update();
+
+        vizBoot(nextCanvas, moduleP, function () {
+          nextCanvas.style.opacity = 1;
+        }, function () {
+          return isCurrent(nextCanvas, token);
+        }).then(function (engine) {
+          if (!isCurrent(nextCanvas, token)) {
+            if (engine) {
+              engine.stop();
+            }
+            return;
+          }
+
+          if (!engine) {
+            return;
+          }
+
+          inst = engine;
+          update();
+        }).catch(function () {});
       });
     }
 
@@ -269,17 +379,8 @@ function init() {
     listenMedia(reduced, sync);
     document.addEventListener('visibilitychange', sync);
     window.addEventListener('resize', sync);
-    window.addEventListener('pagehide', function () {
-      if (inst) {
-        inst.stop();
-      }
-    });
-    document.addEventListener('pjax:send', function () {
-      if (inst) {
-        inst.stop();
-        inst = null;
-      }
-    });
+    window.addEventListener('pagehide', unmount);
+    document.addEventListener('pjax:send', unmount);
     document.addEventListener('pjax:complete', sync);
     mount();
   }

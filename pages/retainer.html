@@ -19,16 +19,36 @@ permalink: /retainer.html
         <script>
         (() => {
             const canvas = document.getElementById('demo');
+            if (!canvas) return;
+
             const context = canvas.getContext('2d');
+            const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
             let t = 0;
+            let disposed = false;
+            let frameId = null;
+            let firstPaintFrameId = null;
+            let secondPaintFrameId = null;
+            let resizeObserver = null;
+
+            function prefersReducedMotion() {
+                return reducedMotion && reducedMotion.matches;
+            }
 
             function resize() {
-                canvas.width = canvas.offsetWidth;
-                canvas.height = canvas.offsetHeight;
+                if (disposed || !document.contains(canvas)) return;
+
+                const width = canvas.offsetWidth;
+                const height = canvas.offsetHeight;
+                if (canvas.width !== width) canvas.width = width;
+                if (canvas.height !== height) canvas.height = height;
             }
 
             function draw() {
-                t += 0.001;
+                frameId = null;
+                if (disposed || !document.contains(canvas)) return;
+
+                resize();
+                if (!prefersReducedMotion()) t += 0.001;
                 context.fillStyle = "#fff";
                 context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -62,16 +82,47 @@ permalink: /retainer.html
                     }
                 }
 
-                requestAnimationFrame(draw);
+                if (!prefersReducedMotion()) {
+                    frameId = requestAnimationFrame(draw);
+                }
+            }
+
+            function start() {
+                if (disposed || frameId !== null) return;
+                frameId = requestAnimationFrame(draw);
+            }
+
+            function startAfterNextPaint() {
+                firstPaintFrameId = requestAnimationFrame(() => {
+                    firstPaintFrameId = null;
+                    secondPaintFrameId = requestAnimationFrame(() => {
+                        secondPaintFrameId = null;
+                        start();
+                    });
+                });
+            }
+
+            function cleanup() {
+                disposed = true;
+                if (frameId !== null) cancelAnimationFrame(frameId);
+                if (firstPaintFrameId !== null) cancelAnimationFrame(firstPaintFrameId);
+                if (secondPaintFrameId !== null) cancelAnimationFrame(secondPaintFrameId);
+                if (resizeObserver) resizeObserver.disconnect();
+                window.removeEventListener('resize', resize);
+                document.removeEventListener('pjax:send', cleanup);
+                window.removeEventListener('pagehide', cleanup);
             }
 
             if (window.ResizeObserver) {
-                new ResizeObserver(resize).observe(canvas.parentElement);
+                resizeObserver = new ResizeObserver(resize);
+                resizeObserver.observe(canvas.parentElement);
             }
             window.addEventListener('resize', resize);
+            document.addEventListener('pjax:send', cleanup, { once: true });
+            window.addEventListener('pagehide', cleanup, { once: true });
 
             resize();
-            draw();
+            startAfterNextPaint();
         })();
         </script>
       </div>
