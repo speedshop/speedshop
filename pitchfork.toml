@@ -1,12 +1,14 @@
 [daemons.jekyll]
-run = "mise exec -- bundle exec jekyll build -w --future --unpublished --drafts --trace --config _config.yml,_config_dev.yml"
+run = "bundle exec jekyll build -w --force_polling --future --unpublished --drafts --trace --config _config.yml,_config_dev.yml"
+mise = true
 retry = 0
 ready_delay = 3
 auto_bump_port = false
 port_bump_attempts = 10
 
 [daemons.static]
-run = "mise exec -- caddy run --config Caddyfile"
+run = "caddy run --config Caddyfile"
+mise = true
 retry = 0
 ready_http = "https://localhost:4000/"
 expected_port = [4000, 4001]
@@ -16,6 +18,7 @@ depends = ["jekyll"]
 
 [daemons.worker]
 run = "./node_modules/.bin/wrangler dev --config workers/wrangler.toml --port 8787"
+mise = true
 retry = 0
 ready_http = "http://localhost:8787/"
 expected_port = [8787]
