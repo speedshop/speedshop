@@ -1,6 +1,9 @@
 // @ts-check
 const { defineConfig } = require('@playwright/test');
 
+const TEST_SERVER_PORT = 4173;
+const TEST_SERVER_URL = `http://127.0.0.1:${TEST_SERVER_PORT}`;
+
 module.exports = defineConfig({
   testDir: './browser',
   testMatch: '**/*.spec.cjs',
@@ -11,7 +14,7 @@ module.exports = defineConfig({
   reporter: 'list',
 
   use: {
-    baseURL: 'http://localhost:4000',
+    baseURL: TEST_SERVER_URL,
     trace: 'on-first-retry',
     viewport: { width: 1920, height: 4000 },
   },
@@ -26,9 +29,9 @@ module.exports = defineConfig({
   ],
 
   webServer: {
-    command: 'node test/browser/server.cjs',
-    url: 'http://localhost:4000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 10000,
+    command: `cd .. && mise exec -- bundle exec jekyll build --quiet && PORT=${TEST_SERVER_PORT} node test/browser/server.cjs`,
+    url: TEST_SERVER_URL,
+    reuseExistingServer: false,
+    timeout: 60000,
   },
 });
