@@ -19,8 +19,9 @@ pitchfork = "2.6.0"
 caddy = "2.11.2"
 
 [tasks.setup]
-description = "Install dependencies and git hooks"
+description = "Install declared mise tools, dependencies, and git hooks"
 run = '''
+mise install
 bundle install
 npm install --ignore-scripts
 hk install
