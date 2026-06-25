@@ -25,6 +25,13 @@
     :root {
       --safe-area-inset-top: env(safe-area-inset-top, 0px);
       --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+      --card-border-width: 1px;
+      --card-space-xs: 0.5rem;
+      --card-space-sm: 0.75rem;
+      --card-space-md: 1rem;
+      --card-space-lg: 1.5rem;
+      --card-padding: clamp(1.5rem, 5vw, 2rem);
+      --card-radius: 8px;
     }
 
     * {
@@ -44,7 +51,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: calc(1rem + var(--safe-area-inset-top)) 1rem calc(1rem + var(--safe-area-inset-bottom));
+      padding: calc(var(--card-space-md) + var(--safe-area-inset-top)) var(--card-space-md) calc(var(--card-space-md) + var(--safe-area-inset-bottom));
       background: #f9f9f9;
       color: #222;
       min-height: 100%;
@@ -53,12 +60,12 @@
 
     h1 {
       font-size: clamp(1.5rem, 5vw, 2rem);
-      margin-bottom: 0.5rem;
+      margin-bottom: var(--card-space-xs);
       line-height: 1.2;
     }
 
     p {
-      margin-bottom: 0.75rem;
+      margin-bottom: var(--card-space-sm);
       font-size: clamp(1rem, 4vw, 1.1rem);
       line-height: 1.4;
     }
@@ -75,9 +82,9 @@
 
     .card {
       background: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: clamp(1.5rem, 5vw, 2rem);
+      border: var(--card-border-width) solid #ddd;
+      border-radius: var(--card-radius);
+      padding: var(--card-padding);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       max-width: 400px;
       width: 100%;
@@ -85,20 +92,20 @@
 
     .title {
       color: #666;
-      margin-bottom: 1rem;
+      margin-bottom: var(--card-space-md);
     }
 
     .formats {
-      margin-top: 1.5rem;
-      padding-top: 1rem;
-      border-top: 1px solid #eee;
+      margin-top: var(--card-space-lg);
+      padding-top: var(--card-space-md);
+      border-top: var(--card-border-width) solid #eee;
       font-size: 0.9rem;
     }
 
     .formats a {
-      margin-right: 0.5rem;
+      margin-right: var(--card-space-xs);
       display: inline-block;
-      margin-bottom: 0.5rem;
+      margin-bottom: var(--card-space-xs);
     }
   </style>
 </head>

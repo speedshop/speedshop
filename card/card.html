@@ -27,6 +27,12 @@
     :root {
       --safe-area-inset-top: env(safe-area-inset-top, 0px);
       --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+      --card-border-width: 1px;
+      --card-space-xs: 0.5rem;
+      --card-space-sm: 0.75rem;
+      --card-space-md: 1rem;
+      --card-padding: clamp(1.25rem, 5vw, 2rem);
+      --card-radius: 1rem;
     }
 
     * {
@@ -46,7 +52,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: calc(1rem + var(--safe-area-inset-top)) 1rem calc(1rem + var(--safe-area-inset-bottom));
+      padding: calc(var(--card-space-md) + var(--safe-area-inset-top)) var(--card-space-md) calc(var(--card-space-md) + var(--safe-area-inset-bottom));
       background: #f9f9f9;
       color: #222;
       min-height: 100%;
@@ -55,12 +61,12 @@
 
     h1 {
       font-size: clamp(1.5rem, 5vw, 2rem);
-      margin-bottom: 0.5rem;
+      margin-bottom: var(--card-space-xs);
       line-height: 1.2;
     }
 
     p {
-      margin-bottom: 0.75rem;
+      margin-bottom: var(--card-space-sm);
       font-size: clamp(1rem, 4vw, 1.1rem);
       line-height: 1.4;
     }
@@ -78,8 +84,8 @@
 
     .card {
       background: #fff;
-      padding: clamp(1.25rem, 5vw, 2rem);
-      border-radius: 1rem;
+      padding: var(--card-padding);
+      border-radius: var(--card-radius);
       box-shadow: 0 4px 16px rgba(0,0,0,0.1);
       width: min(100%, 600px);
       margin: auto;
@@ -105,9 +111,9 @@
     .meta {
       font-size: clamp(0.9rem, 3.5vw, 1rem);
       color: #666;
-      margin-top: 1rem;
-      border-top: 1px solid #eee;
-      padding-top: 1rem;
+      margin-top: var(--card-space-md);
+      border-top: var(--card-border-width) solid #eee;
+      padding-top: var(--card-space-md);
       grid-column: 1 / -1;
     }
 
