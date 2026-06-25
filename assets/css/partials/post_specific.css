@@ -80,10 +80,6 @@
     line-height: var(--rhythm-main); /* 3.3rem = 33px (full baseline) */
   }
 
-  & pre > code {
-    padding: 0 var(--rhythm-side); /* No vertical padding needed - line-height provides spacing */
-  }
-
   & p, & pre, & ul, & ol, & dl, & blockquote {
     margin-bottom: var(--rhythm-main);
   }
@@ -109,10 +105,6 @@
     & .highlight code {
       font-size: 1.1rem;
       line-height: var(--rhythm-mobile); /* 2.1rem = 21px (full mobile baseline) */
-    }
-
-    & pre > code {
-      padding: 0 calc(var(--rhythm-mobile) / 2);
     }
 
     /* Mobile header sizes with rhythm-aligned line-heights */

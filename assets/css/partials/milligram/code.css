@@ -17,7 +17,8 @@ pre {
   & > code {
     border-radius: 0;
     display: block;
-    padding: 1rem 1.5rem;
+    line-height: var(--rhythm-main);
+    padding: 0 var(--rhythm-side);
     white-space: pre;
   }
 }
