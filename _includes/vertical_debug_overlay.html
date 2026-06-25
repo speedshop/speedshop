@@ -13,7 +13,9 @@
   var state = {
     enabled: false,
     gridVisible: true,
+    halfGridVisible: false,
     metricsVisible: false,
+    offset: 0,
   };
 
   function paramValue() {
@@ -36,6 +38,44 @@
     return window.sessionStorage.getItem(STORAGE_KEY) === 'true';
   }
 
+  function rhythmPx() {
+    var computed = window.getComputedStyle(document.documentElement);
+    var value = computed.getPropertyValue('--rhythm-main').trim();
+    var parsed = parseFloat(value);
+
+    if (!Number.isFinite(parsed)) return 33;
+    if (value.endsWith('rem')) return parsed * parseFloat(computed.fontSize);
+    if (value.endsWith('em')) return parsed * parseFloat(window.getComputedStyle(document.body).fontSize);
+
+    return parsed;
+  }
+
+  function normalizedOffset(offset, rhythm) {
+    return ((offset % rhythm) + rhythm) % rhythm;
+  }
+
+  function syncDebugVars() {
+    var rhythm = rhythmPx();
+    state.offset = normalizedOffset(state.offset, rhythm);
+    document.documentElement.style.setProperty('--vertical-debug-rhythm', rhythm + 'px');
+    document.documentElement.style.setProperty('--vertical-debug-offset', state.offset + 'px');
+    updateControlsInfo();
+  }
+
+  function firstParagraphBaselineOffset() {
+    var el = document.querySelector('main p, main li, main h1, main h2, main h3');
+    if (!el) return state.offset;
+
+    var computed = window.getComputedStyle(el);
+    var rect = el.getBoundingClientRect();
+    var fontSize = parseFloat(computed.fontSize);
+    var lineHeight = parseFloat(computed.lineHeight);
+    var paddingTop = parseFloat(computed.paddingTop) || 0;
+    var baseline = rect.top + window.scrollY + paddingTop + ((lineHeight - fontSize) / 2) + (fontSize * 0.8);
+
+    return normalizedOffset(baseline, rhythmPx());
+  }
+
   function ensureStyle() {
     if (document.getElementById(STYLE_ID)) return;
 
@@ -43,9 +83,10 @@
     style.id = STYLE_ID;
     style.textContent = `
       :root {
-        --baseline: 33px;
-        --baseline-mobile: 21px;
+        --vertical-debug-rhythm: var(--rhythm-main, 33px);
+        --vertical-debug-offset: 0px;
         --vertical-debug-grid-color: rgba(255, 0, 0, 0.15);
+        --vertical-debug-grid-color-half: rgba(0, 0, 255, 0.12);
         --vertical-debug-grid-color-strong: rgba(255, 0, 0, 0.4);
       }
 
@@ -62,14 +103,33 @@
           var(--vertical-debug-grid-color-strong) 0px,
           var(--vertical-debug-grid-color-strong) 1px,
           var(--vertical-debug-grid-color) 1px,
-          var(--vertical-debug-grid-color) var(--baseline)
+          var(--vertical-debug-grid-color) var(--vertical-debug-rhythm)
         );
+        background-position-y: var(--vertical-debug-offset);
         opacity: 0;
         transition: opacity 0.2s;
       }
 
       #${GRID_ID}.visible {
         opacity: 1;
+      }
+
+      #${GRID_ID}.half-visible {
+        background-image:
+          repeating-linear-gradient(
+            to bottom,
+            var(--vertical-debug-grid-color-strong) 0px,
+            var(--vertical-debug-grid-color-strong) 1px,
+            var(--vertical-debug-grid-color) 1px,
+            var(--vertical-debug-grid-color) var(--vertical-debug-rhythm)
+          ),
+          repeating-linear-gradient(
+            to bottom,
+            transparent 0px,
+            transparent calc((var(--vertical-debug-rhythm) * 0.5) - 1px),
+            var(--vertical-debug-grid-color-half) calc((var(--vertical-debug-rhythm) * 0.5) - 1px),
+            var(--vertical-debug-grid-color-half) calc(var(--vertical-debug-rhythm) * 0.5)
+          );
       }
 
       #${CONTROLS_ID} {
@@ -101,6 +161,18 @@
         margin: 0;
       }
 
+      #${CONTROLS_ID} input[type="number"] {
+        width: 6rem;
+        color: #111;
+        margin: 0;
+      }
+
+      #${CONTROLS_ID} button {
+        color: #111;
+        margin: 0 0.25rem 0 0;
+        padding: 0.2rem 0.5rem;
+      }
+
       #${CONTROLS_ID} .info {
         margin-top: 0.5rem;
         padding-top: 0.5rem;
@@ -120,8 +192,8 @@
       }
 
       .vertical-debug-specimen-section {
-        padding-bottom: 3.3rem;
-        margin-bottom: 3.3rem;
+        padding-bottom: var(--rhythm-main);
+        margin-bottom: var(--rhythm-main);
       }
 
       .vertical-debug-section-label {
@@ -130,30 +202,8 @@
         color: #999;
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-bottom: 3.3rem;
-        line-height: 3.3rem;
-      }
-
-      @media (max-width: 544px) {
-        #${GRID_ID} {
-          background-image: repeating-linear-gradient(
-            to bottom,
-            var(--vertical-debug-grid-color-strong) 0px,
-            var(--vertical-debug-grid-color-strong) 1px,
-            var(--vertical-debug-grid-color) 1px,
-            var(--vertical-debug-grid-color) var(--baseline-mobile)
-          );
-        }
-
-        .vertical-debug-specimen-section {
-          padding-bottom: 2.1rem;
-          margin-bottom: 2.1rem;
-        }
-
-        .vertical-debug-section-label {
-          margin-bottom: 2.1rem;
-          line-height: 2.1rem;
-        }
+        margin-bottom: var(--rhythm-main);
+        line-height: var(--rhythm-main);
       }
     `;
     document.head.appendChild(style);
@@ -178,7 +228,9 @@
       document.body.prepend(grid);
     }
 
+    syncDebugVars();
     grid.classList.toggle('visible', state.gridVisible);
+    grid.classList.toggle('half-visible', state.halfGridVisible);
     updateGridHeight();
   }
 
@@ -213,6 +265,27 @@
     updateGridHeight();
   }
 
+  function updateControlsInfo() {
+    var controls = document.getElementById(CONTROLS_ID);
+    if (!controls) return;
+
+    var offsetInput = controls.querySelector('[data-vertical-debug-offset]');
+    var info = controls.querySelector('[data-vertical-debug-info]');
+
+    if (offsetInput) offsetInput.value = state.offset.toFixed(1);
+    if (info) {
+      info.innerHTML = 'Rhythm: ' + rhythmPx().toFixed(1) + 'px<br>' +
+        'Offset: ' + state.offset.toFixed(1) + 'px<br>' +
+        'Press g to toggle grid<br>' +
+        'Disable: ?vertical_debug=false';
+    }
+  }
+
+  function setOffset(offset) {
+    state.offset = normalizedOffset(offset, rhythmPx());
+    ensureGrid();
+  }
+
   function ensureControls() {
     var controls = document.getElementById(CONTROLS_ID);
     if (!controls) {
@@ -224,15 +297,23 @@
           Show baseline grid
         </label>
         <label>
+          <input type="checkbox" data-vertical-debug-half-grid>
+          Show half-rhythm lines
+        </label>
+        <label>
           <input type="checkbox" data-vertical-debug-metrics>
           Show metrics
         </label>
-        <div class="info">
-          Desktop: 33px baseline<br>
-          Mobile: 21px baseline<br>
-          Press g to toggle grid<br>
-          Disable: ?vertical_debug=false
+        <label>
+          Offset
+          <input type="number" data-vertical-debug-offset step="1">
+        </label>
+        <div>
+          <button type="button" data-vertical-debug-offset-minus>-1px</button>
+          <button type="button" data-vertical-debug-offset-plus>+1px</button>
+          <button type="button" data-vertical-debug-calibrate>Calibrate first baseline</button>
         </div>
+        <div class="info" data-vertical-debug-info></div>
       `;
       document.body.appendChild(controls);
 
@@ -241,14 +322,37 @@
         ensureGrid();
       });
 
+      controls.querySelector('[data-vertical-debug-half-grid]').addEventListener('change', function (event) {
+        state.halfGridVisible = event.target.checked;
+        ensureGrid();
+      });
+
       controls.querySelector('[data-vertical-debug-metrics]').addEventListener('change', function (event) {
         state.metricsVisible = event.target.checked;
         renderMetrics();
       });
+
+      controls.querySelector('[data-vertical-debug-offset]').addEventListener('change', function (event) {
+        setOffset(parseFloat(event.target.value) || 0);
+      });
+
+      controls.querySelector('[data-vertical-debug-offset-minus]').addEventListener('click', function () {
+        setOffset(state.offset - 1);
+      });
+
+      controls.querySelector('[data-vertical-debug-offset-plus]').addEventListener('click', function () {
+        setOffset(state.offset + 1);
+      });
+
+      controls.querySelector('[data-vertical-debug-calibrate]').addEventListener('click', function () {
+        setOffset(firstParagraphBaselineOffset());
+      });
     }
 
     controls.querySelector('[data-vertical-debug-grid]').checked = state.gridVisible;
+    controls.querySelector('[data-vertical-debug-half-grid]').checked = state.halfGridVisible;
     controls.querySelector('[data-vertical-debug-metrics]').checked = state.metricsVisible;
+    updateControlsInfo();
   }
 
   function mount() {
@@ -289,8 +393,14 @@
     }
   });
 
-  window.addEventListener('resize', updateGridHeight);
-  window.addEventListener('load', updateGridHeight);
+  window.addEventListener('resize', function () {
+    syncDebugVars();
+    updateGridHeight();
+  });
+  window.addEventListener('load', function () {
+    syncDebugVars();
+    updateGridHeight();
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', mount, { once: true });
