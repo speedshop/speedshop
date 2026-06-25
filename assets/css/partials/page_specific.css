@@ -331,6 +331,20 @@ button {
 }
 
 .status-page {
+  /* Compact UI rhythm: status widgets use small tokens, not the article baseline. */
+  --status-border-width: 0.1rem;
+  --status-space-2xs: 0.2rem;
+  --status-space-xs: 0.5rem;
+  --status-space-sm: 0.8rem;
+  --status-space-md: 1rem;
+  --status-space-lg: 1.5rem;
+  --status-space-xl: 2rem;
+  --status-space-2xl: 2.5rem;
+  --status-space-3xl: 3rem;
+  --status-cell-size: 1.2rem;
+  --status-day-header-size: 0.9rem;
+  --status-calendar-min-height: 38rem;
+
   max-width: 900px;
   margin: 0 auto;
 }
@@ -338,16 +352,16 @@ button {
 .status-calendar {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: var(--status-space-xl);
   justify-content: space-between;
-  margin: 30px 0;
-  min-height: 380px;
+  margin: var(--status-space-3xl) 0;
+  min-height: var(--status-calendar-min-height);
 }
 
 .calendar-month {
   & h4 {
-    margin: 0 0 8px 0;
-    font-size: 12px;
+    margin: 0 0 var(--status-space-sm) 0;
+    font-size: var(--status-cell-size);
     color: #666;
     font-weight: normal;
   }
@@ -355,22 +369,22 @@ button {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 12px);
-  gap: 2px;
+  grid-template-columns: repeat(7, var(--status-cell-size));
+  gap: var(--status-space-2xs);
 }
 
 .day-header {
-  font-size: 9px;
+  font-size: var(--status-day-header-size);
   text-align: center;
   color: #999;
-  height: 12px;
-  line-height: 12px;
+  height: var(--status-cell-size);
+  line-height: var(--status-cell-size);
 }
 
 .status-cell {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
+  width: var(--status-cell-size);
+  height: var(--status-cell-size);
+  border-radius: var(--status-space-2xs);
 
   &.green {
     background-color: #40c463;
@@ -390,24 +404,24 @@ button {
 
   &.future {
     background-color: #f6f8fa;
-    border: 1px solid #ebedf0;
-    width: 10px;
-    height: 10px;
+    border: var(--status-border-width) solid #ebedf0;
+    width: calc(var(--status-cell-size) - var(--status-space-2xs));
+    height: calc(var(--status-cell-size) - var(--status-space-2xs));
   }
 }
 
 .status-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
-  margin: 20px 0;
-  font-size: 12px;
+  gap: var(--status-space-lg);
+  margin: var(--status-space-xl) 0;
+  font-size: var(--status-cell-size);
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--status-space-xs);
 
   & .status-cell {
     display: inline-block;
@@ -415,21 +429,21 @@ button {
 }
 
 .status-updated {
-  font-size: 12px;
+  font-size: var(--status-cell-size);
   color: #666;
-  margin-top: 2rem;
+  margin-top: var(--status-space-xl);
 }
 
 .status-section {
-  margin-top: 3rem;
+  margin-top: var(--status-space-3xl);
 
   & h3 {
-    margin-bottom: 1rem;
+    margin-bottom: var(--status-space-md);
   }
 }
 
 .sla-histogram-section {
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--status-space-2xl);
 }
 
 .sla-histogram {
@@ -437,15 +451,15 @@ button {
   display: block;
   height: auto;
   margin-left: -7.921%;
-  margin-top: 1rem;
+  margin-top: var(--status-space-md);
   max-width: none;
   width: 111.386%;
 }
 
 .performance-stats {
   display: flex;
-  gap: 2rem;
-  margin: 1.5rem 0;
+  gap: var(--status-space-xl);
+  margin: var(--status-space-lg) 0;
 }
 
 .stat {
