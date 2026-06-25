@@ -76,12 +76,12 @@ test.describe('Newsletter signup popup', () => {
     expect(signupCookie.value).toBe('true');
   });
 
-  test('popup does not appear when cookie is set', async ({ page }) => {
+  test('popup does not appear when cookie is set', async ({ page, baseURL }) => {
     // Set the cookie before loading the page
     await page.context().addCookies([{
       name: 'nateberkopecShowSignup',
       value: 'true',
-      url: 'http://localhost:4000',
+      url: baseURL,
     }]);
 
     // Fast-forward the timeout
