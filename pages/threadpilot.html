@@ -44,14 +44,82 @@ permalink: /threadpilot.html
   <div class="row">
     <div class="column">
       <p>
-        How many threads are you running for Puma and Sidekiq processes today? Are you even sure you know? And when you do figure out the number - how did you pick it? Forget it - just ship the default. Or, you probably Googled for 5 minutes or let Claude pick. Nothing broke, you moved on. But you're a curious engineer: what gains did you leave on the table?
+        For the last 10 years or so, every Rubyist has had this problem:
+      </p>
+
+      <pre class="highlight"><code># config/sidekiq.yml
+:concurrency: ???</code></pre>
+
+      <pre class="highlight"><code># config/puma.rb
+threads ???, ???</code></pre>
+
+      <p>
+        <b>What number do you put here?!</b> How many threads is the right number? Most people will have this set to an env variable, like <code>RAILS_MAX_THREADS</code>, and they might not even be able to tell you what it's set to.
       </p>
       <p>
-        Maybe you read a Github issue that was a hundred comments long and realized that not even some of the most experienced Rails developers in the world could agree on a single number. Maybe you accidentally crashed your Sidekiq process because your database pool wasn't set to the same number as your concurrency configuration. There's a nagging sense that this all ought to be easier.
+        Are you even sure you know what number you're running today? How did you pick it? . You probably Googled for 5 minutes or let Claude pick, or maybe you just shipped the defaults. Nothing broke, you moved on. But you're a curious engineer: <b>what gains did you leave on the table?</b>
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column">
+      <h3>Nobody understands the GVL</h3>
+      <p>
+        The problem is that picking the right number of threads in a threadpool is very hard. Getting this answer correct requires extensive knowledge of the Global VM Lock (GVL), and in-depth observability in production which gives you a sense of your workload's I/O characteristics.
       </p>
       <p>
-        Even Mike Perham (the author of Sidekiq) and Rails core members like byroot have changed their minds on the "right" number over the years. And yet, you're expected to understand the complexities of the GVL, and have exactly the right instrumentation place to measure this? Most people just give up and either ship the defaults or just abandon multithreading entirely.
+        Maybe you read a Github issue that was a hundred comments long and realized that not even some of the most experienced Rails developers in the world could agree on a single "best" number. Maybe you accidentally crashed your Sidekiq process because your database pool wasn't set to the same number as your concurrency configuration. There's a nagging sense that this all ought to be easier.
       </p>
+      <p>
+        Even Mike Perham (the author of Sidekiq) and Rails core members like byroot have changed their minds on the "right" number over the years. The defaults for Puma and Sidekiq have changed over the years - why? Who can stay on top of all of this?
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column">
+      <h3>Too few threads? You're wasting money.</h3>
+
+      <p>
+        More threads allow CRuby processes to do more waiting in parallel. If your workload spends any significant portion of it's time waiting on I/O, you'll easily be able to save a lot on memory usage by using more threads per process.
+      </p>
+
+      <p>
+        For a workload which spends 25% of it's time waiting on I/O, a Sidekiq process with 5 threads will perform X% more jobs per second than a single-threaded Solid Queue process in <code>fork</code> mode.
+      </p>
+
+      INSERT BENCHMARK RESULT HERE
+
+      <p>
+        The reason for this is quite simple: when the job waits on I/O, Sidekiq can pick up a different job and work on it while it waits for the I/O to finish. It's multi-tasking!
+      </p>
+
+      INSERT GANTT CHART SHOWING 5 THREADS SHARING GVL, DOING IO HERE
+
+      <p>
+        A Sidekiq process with 5 threads will use slightly more memory than a single-threaded Solid Queue process. However, in terms of <b>job throughput per GB of memory</b>, it does much better:
+      </p>
+
+      INSERT BENCHMARK RESULT: GIVEN ONE CPU CORE, SIDEKIQ W 5 THREADS VS SINGLE THREADED, MEMORY USAGE, JOBS/SEC AT 25% IO, WHAT IS JOB/SEC/GB?
+
+      <p>
+        This effect can become extremely pronounced when I/O dominates the workload. Imagine a workload of jobs which talk to upstream AI chat completion APIs over HTTP. This could easily be a 95% I/O job: wait for 19 seconds, then run Ruby for 1 second after you get a response. In that case, our Sidekiq process really gets crazy:
+      </p>
+
+      INSERT BENCHMARK RESULT
+
+      <p>
+        <b>If you shoot too low with your thread numbers, you are wasting money</b>. You are buying extra memory you don't need. I don't like wasting money, do you?
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column">
+      <h3>Too many threads? Your app is slow, fragile and memory-bloated.</h3>
+
+
     </div>
   </div>
 
