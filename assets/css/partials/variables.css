@@ -15,6 +15,28 @@
   --rhythm-main: 3.3rem;
   --rhythm-side: 1.65rem;
   --rhythm-mobile: 2.1rem;
+
+  /* Loose UI rhythm: compact tokens for controls, cards, and CTAs. */
+  --ui-border-width: 0.1rem;
+  --ui-radius: 0.4rem;
+  --ui-popup-radius: 6px;
+  --ui-space-xs: 4px;
+  --ui-space-2xs: 0.5rem;
+  --ui-space-sm: 1rem;
+  --ui-space-md: 2rem;
+  --ui-control-height: 3.8rem;
+  --ui-control-line-height: var(--ui-control-height);
+  --ui-control-padding-block: 0.6rem;
+  --ui-control-padding-inline: 3rem;
+  --ui-form-padding-inline: var(--ui-space-sm);
+  --ui-textarea-min-height: 6.5rem;
+  --ui-card-padding: var(--ui-space-md);
+  --ui-popup-copy-line-height: 2.8rem;
+  --ui-popup-copy-margin: 0.85rem;
+  --ui-cta-height: var(--rhythm-main);
+  --ui-cta-line-height: calc(var(--rhythm-main) - 0.2rem);
+  --ui-cta-mobile-height: calc(var(--rhythm-main) * 2);
+  --ui-cta-mobile-line-height: calc((var(--rhythm-main) * 2) - 0.2rem);
 }
 
 @media (max-width: 544px) {

@@ -26,8 +26,8 @@
 }
 
 .home-page .cta-links .button {
-  height: var(--rhythm-main);
-  line-height: calc(var(--rhythm-main) - 0.2rem);
+  height: var(--ui-cta-height);
+  line-height: var(--ui-cta-line-height);
 }
 
 @media (max-width: 768px) {
@@ -40,8 +40,8 @@
   }
 
   .home-page .cta-links .button {
-    height: calc(var(--rhythm-main) * 2);
-    line-height: calc((var(--rhythm-main) * 2) - 0.2rem);
+    height: var(--ui-cta-mobile-height);
+    line-height: var(--ui-cta-mobile-line-height);
   }
 }
 

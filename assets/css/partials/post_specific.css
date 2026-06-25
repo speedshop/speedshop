@@ -304,22 +304,22 @@
 
 div.innocuous {
   font-family: 'Helvetica Neue', Inter, Roboto, 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
-  border: 4px solid #333;
-  padding: 2rem;
+  border: var(--ui-space-xs) solid #333;
+  padding: var(--ui-card-padding);
   position: fixed;
   max-width: 50rem;
   box-shadow: -10px -10px 20px rgba(0,0,0,0.15), 0 6px 6px rgba(0,0,0,0.20);
-  bottom: -4px;
-  right: -4px;
+  bottom: calc(var(--ui-space-xs) * -1);
+  right: calc(var(--ui-space-xs) * -1);
   background-color: var(--color-initial);
-  border-top-left-radius: 6px;
+  border-top-left-radius: var(--ui-popup-radius);
   display: none;
 }
 
 a.innocuous-close {
   position: absolute;
-  top: 2rem;
-  right: 2rem;
+  top: var(--ui-card-padding);
+  right: var(--ui-card-padding);
   display: block;
   text-decoration: underline;
   font-weight: bold;
@@ -334,15 +334,15 @@ a.innocuous-close {
 div.innocuous h4 {
   margin: 0px;
   font-size: 2.2rem;
-  margin-bottom: 1rem;
+  margin-bottom: var(--ui-space-sm);
   color: #333;
 }
 
 div.innocuous p {
   margin: 0px;
   font-size: 1.8rem;
-  line-height: 2.8rem;
-  margin-bottom: .85rem;
+  line-height: var(--ui-popup-copy-line-height);
+  margin-bottom: var(--ui-popup-copy-margin);
   color: #333;
   font-family: 'Helvetica Neue', Inter, Roboto, 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
 }
@@ -352,11 +352,11 @@ div.innocuous form {
   display: flex;
   width: 100%;
   margin: 0px;
-  margin-bottom: 1rem;
+  margin-bottom: var(--ui-space-sm);
 }
 
 div.innocuous input[type='email'] {
-  padding: .5rem;
+  padding: var(--ui-space-2xs);
   font-size: 1.1rem;
   flex-grow: 1;
   margin: 0px;
