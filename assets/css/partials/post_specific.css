@@ -61,6 +61,7 @@
     color: inherit;
     text-decoration: underline;
     font-size: 0.5em;
+    line-height: 0;
     vertical-align: super;
     margin-left: 0.3em;
   }
