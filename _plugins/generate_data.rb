@@ -1,3 +1,4 @@
+require "date"
 require "fileutils"
 require "json"
 
@@ -57,10 +58,16 @@ module Speedshop
 
   module SlaStatusData
     CUTOFF_DATE = "2026-01-01"
+    PASS_FAIL_STATUSES = %w[green red].freeze
+    PERFORMANCE_WINDOWS = {
+      "last_30_days" => ->(today) { today - 30 },
+      "last_90_days" => ->(today) { today - 90 },
+      "last_6_months" => ->(today) { today << 6 }
+    }.freeze
 
     module_function
 
-    def normalize_file!(path, cutoff_date: CUTOFF_DATE)
+    def normalize_file!(path, cutoff_date: CUTOFF_DATE, today: current_japan_date)
       return unless File.exist?(path)
 
       payload = JSON.parse(File.read(path))
@@ -75,7 +82,49 @@ module Speedshop
       end
       payload["reply_histogram"] ||= Speedshop::GenerateDataDefaults.sla_status.fetch("reply_histogram")
 
+      recalculate_performance!(payload, today) if suppress_current_business_status!(payload, today)
+
       File.write(path, "#{JSON.pretty_generate(payload)}\n")
+    end
+
+    def current_japan_date
+      Time.now.getlocal("+09:00").to_date
+    end
+
+    def suppress_current_business_status!(payload, today)
+      status = payload.fetch("days", {})[today.to_s]
+      return false unless PASS_FAIL_STATUSES.include?(status)
+
+      payload["days"][today.to_s] = "future"
+      true
+    end
+
+    def recalculate_performance!(payload, today)
+      return unless payload["performance"].is_a?(Hash)
+
+      PERFORMANCE_WINDOWS.each do |key, start_date_for|
+        next unless payload["performance"].key?(key)
+
+        statuses = statuses_between(payload.fetch("days", {}), start_date_for.call(today), today)
+        payload["performance"][key] = performance_percentage(statuses)
+      end
+    end
+
+    def statuses_between(days, start_date, end_date)
+      days.filter_map do |date, status|
+        status if PASS_FAIL_STATUSES.include?(status) && date_in_range?(date, start_date, end_date)
+      end
+    end
+
+    def date_in_range?(date, start_date, end_date)
+      date = Date.parse(date)
+      date >= start_date && date < end_date
+    end
+
+    def performance_percentage(statuses)
+      return 0 if statuses.empty?
+
+      (statuses.count("green") * 100.0 / statuses.length).round(1)
     end
 
     def merge_reply_histogram!(path, stats)
