@@ -77,15 +77,13 @@ class SiteServlet < WEBrick::HTTPServlet::AbstractServlet
   end
 
   def within_site?(candidate)
-    root = Pathname.new(@site_dir).realpath
+    root = Pathname.new(@site_dir).expand_path.cleanpath
     path = Pathname.new(candidate).cleanpath
 
     root_str = root.to_s
     path_str = path.to_s
 
     path_str == root_str || path_str.start_with?("#{root_str}/")
-  rescue Errno::ENOENT
-    false
   end
 end
 

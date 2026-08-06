@@ -42,9 +42,12 @@ module TestHelper
 
     FileUtils.rm_rf(SITE_DIR)
 
+    original_path = ENV.fetch("PATH")
+
     Dir.chdir(ROOT_DIR) do
       Bundler.with_unbundled_env do
         system(
+          {"PATH" => original_path},
           RbConfig.ruby, "-S", "bundle", "exec", "jekyll", "build", "--quiet",
           "--destination", SITE_DIR,
           exception: true

@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Threadpilot - Adaptive Ruby Concurrency
-summary: "Threadpilot automatically tunes Puma and Sidekiq thread counts at runtime to match your Ruby application's changing workload. Coming soon."
+summary: "Threadpilot adaptively tunes Puma and Sidekiq thread counts at runtime to improve throughput without excessive latency or memory use."
 permalink: /threadpilot.html
 ---
 
@@ -10,25 +10,28 @@ permalink: /threadpilot.html
     <a class="threadpilot-wordmark" href="/" aria-label="Speedshop homepage">
       {% include speedshop_wordmark.svg %}
     </a>
-    <p class="threadpilot-eyebrow">Adaptive concurrency for Ruby</p>
-    <h1>Thread count?<br>Stop guessing.</h1>
-    <p class="threadpilot-deck">Threadpilot automatically tunes Puma and Sidekiq thread pools at runtime, based on what your application is actually doing.</p>
+    <h1>Never set threads again<br>in Puma or Sidekiq.</h1>
+    <p class="threadpilot-deck">Threadpilot adaptively tunes your Sidekiq and Puma processes at runtime, in response to your real workloads. Improve throughput by up to 5-10x, without excessive latency or memory use.</p>
   </div>
 </header>
 
 <div class="container container-narrow threadpilot-coming-soon">
   <div class="row">
     <div class="column">
-      <h2>Coming soon</h2>
-      <p>Choosing a static thread count means betting that one number will suit every workload, forever. Real applications change from request to request and job to job. Sometimes they wait on I/O. Sometimes they compete for Ruby's Global VM Lock.</p>
-      <p>Threadpilot responds as conditions change: adding concurrency when more threads can improve throughput, and reducing it when contention would increase memory use, database connections, and tail latency. Install the gem once and let your Puma and Sidekiq processes adapt themselves.</p>
-      <p>Threadpilot is being built by Yuki Nishijima, a Ruby core contributor, and Nate Berkopec, Puma maintainer and author of <cite>The Complete Guide to Rails Performance</cite>.</p>
+      <h2>If you're tired of guessing at the perfect thread count, we've solved it.</h2>
+      <p>For over ten years, as the author of the Complete Guide to Rails Performance, I've taught people about Ruby's Global VM Lock (GVL) and how it impacts thread settings in multithread execution environments like Puma and Sidekiq. It's extremely complicated, and takes many hours to grok properly.</p>
+      <p>And even when you do understand it, you have the following problems to solve:</p>
+      <ul>
+        <li><b>How will I observe my workload's time spent waiting in IO?</b> In order to set thread counts properly, you need to know what % of the time the GVL is sitting unlocked. How will you do that?</li>
+        <li><b>What happens if my workload changes?</b> Even if you do know what percent of the time your workload spends waiting on IO, is that a constant number? What if you have a batch of Sidekiq jobs which spend 60 seconds waiting on an upstream HTTP API, and then a batch of Sidekiq jobs doing something CPU heavy like Fibonacci sequences?</li>
+      </ul>
+      <p>We realized that the only answer was that Sidekiq and Puma have to self-tune. So, after 18 months of research and development, we've now built that.</p>
     </div>
   </div>
 
   <section class="threadpilot-signup" aria-labelledby="threadpilot-signup-heading">
-    <h2 id="threadpilot-signup-heading">Get launch updates</h2>
-    <p>Threadpilot isn't available yet. Join Nate's newsletter to hear when it launches and get updates along the way.</p>
+    <h2 id="threadpilot-signup-heading">Sign up to be notified on launch</h2>
+    <p>Threadpilot is already in production at a handful of Speedshop clients. We will be making it available to the public soon. To get notified, join Speedshop's email list.</p>
     {% include mailchimp.html %}
   </section>
 </div>

@@ -6,9 +6,9 @@ test.describe('Threadpilot coming soon page', () => {
     await page.goto('/threadpilot.html');
 
     await expect(page).toHaveTitle(/Threadpilot/);
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Stop guessing');
-    await expect(page.getByRole('heading', { name: 'Coming soon' })).toBeVisible();
-    await expect(page.getByText(/automatically tunes Puma and Sidekiq thread pools/)).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Never set threads again');
+    await expect(page.getByRole('heading', { name: /tired of guessing/ })).toBeVisible();
+    await expect(page.getByText(/adaptively tunes your Sidekiq and Puma processes/)).toBeVisible();
 
     const form = page.locator('form.mailchimp');
     await expect(form).toBeVisible();
