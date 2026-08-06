@@ -1,0 +1,34 @@
+---
+layout: default
+title: Threadpilot - Adaptive Ruby Concurrency
+summary: "Threadpilot automatically tunes Puma and Sidekiq thread counts at runtime to match your Ruby application's changing workload. Coming soon."
+permalink: /threadpilot.html
+---
+
+<header class="threadpilot-coming-soon-hero">
+  <div class="container container-narrow">
+    <a class="threadpilot-wordmark" href="/" aria-label="Speedshop homepage">
+      {% include speedshop_wordmark.svg %}
+    </a>
+    <p class="threadpilot-eyebrow">Adaptive concurrency for Ruby</p>
+    <h1>Thread count?<br>Stop guessing.</h1>
+    <p class="threadpilot-deck">Threadpilot automatically tunes Puma and Sidekiq thread pools at runtime, based on what your application is actually doing.</p>
+  </div>
+</header>
+
+<div class="container container-narrow threadpilot-coming-soon">
+  <div class="row">
+    <div class="column">
+      <h2>Coming soon</h2>
+      <p>Choosing a static thread count means betting that one number will suit every workload, forever. Real applications change from request to request and job to job. Sometimes they wait on I/O. Sometimes they compete for Ruby's Global VM Lock.</p>
+      <p>Threadpilot responds as conditions change: adding concurrency when more threads can improve throughput, and reducing it when contention would increase memory use, database connections, and tail latency. Install the gem once and let your Puma and Sidekiq processes adapt themselves.</p>
+      <p>Threadpilot is being built by Yuki Nishijima, a Ruby core contributor, and Nate Berkopec, Puma maintainer and author of <cite>The Complete Guide to Rails Performance</cite>.</p>
+    </div>
+  </div>
+
+  <section class="threadpilot-signup" aria-labelledby="threadpilot-signup-heading">
+    <h2 id="threadpilot-signup-heading">Get launch updates</h2>
+    <p>Threadpilot isn't available yet. Join Nate's newsletter to hear when it launches and get updates along the way.</p>
+    {% include mailchimp.html %}
+  </section>
+</div>

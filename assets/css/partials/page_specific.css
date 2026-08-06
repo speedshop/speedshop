@@ -4,6 +4,85 @@
   max-width: 80rem;
 }
 
+.threadpilot-coming-soon-hero {
+  background: #eee;
+  margin-bottom: calc(var(--rhythm-main) * 2);
+  padding: calc(var(--rhythm-main) * 2) 1rem;
+  text-align: center;
+}
+
+.threadpilot-wordmark {
+  color: #111;
+  display: inline-block;
+  line-height: 0;
+  margin-bottom: calc(var(--rhythm-main) * 2);
+  width: 18rem;
+}
+
+.threadpilot-wordmark svg {
+  display: block;
+  width: 100%;
+}
+
+.threadpilot-eyebrow {
+  color: #666;
+  font-family: monospace;
+  font-size: 1.4rem;
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+}
+
+.threadpilot-coming-soon-hero h1 {
+  margin-bottom: var(--rhythm-main);
+}
+
+.threadpilot-deck {
+  font-size: 2.2rem;
+  line-height: var(--rhythm-main);
+  margin: 0 auto;
+  max-width: 64rem;
+}
+
+.threadpilot-coming-soon {
+  padding-bottom: calc(var(--rhythm-main) * 2);
+}
+
+.threadpilot-signup {
+  border-top: 0.1rem solid #ccc;
+  margin-top: var(--rhythm-main);
+  padding-top: calc(var(--rhythm-main) * 2 - 0.1rem);
+}
+
+.threadpilot-signup .mailchimp {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.threadpilot-signup .mailchimp .email {
+  flex: 1;
+  width: auto;
+}
+
+@media screen and (max-width: 544px) {
+  .threadpilot-coming-soon-hero {
+    padding: var(--rhythm-main) 1rem calc(var(--rhythm-main) * 2);
+  }
+
+  .threadpilot-wordmark {
+    margin-bottom: var(--rhythm-main);
+  }
+
+  .threadpilot-signup .mailchimp {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .threadpilot-signup .mailchimp .email {
+    width: 100%;
+  }
+}
+
 .type-specimen-page {
   padding-bottom: calc(var(--rhythm-main) * 2);
 }
