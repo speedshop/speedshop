@@ -55,7 +55,7 @@ class LinkIntegrityTest < Minitest::Test
 
     target_failures = check_targets(url_targets, response_cache)
     external_flaky_failures, hard_target_failures = target_failures.partition do |failure|
-      [:external_timeout, :external_rate_limited].include?(failure[:kind])
+      [:external_timeout, :external_rate_limited, :external_unavailable].include?(failure[:kind])
     end
 
     warn format_external_link_warnings(external_flaky_failures) unless external_flaky_failures.empty?
@@ -202,13 +202,24 @@ class LinkIntegrityTest < Minitest::Test
       }
     end
 
-    if last_response&.code.to_i == 429 && external_host?(uri.host)
-      return {
-        kind: :external_rate_limited,
-        url: url,
-        locations: locations,
-        details: details
-      }
+    if external_host?(uri.host)
+      if [403, 429].include?(last_response&.code.to_i)
+        return {
+          kind: :external_rate_limited,
+          url: url,
+          locations: locations,
+          details: details
+        }
+      end
+
+      unless last_response
+        return {
+          kind: :external_unavailable,
+          url: url,
+          locations: locations,
+          details: details
+        }
+      end
     end
 
     {

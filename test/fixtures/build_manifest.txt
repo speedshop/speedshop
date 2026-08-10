@@ -19,6 +19,7 @@ four-line-fridays.*
 index.*
 retainer.*
 rpw_checkout_success.*
+threadpilot.*
 slack.*
 status.*
 
@@ -44,3 +45,4 @@ https://www.speedshop.co/blog/
 https://www.speedshop.co/retainer.html
 https://www.speedshop.co/rpw_checkout_success.html
 https://www.speedshop.co/slack.html
+https://www.speedshop.co/threadpilot.html
