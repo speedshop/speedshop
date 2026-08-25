@@ -90,6 +90,22 @@ class SlaReplyHistogramTest < Minitest::Test
     assert_equal 5, bins.last.fetch("upper")
   end
 
+  def test_bins_use_one_bin_for_a_zero_max
+    bins = Speedshop::SlaReplyHistogram.bins_for([0.0])
+
+    assert_equal 1, bins.length
+    assert_equal 1, bins.first.fetch("count")
+    assert_equal 1, bins.first.fetch("upper")
+  end
+
+  def test_bins_use_one_bin_for_a_fractional_max_below_one
+    bins = Speedshop::SlaReplyHistogram.bins_for([0.25])
+
+    assert_equal 1, bins.length
+    assert_equal 1, bins.first.fetch("count")
+    assert_equal 1, bins.first.fetch("upper")
+  end
+
   def test_generate_writes_svg
     Dir.mktmpdir do |dir|
       client_notes_path = File.join(dir, "client_notes_repo")
