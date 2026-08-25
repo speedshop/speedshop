@@ -139,10 +139,10 @@ module Speedshop
     def bins_for(sorted_values)
       return [] if sorted_values.empty?
 
-      max_value = [sorted_values.last, 1.0].max
+      max_value = sorted_values.last
       width = 1
-      upper_bound = (max_value / width).ceil * width
-      bin_count = (upper_bound / width).ceil
+      upper_bound = ((max_value / width).floor + 1) * width
+      bin_count = [(upper_bound / width).ceil, 1].max
       bins = Array.new(bin_count) do |index|
         lower = index * width
         upper = lower + width
