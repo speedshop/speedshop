@@ -31,10 +31,17 @@ class PrettierFormatTest < Minitest::Test
       original_path = ENV.fetch("PATH")
       ENV["PATH"] = "#{directory}:#{original_path}"
       capture_io do
-        Jekyll::Hooks.trigger :site, :post_write, OpenStruct.new(dest: directory)
+        prettier_hook.call OpenStruct.new(dest: directory)
       end.first
     ensure
       ENV["PATH"] = original_path
+    end
+  end
+
+  def prettier_hook
+    registry = Jekyll::Hooks.instance_variable_get(:@registry)
+    registry.dig(:site, :post_write).find do |hook|
+      hook.source_location.first.end_with?("/_plugins/prettier_format.rb")
     end
   end
 end
