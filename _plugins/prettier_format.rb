@@ -11,6 +11,7 @@ Jekyll::Hooks.register :site, :post_write do |site|
 
   unless system(prettier_cmd)
     puts "❌ Prettier formatting failed"
+    next
   end
 
   puts "✨ Successfully formatted site assets"
