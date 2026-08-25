@@ -141,7 +141,7 @@ module Speedshop
 
       max_value = [sorted_values.last, 1.0].max
       width = 1
-      upper_bound = (max_value / width).ceil * width
+      upper_bound = ((max_value / width).floor + 1) * width
       bin_count = (upper_bound / width).ceil
       bins = Array.new(bin_count) do |index|
         lower = index * width
