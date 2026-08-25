@@ -34,6 +34,13 @@ class StripSidenotesFilterTest < Minitest::Test
     assert_equal "<p>Main (parens)</p>", result
   end
 
+  def test_strip_sidenotes_removes_number_from_numbered_sidenote
+    input = "<p>Main<sup class='sidenote-number'>1</sup><span class='sidenote-parens'> (note text)</span><span class='sidenote'><sup class='sidenote-number'>1</sup> note text</span></p>"
+    result = build_filter.strip_sidenotes(input)
+
+    assert_equal "<p>Main (note text)</p>", result
+  end
+
   def test_strip_sidenotes_handles_multiline_sidenotes
     input = "<span class='sidenote'>Line one\nLine two</span>"
     result = build_filter.strip_sidenotes(input)
