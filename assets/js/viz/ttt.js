@@ -44,7 +44,7 @@ const chart = (kind, seed, n = 16) => {
     if (fill) {
       x.lineTo(118, 75);
       x.lineTo(18, 75);
-      x.fillStyle = col.replace(')', ',.16)').replace('rgb', 'rgba');
+      x.fillStyle = `rgba(${parseInt(col.slice(1, 3), 16)},${parseInt(col.slice(3, 5), 16)},${parseInt(col.slice(5, 7), 16)},.16)`;
       x.fill();
     }
     x.strokeStyle = col;
