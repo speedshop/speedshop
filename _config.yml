@@ -28,6 +28,8 @@ kramdown:
   auto_ids: true
 encoding: utf-8
 vertical_debug: false
+include:
+   - .well-known
 exclude:
    - _scripts
    - client_notes
