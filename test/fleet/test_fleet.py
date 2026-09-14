@@ -76,10 +76,12 @@ class FleetTest(unittest.TestCase):
         integrator_path = self.root / ".git/fleet/integrator.json"
         if integrator_path.exists():
             integrator = json.loads(integrator_path.read_text())
-            try:
-                os.killpg(integrator.get("pid", integrator.get("last_pid", 0)), signal.SIGTERM)
-            except (ProcessLookupError, PermissionError):
-                pass
+            integrator_pid = integrator.get("pid", integrator.get("last_pid", 0))
+            if integrator_pid > 0:
+                try:
+                    os.killpg(integrator_pid, signal.SIGTERM)
+                except (ProcessLookupError, PermissionError):
+                    pass
         self.temporary.cleanup()
 
     def fleet(self, *args, cwd=None, check=True):
