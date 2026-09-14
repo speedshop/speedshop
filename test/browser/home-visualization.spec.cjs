@@ -68,11 +68,9 @@ test.describe('Homepage visualization', () => {
           const before = await page
             .locator('#sslogocanvas')
             .evaluate((canvas) => canvas.toDataURL());
-          await page.waitForTimeout(500);
-          const after = await page
-            .locator('#sslogocanvas')
-            .evaluate((canvas) => canvas.toDataURL());
-          expect(after).not.toEqual(before);
+          await expect.poll(() =>
+            page.locator('#sslogocanvas').evaluate((canvas, previous) => canvas.toDataURL() !== previous, before)
+          ).toBe(true);
         }
       });
     }
