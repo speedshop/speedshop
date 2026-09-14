@@ -3,7 +3,7 @@
 
   {% include head.html %}
 
-  <body>
+  <body{% if page.body_class %} class="{{ page.body_class }}"{% endif %}>
     <script>0</script>
     <main class="" aria-label="Content">
       {{ content }}

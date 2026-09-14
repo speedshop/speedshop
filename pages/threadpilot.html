@@ -3,41 +3,41 @@ layout: default
 title: Threadpilot - Adaptive Ruby Concurrency
 summary: "Threadpilot automatically adjusts your Ruby application's thread count at runtime based on actual workload demands, improving throughput and reducing tail latency."
 permalink: /threadpilot.html
+body_class: threadpilot
+stylesheet: /assets/css/threadpilot.css
 ---
 
-<header class="fancy-ruby threadpilot-hero">
-  <div class="container container-narrow">
-    <div class="row threadpilot-logo-row">
-      <div class="column column-20">
-        {% include speedshop_wordmark.svg %}
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="column threadpilot-centered">
-        <p>For high-throughput Ruby and Rails applications:</p>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="column threadpilot-centered">
-        <h1>Thread count?<br>Stop guessing.</h1>
-        <p>Thread-pool auto-tuning for <b>Puma</b> and <b>Sidekiq</b>,<br> adjusted dynamically at runtime.</p>
-      </div>
-    </div>
-  </div>
+<div class="threadpilot-topbar">a <a href="/" aria-label="Speedshop">{% include speedshop_wordmark.svg %}</a> skunkworks product</div>
+<header class="threadpilot-hero">
+  <img class="threadpilot-hero-art" src="/assets/img/tp-hero.png" alt="" fetchpriority="high">
+  <h1>THREAD<br>PILOT</h1>
 </header>
 
 <div class="container container-narrow threadpilot-page">
+  <section class="threadpilot-lead">
+    <div class="threadpilot-lead-copy">
+      <h2>Thread count?<br><em>Stop guessing.</em></h2>
+      <p>Thread-pool auto-tuning for <b>Puma</b> and <b>Sidekiq</b>, adjusted dynamically at runtime.</p>
+    </div>
+    <figure class="threadpilot-benchmark">
+      <canvas class="threadpilot-benchmark-canvas" role="img" aria-label="Illustrative benchmark placeholder plotting throughput over time, with Threadpilot above static concurrency" aria-describedby="threadpilot-benchmark-description"></canvas>
+      <figcaption id="threadpilot-benchmark-description">
+        <span class="threadpilot-chart-adaptive">Threadpilot</span>
+        <span class="threadpilot-chart-static">Static concurrency</span>
+      </figcaption>
+    </figure>
+  </section>
   <div class="row threadpilot-intro-row">
     <div class="column threadpilot-centered">
       <p>From @yuki24 (Ruby Core) and @nateberkopec (Puma maintainer, author Complete Guide to Rails Performance)</p>
     </div>
   </div>
   <div class="row threadpilot-used-by-row">
-    <div class="column threadpilot-centered">
-      <p>Used by:</p>
-      [CLIENT LOGOS: Recognizable names only.]
+    <p>Used by:</p>
+    <div class="threadpilot-client-logos">
+      <img class="threadpilot-client-logo-aviary" src="/assets/img/client-logos/aviary-health.svg" alt="Aviary Health">
+      <img class="threadpilot-client-logo-adquick" src="/assets/img/client-logos/adquick.svg" alt="AdQuick">
+      <img class="threadpilot-client-logo-atob" src="/assets/img/client-logos/atob.svg" alt="AtoB">
     </div>
   </div>
 
@@ -438,22 +438,22 @@ threads ???, ???</code></pre>
       var s = setupCanvas(id);
       var pad = Math.round(s.w * PAD_RATIO * 0.3);
       // Background
-      s.ctx.fillStyle = '#fafafa';
+      s.ctx.fillStyle = '#080808';
       s.ctx.fillRect(0, 0, s.w, s.h);
 
       // Gridlines
       for (var t = 0; t < yTicks.length; t++) {
         var y = mapY(yTicks[t], yMin, yMax, s.h, pad);
         for (var x = pad + 2; x < s.w - pad; x += 3) {
-          px(s.ctx, x, y, '#e0e0e0');
+          px(s.ctx, x, y, '#303030');
         }
       }
 
       drawAxes(s.ctx, s.w, s.h, pad, yMin, yMax, yTicks);
 
       // Plot both series as individual data points (every point = 1 device pixel)
-      plotSeries(s.ctx, staticData, s.w, s.h, pad, yMin, yMax, '#e45858');
-      plotSeries(s.ctx, tpData, s.w, s.h, pad, yMin, yMax, '#3b82f6');
+      plotSeries(s.ctx, staticData, s.w, s.h, pad, yMin, yMax, '#ff55ff');
+      plotSeries(s.ctx, tpData, s.w, s.h, pad, yMin, yMax, '#55ffff');
     }
 
     function render() {
@@ -531,6 +531,7 @@ threads ???, ???</code></pre>
   </div>
 
   {% include threadpilot_pricing_comparison.html heading="Stop guessing. Start tuning." %}
+  <script src="/assets/js/threadpilot_benchmark.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.1/dist/embed.global.js" defer data-auto-init></script>
 
 </div>

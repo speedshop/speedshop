@@ -357,36 +357,6 @@ header {
   margin-bottom: 7rem;
 }
 
-.threadpilot-hero {
-  margin-bottom: 0;
-  padding: var(--rhythm-main) 1rem;
-}
-
-.threadpilot-hero .row:last-child p {
-  margin-bottom: 0;
-}
-
-.threadpilot-logo-row {
-  height: calc(var(--rhythm-main) * 2);
-  margin-bottom: var(--rhythm-main);
-}
-
-.threadpilot-logo-row .column {
-  align-self: flex-end;
-  line-height: 0;
-  margin-bottom: 0;
-}
-
-.threadpilot-logo-row svg {
-  display: block;
-}
-
-@media screen and (max-width: 639px) {
-  .threadpilot-logo-row {
-    justify-content: flex-end;
-  }
-}
-
 .threadpilot-centered {
   text-align: center;
 }

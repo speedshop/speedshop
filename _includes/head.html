@@ -27,6 +27,7 @@
   <meta name="description" content="{{ seo_description | escape }}">
   <meta name="author" content="{{ seo_author_name | escape }}">
   <!-- INLINE_CSS -->
+  {% if page.stylesheet %}<link rel="stylesheet" href="{{ page.stylesheet }}">{% endif %}
 
   <link rel="canonical" href="{{ seo_canonical_url }}">
   <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | absolute_url }}">

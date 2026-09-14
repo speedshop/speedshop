@@ -1,0 +1,346 @@
+@font-face {
+  font-family: "Redaction 35";
+  src: url("/assets/fonts/redaction/Redaction35-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Redaction 70";
+  src: url("/assets/fonts/redaction/Redaction70-Italic.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Redaction 70";
+  src: url("/assets/fonts/redaction/Redaction70-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+body.threadpilot {
+  --tp-black: #000;
+  --tp-white: #fff;
+  --tp-cyan: #55ffff;
+  --tp-magenta: #ff55ff;
+  --tp-border: #333;
+  background: var(--tp-black);
+  color: var(--tp-white);
+  color-scheme: dark;
+  font-family:
+    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
+    "DejaVu Sans Mono", monospace;
+  font-weight: normal;
+}
+
+.threadpilot p,
+.threadpilot li {
+  font-family: inherit;
+}
+
+.threadpilot ::selection {
+  background: var(--tp-magenta);
+  color: var(--tp-black);
+}
+
+.threadpilot h1,
+.threadpilot h2,
+.threadpilot h3,
+.threadpilot h4 {
+  color: var(--tp-white);
+  font-family: "Redaction 35", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.threadpilot h2 {
+  font-size: clamp(4rem, 6vw, 7.2rem);
+}
+.threadpilot h3 {
+  font-size: clamp(3.2rem, 4vw, 4.8rem);
+}
+.threadpilot h4 {
+  font-size: 3rem;
+}
+.threadpilot a {
+  color: var(--tp-cyan);
+}
+.threadpilot a:hover {
+  color: var(--tp-magenta);
+}
+.threadpilot a:focus-visible {
+  outline: 2px solid var(--tp-magenta);
+  outline-offset: 5px;
+}
+
+.threadpilot-topbar {
+  padding: 1.4rem 2rem;
+  border-bottom: 1px solid var(--tp-border);
+  text-align: center;
+  font-size: 1.3rem;
+  line-height: 1.5;
+}
+
+.threadpilot-topbar a {
+  display: inline-block;
+  color: var(--tp-white);
+  vertical-align: middle;
+  line-height: 0;
+}
+
+.threadpilot-topbar svg {
+  display: block;
+  width: 9rem;
+  height: auto;
+}
+
+.threadpilot .threadpilot-hero {
+  position: relative;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  height: 66.667svh;
+  margin: 0;
+  padding: 3rem;
+  overflow: hidden;
+  border-bottom: 1px solid var(--tp-border);
+  background: #080b08;
+}
+
+.threadpilot-hero-art {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.threadpilot .threadpilot-hero h1 {
+  margin: 0;
+  font-family: "Redaction 70", Georgia, serif;
+  font-style: italic;
+  font-size: clamp(5rem, 13.5vw, 21rem);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+  text-align: center;
+}
+
+.threadpilot .threadpilot-page {
+  max-width: 108rem;
+  padding: 0 clamp(2rem, 5vw, 6rem) 8rem;
+  font-size: 1.6rem;
+  line-height: 1.8;
+  overflow-wrap: break-word;
+}
+
+.threadpilot-lead {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: start;
+  gap: clamp(3rem, 6vw, 7rem);
+  padding: 4.5rem 0 2.5rem;
+  text-align: left;
+}
+
+.threadpilot-lead h2 {
+  margin: 0 0 1.6rem;
+  font-size: clamp(3.6rem, 4.5vw, 5.6rem);
+}
+
+.threadpilot-lead-copy p {
+  margin-bottom: 0;
+}
+
+.threadpilot-benchmark {
+  --benchmark-axis-offset: 48px;
+  margin: 0;
+  min-width: 0;
+}
+
+.threadpilot-benchmark-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 480 / 286;
+  image-rendering: pixelated;
+}
+
+.threadpilot-benchmark figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 2rem;
+  padding-left: var(--benchmark-axis-offset);
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.threadpilot :is(h2, h3, h4) em {
+  font-family: "Redaction 70", Georgia, serif;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--tp-magenta);
+}
+.threadpilot-page > .row {
+  margin-bottom: 5rem;
+}
+.threadpilot .threadpilot-intro-row {
+  margin-bottom: 1.5rem;
+  color: #bbb;
+  font-size: 1.3rem;
+}
+.threadpilot-intro-row p {
+  margin-bottom: 0;
+}
+.threadpilot .threadpilot-used-by-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 2.4rem;
+  width: 100%;
+  margin: 0 0 3.5rem;
+  padding: 0 0 2rem;
+  border-bottom: 1px solid var(--tp-border);
+}
+.threadpilot-used-by-row p {
+  flex: 0 0 auto;
+  margin: 0;
+}
+.threadpilot-client-logos {
+  display: flex;
+  align-items: center;
+  gap: 2.4rem;
+  min-width: 0;
+}
+.threadpilot-client-logos img {
+  display: block;
+  max-height: 2.8rem;
+  filter: brightness(0) invert(1);
+  opacity: 0.72;
+}
+.threadpilot-client-logo-aviary {
+  width: 9rem;
+}
+.threadpilot-client-logo-adquick {
+  width: 11.5rem;
+}
+.threadpilot-client-logo-atob {
+  width: 7.5rem;
+}
+.threadpilot .sales-testimonials {
+  background: transparent;
+  border-block: 1px solid var(--tp-border);
+  padding: 4rem 0;
+  margin: 5rem 0;
+}
+.threadpilot .card {
+  background: #080808;
+  border-color: var(--tp-border);
+  box-shadow: none;
+}
+.threadpilot .threadpilot-feature-card {
+  border-top: 2px solid var(--tp-cyan);
+}
+.threadpilot .threadpilot-feature-card:nth-child(2) {
+  border-top-color: var(--tp-magenta);
+}
+.threadpilot .threadpilot-pricing-card h3 {
+  font-size: 3.2rem;
+  line-height: 1.2;
+  margin-bottom: 2rem;
+}
+.threadpilot .threadpilot-price {
+  font-family: inherit;
+  font-weight: normal;
+  font-size: 3.2rem;
+  color: var(--tp-white);
+}
+.threadpilot .button {
+  background: var(--tp-cyan);
+  color: var(--tp-black);
+  border: 1px solid var(--tp-cyan);
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: normal;
+  letter-spacing: 0;
+}
+.threadpilot .button:hover,
+.threadpilot .button:focus {
+  background: var(--tp-magenta);
+  border-color: var(--tp-magenta);
+  color: var(--tp-black);
+}
+.threadpilot pre,
+.threadpilot code {
+  background: #111;
+  color: var(--tp-cyan);
+  border-color: var(--tp-border);
+  font-family: inherit;
+}
+.threadpilot pre {
+  border-left: 2px solid var(--tp-magenta);
+}
+.threadpilot .threadpilot-chart-note,
+.threadpilot .threadpilot-chart-caption {
+  color: #bbb;
+}
+.threadpilot .threadpilot-chart-caption {
+  height: auto;
+  overflow: visible;
+}
+.threadpilot .threadpilot-chart-static {
+  color: var(--tp-magenta);
+}
+.threadpilot .threadpilot-chart-adaptive {
+  color: var(--tp-cyan);
+}
+
+@media (max-width: 800px) {
+  .threadpilot-lead {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+    padding-top: 3.5rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .threadpilot .threadpilot-hero {
+    padding: 1rem;
+  }
+  .threadpilot .threadpilot-page {
+    font-size: 1.4rem;
+  }
+  .threadpilot-page > .row {
+    margin-bottom: 3rem;
+  }
+  .threadpilot .threadpilot-intro-row {
+    margin-bottom: 1.2rem;
+  }
+  .threadpilot .threadpilot-used-by-row {
+    gap: 1.4rem;
+    margin-bottom: 2.5rem;
+  }
+  .threadpilot-client-logos {
+    gap: 0.8rem;
+  }
+  .threadpilot-client-logo-aviary {
+    width: 7rem;
+  }
+  .threadpilot-client-logo-adquick {
+    width: 9rem;
+  }
+  .threadpilot-client-logo-atob {
+    width: 6rem;
+  }
+  .threadpilot .threadpilot-pricing-card-aside {
+    align-items: stretch;
+  }
+}
