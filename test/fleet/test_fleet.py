@@ -129,6 +129,17 @@ class FleetTest(unittest.TestCase):
         self.fleet("sync")
         self.assertEqual(command("git", "rev-parse", "fleet/integrated", cwd=self.root).stdout, command("git", "rev-parse", "HEAD", cwd=self.root).stdout)
 
+    def test_claims_prevent_overlapping_writers_and_release_cleanly(self):
+        self.fleet("claim", "worker-1", "Own index", "--paths", "index.html")
+        overlap = self.fleet("claim", "worker-2", "Also own index", "--paths", "index.html", check=False)
+        self.assertNotEqual(0, overlap.returncode)
+        self.assertIn("worker-1", overlap.stderr)
+        self.fleet("release", "worker-1")
+        self.fleet("claim", "worker-2", "Own index now", "--paths", "index.html")
+        status = self.fleet("status").stdout
+        self.assertIn("worker-1", status)
+        self.assertIn("unclaimed", status)
+
     def test_dirty_sync_refuses_without_touching_dirt(self):
         (self.root / "notes.txt").write_text("mine\n")
         result = self.fleet("sync", check=False)

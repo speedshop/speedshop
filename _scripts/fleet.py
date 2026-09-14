@@ -526,7 +526,8 @@ def show_status(_args) -> None:
         preview_value = servers.get(lane, {})
         planned_url = f"http://127.0.0.1:{cfg['live_ports'][lane]}/threadpilot.html"
         preview_state = preview_value.get("url", planned_url) if preview_value and pid_alive(preview_value.get("pid", 0)) else f"stopped: {planned_url}"
-        print(f"  {lane:11} {head:8} {'DIRTY' if dirty else 'clean':5} | {claim_value.get('task', 'unclaimed')} | {preview_state}")
+        claim_label = claim_value.get("task", "unclaimed") if claim_value.get("status") == "active" else "unclaimed"
+        print(f"  {lane:11} {head:8} {'DIRTY' if dirty else 'clean':5} | {claim_label} | {preview_state}")
     heading("SUBMISSIONS")
     values = submissions()
     if not values:
