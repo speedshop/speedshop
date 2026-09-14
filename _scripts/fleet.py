@@ -99,6 +99,15 @@ def branch_exists(branch: str) -> bool:
     return run("git", "show-ref", "--verify", "--quiet", f"refs/heads/{branch}", check=False).returncode == 0
 
 
+def link_dependencies(source: Path, destination: Path) -> None:
+    for relative in (Path("node_modules"), Path("vendor/bundle")):
+        source_path = source / relative
+        destination_path = destination / relative
+        if source_path.exists() and not destination_path.exists():
+            destination_path.parent.mkdir(parents=True, exist_ok=True)
+            destination_path.symlink_to(source_path, target_is_directory=True)
+
+
 def bootstrap(args) -> None:
     root = repository_root()
     tracked_changes = git("status", "--porcelain", "--untracked-files=no", cwd=root)
@@ -125,9 +134,7 @@ def bootstrap(args) -> None:
             git("branch", branch, base, cwd=root)
         if not path.exists():
             git("worktree", "add", str(path), branch, cwd=root, capture=False)
-        node_modules = root / "node_modules"
-        if node_modules.exists() and not (path / "node_modules").exists():
-            (path / "node_modules").symlink_to(node_modules, target_is_directory=True)
+        link_dependencies(root, path)
     cfg = {
         "version": 1,
         "created_at": now(),
@@ -286,9 +293,7 @@ def immutable_preview(submission: dict) -> str:
         if checkout.exists():
             git("worktree", "remove", str(checkout), "--force", cwd=repository_root())
         git("worktree", "add", "--detach", str(checkout), submission["head"], cwd=repository_root(), capture=False)
-        source_modules = Path(cfg["worktrees"]["personal"]) / "node_modules"
-        if source_modules.exists() and not (checkout / "node_modules").exists():
-            (checkout / "node_modules").symlink_to(source_modules, target_is_directory=True)
+        link_dependencies(Path(cfg["worktrees"]["personal"]), checkout)
         command = cfg["build_command"]
         log = state_root() / "logs" / f"build-submission-{submission['id']}.log"
         log.parent.mkdir(parents=True, exist_ok=True)
@@ -406,9 +411,7 @@ def receive_one(item: dict) -> bool:
         git("worktree", "remove", str(candidate), "--force", cwd=integration_path)
     candidate.parent.mkdir(parents=True, exist_ok=True)
     git("worktree", "add", "--detach", str(candidate), current, cwd=integration_path, capture=False)
-    source_modules = Path(cfg["worktrees"]["personal"]) / "node_modules"
-    if source_modules.exists() and not (candidate / "node_modules").exists():
-        (candidate / "node_modules").symlink_to(source_modules, target_is_directory=True)
+    link_dependencies(Path(cfg["worktrees"]["personal"]), candidate)
     log = state_root() / "logs" / f"integrate-{item['id']}.log"
     try:
         merge = run("git", "merge", "--no-ff", "--no-commit", item["head"], cwd=candidate, check=False)
