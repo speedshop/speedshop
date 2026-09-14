@@ -12,7 +12,6 @@ pandoc = "3.9.0.2"
 terraform = "1.14.6"
 awscli = "2.34.1"
 hk = "1.42.0"
-pitchfork = "2.6.0"
 caddy = "2.11.2"
 
 [tasks.setup]
