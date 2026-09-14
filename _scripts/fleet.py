@@ -35,8 +35,7 @@ def repository_root() -> Path:
 
 
 def common_git_dir() -> Path:
-    path = Path(git("rev-parse", "--git-common-dir"))
-    return (repository_root() / path).resolve() if not path.is_absolute() else path.resolve()
+    return Path(git("rev-parse", "--path-format=absolute", "--git-common-dir")).resolve()
 
 
 def state_root() -> Path:
@@ -117,6 +116,8 @@ def link_dependencies(source: Path, destination: Path) -> None:
 
 def bootstrap(args) -> None:
     root = repository_root()
+    if config_path().exists():
+        raise SystemExit(f"Fleet is already bootstrapped at {state_root()}; existing state was preserved")
     tracked_changes = git("status", "--porcelain", "--untracked-files=no", cwd=root)
     if tracked_changes:
         raise SystemExit(f"Tracked or staged changes must be checkpointed before bootstrap:\n{tracked_changes}")
@@ -230,6 +231,8 @@ def shell(command: str, cwd: Path, log: Path | None = None) -> int:
 
 
 def pid_alive(pid: int) -> bool:
+    if not isinstance(pid, int) or pid <= 0:
+        return False
     try:
         os.kill(pid, 0)
         return True
@@ -298,7 +301,7 @@ def immutable_preview(submission: dict) -> str:
     if not (snapshot / "threadpilot.html").exists():
         checkout.parent.mkdir(parents=True, exist_ok=True)
         if checkout.exists():
-            git("worktree", "remove", str(checkout), "--force", cwd=repository_root())
+            raise SystemExit(f"Preserved preview checkout already exists and needs inspection: {checkout}")
         git("worktree", "add", "--detach", str(checkout), submission["head"], cwd=repository_root(), capture=False)
         link_dependencies(Path(cfg["worktrees"]["personal"]), checkout)
         command = cfg["build_command"]
@@ -308,7 +311,7 @@ def immutable_preview(submission: dict) -> str:
             result = subprocess.run(command, cwd=checkout, shell=True, executable="/bin/bash", stdout=output, stderr=subprocess.STDOUT)
         if result.returncode == 0:
             shutil.copytree(checkout / "_site", snapshot, dirs_exist_ok=True)
-        git("worktree", "remove", str(checkout), "--force", cwd=repository_root())
+        git("worktree", "remove", str(checkout), cwd=repository_root(), check=False)
         if result.returncode:
             raise SystemExit(f"Submission preview build failed; see {log}")
     return start_server(snapshot, submission["preview_port"], f"submission-{submission['id']}")
@@ -326,7 +329,7 @@ def submit(args) -> None:
         git("add", "--", *args.paths, cwd=root)
     staged = git("diff", "--cached", "--name-only", cwd=root).splitlines()
     if staged:
-        git("commit", "--no-gpg-sign", "-m", args.message, "--", *staged, cwd=root, capture=False)
+        git("commit", "--no-gpg-sign", "-m", args.message, cwd=root, capture=False)
     head = git("rev-parse", "HEAD", cwd=root)
     integration_head = git("rev-parse", cfg["integration_branch"], cwd=root)
     if run("git", "merge-base", "--is-ancestor", head, integration_head, cwd=root, check=False).returncode == 0:
@@ -339,7 +342,7 @@ def submit(args) -> None:
     with locked("queue"):
         values = submissions()
         for item in values:
-            if item["lane"] == lane and item["status"] in ("held", "queued"):
+            if item["lane"] == lane and item["status"] in ("preview-building", "held", "queued", "preparing", "validating"):
                 item["status"] = "superseded"
                 item["superseded_at"] = now()
                 item["superseded_by"] = submission_id
@@ -353,7 +356,7 @@ def submit(args) -> None:
             "ref": ref,
             "paths": staged,
             "requires_signoff": requires_signoff,
-            "status": "held" if requires_signoff else "queued",
+            "status": "preview-building",
             "submitted_at": now(),
             "preview_port": preview_port,
         }
@@ -361,13 +364,23 @@ def submit(args) -> None:
         save_json(state_root() / "submissions.json", values)
     try:
         url = immutable_preview(item)
-        update_submission(submission_id, lambda value: value.update({"preview_url": url}))
     except SystemExit as error:
-        update_submission(submission_id, lambda value: value.update({"status": "preview-failed", "error": str(error)}))
+        def fail_preview(value):
+            if value["status"] == "preview-building":
+                value.update({"status": "preview-failed", "error": str(error)})
+        update_submission(submission_id, fail_preview)
         raise
+
+    ready_status = "held" if requires_signoff else "queued"
+    def finish_preview(value):
+        if value["status"] == "preview-building":
+            value.update({"status": ready_status, "preview_url": url, "previewed_at": now()})
+    completed = update_submission(submission_id, finish_preview)
     print(f"Submitted {submission_id} at immutable SHA {head}")
     print(f"Preview: {url}")
-    if requires_signoff:
+    if completed["status"] != ready_status:
+        print(f"Submission became {completed['status']} while its preview built; it will not be integrated")
+    elif requires_signoff:
         heading(f"SIGN THIS OFF PLEASE: fleet approve {submission_id} {head}")
     else:
         print("Ready for integration")
@@ -394,6 +407,7 @@ def retry(args) -> None:
         item.pop("reason", None)
     item = update_submission(args.submission, apply)
     print(f"Requeued {item['id']} at unchanged SHA {item['head']}")
+    wake_integrator()
 
 
 def reject(args) -> None:
@@ -405,47 +419,206 @@ def reject(args) -> None:
     print(f"Rejected {item['id']}: {args.reason}")
 
 
+def submission_by_id(values: list[dict], submission_id: str) -> dict | None:
+    return next((item for item in values if item["id"] == submission_id), None)
+
+
+def update_if_status(submission_id: str, expected: tuple[str, ...], fields: dict) -> bool:
+    with locked("queue"):
+        values = submissions()
+        item = submission_by_id(values, submission_id)
+        if not item or item["status"] not in expected:
+            return False
+        item.update(fields)
+        save_json(state_root() / "submissions.json", values)
+        return True
+
+
+def refresh_integration_preview(submission_id: str) -> None:
+    try:
+        url = build_live_preview("integration")
+        update_if_status(submission_id, ("accepted",), {"integration_preview_url": url, "preview_refreshed_at": now()})
+    except SystemExit as error:
+        update_if_status(submission_id, ("accepted",), {"preview_refresh_error": str(error)})
+        print(f"Accepted, but integration preview refresh failed: {error}", file=sys.stderr)
+
+
+def remove_candidate_after_acceptance(submission_id: str, candidate: Path, integration_path: Path) -> None:
+    result = run("git", "worktree", "remove", str(candidate), cwd=integration_path, check=False)
+    fields = {"candidate_removed_at": now()} if result.returncode == 0 else {
+        "candidate_preserved": str(candidate),
+        "candidate_cleanup_error": result.stderr.strip() or "candidate worktree is not clean",
+    }
+    update_if_status(submission_id, ("accepted",), fields)
+
+
+def finalize_validation(submission_id: str) -> bool:
+    cfg = config()
+    integration_path = Path(cfg["worktrees"]["integration"])
+    item = submission_by_id(submissions(), submission_id)
+    if not item or item["status"] != "validating":
+        return False
+    result_path = Path(item["validation_result"])
+    if pid_alive(item["validation_pid"]):
+        print(f"Validation still running for {submission_id} (PID {item['validation_pid']})")
+        return False
+    if not result_path.exists():
+        update_if_status(submission_id, ("validating",), {
+            "status": "failed",
+            "failed_at": now(),
+            "reason": f"Interrupted validator left no result; candidate preserved at {item['candidate_path']}",
+        })
+        return False
+    try:
+        exit_code = int(result_path.read_text().strip())
+    except ValueError:
+        exit_code = -1
+    if exit_code != 0:
+        update_if_status(submission_id, ("validating",), {
+            "status": "failed",
+            "failed_at": now(),
+            "reason": f"Validation failed with exit {exit_code}; candidate preserved at {item['candidate_path']}; see {item['validation_log']}",
+        })
+        return False
+
+    with locked("queue"):
+        values = submissions()
+        current_item = submission_by_id(values, submission_id)
+        if not current_item or current_item["status"] != "validating":
+            return False
+        ensure_clean(integration_path)
+        current_head = git("rev-parse", cfg["integration_branch"], cwd=integration_path)
+        if current_head != current_item["integration_parent"]:
+            current_item.update({
+                "status": "rework",
+                "failed_at": now(),
+                "reason": f"Integration advanced from {current_item['integration_parent']} to {current_head}; candidate preserved at {current_item['candidate_path']}",
+            })
+            save_json(state_root() / "submissions.json", values)
+            return False
+        promotion = run("git", "merge", "--ff-only", current_item["candidate_head"], cwd=integration_path, check=False, capture=False)
+        if promotion.returncode:
+            current_item.update({
+                "status": "failed",
+                "failed_at": now(),
+                "reason": f"Promotion failed; candidate preserved at {current_item['candidate_path']}",
+            })
+            save_json(state_root() / "submissions.json", values)
+            return False
+        accepted = git("rev-parse", "HEAD", cwd=integration_path)
+        current_item.update({"status": "accepted", "accepted_sha": accepted, "accepted_at": now()})
+        save_json(state_root() / "submissions.json", values)
+
+    refresh_integration_preview(submission_id)
+    remove_candidate_after_acceptance(submission_id, Path(item["candidate_path"]), integration_path)
+    return True
+
+
+def start_validation(item: dict, candidate: Path, log: Path) -> bool:
+    cfg = config()
+    result_path = state_root() / "validation" / f"{item['id']}.result"
+    temporary_result = result_path.with_suffix(".tmp")
+    result_path.parent.mkdir(parents=True, exist_ok=True)
+    result_path.unlink(missing_ok=True)
+    temporary_result.unlink(missing_ok=True)
+    script = (
+        "set +e\n" + cfg["validation_command"] + "\ncode=$?\n" +
+        f"printf '%s\\n' \"$code\" > {shlex.quote(str(temporary_result))}\n" +
+        f"mv {shlex.quote(str(temporary_result))} {shlex.quote(str(result_path))}\nexit \"$code\""
+    )
+    log.parent.mkdir(parents=True, exist_ok=True)
+    with locked("queue"):
+        values = submissions()
+        current_item = submission_by_id(values, item["id"])
+        if not current_item or current_item["status"] != "preparing":
+            return False
+        with log.open("a") as output:
+            output.write(f"$ {cfg['validation_command']}\n")
+            process = subprocess.Popen(["/bin/bash", "-c", script], cwd=candidate, stdout=output, stderr=subprocess.STDOUT, start_new_session=True)
+        current_item.update({
+            "status": "validating",
+            "validation_pid": process.pid,
+            "validation_result": str(result_path),
+            "validation_log": str(log),
+            "validation_started_at": now(),
+        })
+        save_json(state_root() / "submissions.json", values)
+    process.wait()
+    return finalize_validation(item["id"])
+
+
 def receive_one(item: dict) -> bool:
     cfg = config()
     integration_path = Path(cfg["worktrees"]["integration"])
     ensure_clean(integration_path)
     current = git("rev-parse", cfg["integration_branch"], cwd=integration_path)
+    if not update_if_status(item["id"], ("queued",), {"status": "preparing", "integration_parent": current, "processing_started_at": now()}):
+        return False
+
     if run("git", "merge-base", "--is-ancestor", item["head"], current, cwd=integration_path, check=False).returncode == 0:
-        update_submission(item["id"], lambda value: value.update({"status": "accepted", "accepted_sha": current, "accepted_at": now(), "note": "already contained in integration head"}))
+        with locked("queue"):
+            values = submissions()
+            current_item = submission_by_id(values, item["id"])
+            if not current_item or current_item["status"] != "preparing":
+                return False
+            current_item.update({"status": "accepted", "accepted_sha": current, "accepted_at": now(), "note": "already contained in integration head"})
+            save_json(state_root() / "submissions.json", values)
+        refresh_integration_preview(item["id"])
         return True
+
     candidate = state_root() / "candidates" / item["id"]
+    log = state_root() / "logs" / f"integrate-{item['id']}.log"
+    latest = submission_by_id(submissions(), item["id"])
+    reusable = candidate.exists() and latest and latest.get("candidate_head") and latest.get("integration_parent") == current
+    if reusable:
+        return start_validation(latest, candidate, log)
     if candidate.exists():
-        git("worktree", "remove", str(candidate), "--force", cwd=integration_path)
+        update_if_status(item["id"], ("preparing",), {
+            "status": "failed",
+            "failed_at": now(),
+            "reason": f"Existing candidate preserved for inspection: {candidate}",
+        })
+        return False
+
     candidate.parent.mkdir(parents=True, exist_ok=True)
     git("worktree", "add", "--detach", str(candidate), current, cwd=integration_path, capture=False)
     link_dependencies(Path(cfg["worktrees"]["personal"]), candidate)
-    log = state_root() / "logs" / f"integrate-{item['id']}.log"
-    try:
-        merge = run("git", "merge", "--no-ff", "--no-commit", item["head"], cwd=candidate, check=False)
-        if merge.returncode:
-            conflicts = git("diff", "--name-only", "--diff-filter=U", cwd=candidate, check=False)
-            run("git", "merge", "--abort", cwd=candidate, check=False)
-            reason = f"Conflict against integration {current}: {conflicts or merge.stderr.strip()}"
-            update_submission(item["id"], lambda value: value.update({"status": "rework", "reason": reason, "failed_at": now()}))
-            return False
-        git("commit", "--no-gpg-sign", "-m", f"Integrate {item['title']} ({item['id']})", cwd=candidate, capture=False)
-        candidate_head = git("rev-parse", "HEAD", cwd=candidate)
-        if shell(cfg["validation_command"], candidate, log):
-            reason = f"Validation failed; see {log}"
-            update_submission(item["id"], lambda value: value.update({"status": "failed", "reason": reason, "failed_at": now()}))
-            return False
-        ensure_clean(integration_path)
-        git("merge", "--ff-only", candidate_head, cwd=integration_path, capture=False)
-        accepted = git("rev-parse", "HEAD", cwd=integration_path)
-        update_submission(item["id"], lambda value: value.update({"status": "accepted", "accepted_sha": accepted, "accepted_at": now(), "validation_log": str(log)}))
-        return True
-    finally:
-        git("worktree", "remove", str(candidate), "--force", cwd=integration_path, check=False)
+    merge = run("git", "merge", "--no-ff", "--no-commit", item["head"], cwd=candidate, check=False)
+    if merge.returncode:
+        conflicts = git("diff", "--name-only", "--diff-filter=U", cwd=candidate, check=False)
+        reason = f"Conflict against integration {current}; candidate preserved at {candidate}: {conflicts or merge.stderr.strip()}"
+        update_if_status(item["id"], ("preparing",), {"status": "rework", "reason": reason, "failed_at": now(), "candidate_path": str(candidate)})
+        return False
+    git("commit", "--no-gpg-sign", "-m", f"Integrate {item['title']} ({item['id']})", cwd=candidate, capture=False)
+    candidate_head = git("rev-parse", "HEAD", cwd=candidate)
+    if not update_if_status(item["id"], ("preparing",), {"candidate_path": str(candidate), "candidate_head": candidate_head}):
+        return False
+    prepared = submission_by_id(submissions(), item["id"])
+    return start_validation(prepared, candidate, log) if prepared else False
+
+
+def reconcile_interrupted() -> None:
+    for item in submissions():
+        if item["status"] == "validating":
+            if pid_alive(item.get("validation_pid", 0)):
+                print(f"Waiting for orphan validator {item['validation_pid']} for {item['id']}")
+                while pid_alive(item["validation_pid"]):
+                    time.sleep(0.1)
+            print(f"Reconciling completed orphan validator for {item['id']}")
+            finalize_validation(item["id"])
+        elif item["status"] == "preparing":
+            candidate = item.get("candidate_path") or str(state_root() / "candidates" / item["id"])
+            update_if_status(item["id"], ("preparing",), {
+                "status": "failed",
+                "failed_at": now(),
+                "reason": f"Interrupted candidate preparation preserved at {candidate}",
+            })
 
 
 def receive(args) -> None:
     config()
     with locked("integration"):
+        reconcile_interrupted()
         queue = [item for item in submissions() if item["status"] == "queued"]
         if args.submission:
             queue = [item for item in queue if item["id"] == args.submission]
@@ -455,9 +628,25 @@ def receive(args) -> None:
         for item in queue:
             print(f"Receiving {item['id']}: {item['title']}")
             accepted = receive_one(item)
-            print("Accepted" if accepted else "Returned for rework; run fleet status for details")
+            print("Accepted" if accepted else "Not accepted; run fleet status for details")
             if not args.all:
                 break
+
+
+def queued_submission_ids() -> list[str]:
+    return [item["id"] for item in submissions() if item["status"] == "queued"]
+
+
+def spawn_integrator_locked(cfg: dict, initial_ids: list[str]) -> dict:
+    log = state_root() / "logs" / f"integrator-wake-{int(time.time())}-{uuid.uuid4().hex[:4]}.log"
+    log.parent.mkdir(parents=True, exist_ok=True)
+    configured = cfg.get("integrator_command")
+    command = configured or [str(Path(cfg["worktrees"]["integration"]) / "_scripts" / "fleet"), "integrate"]
+    with log.open("a") as output:
+        process = subprocess.Popen(command, cwd=cfg["worktrees"]["integration"], stdout=output, stderr=subprocess.STDOUT, start_new_session=True)
+    marker = {"pid": process.pid, "started_at": now(), "log": str(log), "initial_submission_ids": initial_ids}
+    save_json(state_root() / "integrator.json", marker)
+    return marker
 
 
 def wake_integrator() -> None:
@@ -471,33 +660,68 @@ def wake_integrator() -> None:
         if marker.get("pid") and pid_alive(marker["pid"]):
             print(f"Integration agent already running (PID {marker['pid']})")
             return
-        log = state_root() / "logs" / f"integrator-wake-{int(time.time())}.log"
-        log.parent.mkdir(parents=True, exist_ok=True)
-        with log.open("a") as output:
-            process = subprocess.Popen(
-                [str(Path(cfg["worktrees"]["integration"]) / "_scripts" / "fleet"), "integrate", "--all"],
-                cwd=cfg["worktrees"]["integration"], stdout=output, stderr=subprocess.STDOUT, start_new_session=True,
-            )
-        save_json(marker_path, {"pid": process.pid, "started_at": now(), "log": str(log)})
-        print(f"Woke integration agent (PID {process.pid}); log: {log}")
+        pending = queued_submission_ids()
+        if not pending:
+            return
+        marker = spawn_integrator_locked(cfg, pending)
+        print(f"Woke integration agent (PID {marker['pid']}); log: {marker['log']}")
 
 
-def integrate(args) -> None:
+def finish_integrator(initial_ids: list[str]) -> None:
+    cfg = config()
+    marker_path = state_root() / "integrator.json"
+    with locked("integrator-start"):
+        marker = load_json(marker_path, {})
+        if marker.get("pid") == os.getpid():
+            save_json(marker_path, {"finished_at": now(), "last_pid": os.getpid(), "initial_submission_ids": initial_ids})
+        late_ids = [submission_id for submission_id in queued_submission_ids() if submission_id not in initial_ids]
+        if late_ids and cfg.get("auto_integrate", True):
+            successor = spawn_integrator_locked(cfg, late_ids)
+            print(f"Handed {len(late_ids)} late submission(s) to integration agent PID {successor['pid']}")
+
+
+def pending(_args) -> None:
+    cfg = config()
+    values = [item for item in submissions() if item["status"] == "queued"]
+    if not values:
+        print("No approved queued submissions")
+        return
+    for item in values:
+        print(f"SUBMISSION {item['id']}")
+        print(f"  title: {item['title']}")
+        print(f"  submitted SHA: {item['head']}")
+        print(f"  pinned ref: {item['ref']}")
+        print(f"  current integration: {git('rev-parse', cfg['integration_branch'])}")
+        print(f"  preview: {item.get('preview_url', 'missing')}")
+        print(f"  review: git diff {cfg['integration_branch']}...{item['head']} --")
+        print(f"  accept after review: fleet receive {item['id']}")
+        print(f"  reject: fleet reject {item['id']} \"specific reason\"")
+
+
+def integrate(_args) -> None:
     cfg = config()
     integration = Path(cfg["worktrees"]["integration"])
+    marker = load_json(state_root() / "integrator.json", {})
+    initial_ids = marker.get("initial_submission_ids", []) if marker.get("pid") == os.getpid() else queued_submission_ids()
     prompt = (
-        "You are the dedicated Speedshop fleet integration agent. Read _scripts/FLEET.md, then run "
-        f"{shlex.quote(str(integration / '_scripts' / 'fleet'))} receive{' --all' if args.all else ''}. "
-        "Report accepted, held, failed, and rework submissions. Preserve product decisions: mechanical conflicts may be diagnosed, but semantic conflicts must be returned for rework. Do not edit product files or push remotely."
+        "You are the dedicated Speedshop integration reviewer. Read _scripts/FLEET.md and run `fleet pending`. "
+        "For every submission listed in that initial packet, verify its pinned ref resolves to the stated exact SHA, "
+        "inspect the complete diff against the current fleet/integrated branch, and use the immutable preview when UI changed. "
+        "Decide independently: run `fleet receive <id>` only when the exact diff is correct, in scope, and safe; otherwise run "
+        "`fleet reject <id> \"specific rework reason\"`. Never bulk-receive, never edit product files, and never resolve semantic "
+        "conflicts by guessing. Report each reviewed SHA and decision."
     )
-    log = state_root() / "logs" / f"agent-integrator-{int(time.time())}.log"
+    log = state_root() / "logs" / f"agent-integrator-{int(time.time())}-{uuid.uuid4().hex[:4]}.log"
     log.parent.mkdir(parents=True, exist_ok=True)
     command = ["pi", "--name", "fleet-integrator", "--tools", "read,bash", "-p", prompt]
-    with log.open("w") as output:
-        result = subprocess.run(command, cwd=integration, stdout=output, stderr=subprocess.STDOUT)
-    print(log.read_text())
-    if result.returncode:
-        raise SystemExit(f"Integration agent failed ({result.returncode}); log: {log}")
+    try:
+        with log.open("w") as output:
+            result = subprocess.run(command, cwd=integration, stdout=output, stderr=subprocess.STDOUT)
+        print(log.read_text())
+        if result.returncode:
+            raise SystemExit(f"Integration agent failed ({result.returncode}); log: {log}")
+    finally:
+        finish_integrator(initial_ids)
 
 
 def sync(args) -> None:
@@ -574,12 +798,13 @@ def parser() -> argparse.ArgumentParser:
     reject_parser.add_argument("submission")
     reject_parser.add_argument("reason")
     reject_parser.set_defaults(func=reject)
+    pending_parser = commands.add_parser("pending")
+    pending_parser.set_defaults(func=pending)
     receive_parser = commands.add_parser("receive")
     receive_parser.add_argument("submission", nargs="?")
     receive_parser.add_argument("--all", action="store_true")
     receive_parser.set_defaults(func=receive)
     integrate_parser = commands.add_parser("integrate")
-    integrate_parser.add_argument("--all", action="store_true")
     integrate_parser.set_defaults(func=integrate)
     sync_parser = commands.add_parser("sync")
     sync_parser.set_defaults(func=sync)

@@ -39,14 +39,17 @@ fleet approve <submission-id> <full-submitted-sha>
 
 The chief of staff must translate verbal approval into that exact command. Approval of an older SHA cannot approve a newer submission.
 
-Submitting approved work, or approving held work, wakes a fresh one-shot integration agent. There is no polling or permanent AI process. To retry the wake manually:
+A submission is not receivable while its immutable preview builds. Submitting approved work, or approving held work, wakes a fresh one-shot integration agent. There is no polling or permanent AI process. Work arriving during review is handed to a successor before the active integrator relinquishes ownership. To retry the wake manually:
 
 ```sh
 fleet integrate
-fleet integrate --all
 ```
 
-The integration agent calls deterministic `fleet receive`. It merges in an isolated candidate worktree, validates, and only then fast-forwards `fleet/integrated`. A conflict becomes `rework`; a failed gate becomes `failed`. Either leaves accepted integration and author files unchanged. Semantic conflict resolution returns to the author. A transient validation failure can be requeued at its unchanged SHA with `fleet retry <submission-id>` after fixing the environment.
+The integration agent runs `fleet pending`, verifies each pinned SHA, reviews its complete diff and UI preview, and decides separately whether to run `fleet receive <submission-id>` or `fleet reject <submission-id> "reason"`. Bulk acceptance is not part of the integration-agent contract.
+
+`fleet receive` merges one reviewed submission in an isolated candidate worktree, validates, rechecks queue eligibility under the promotion lock, and only then fast-forwards `fleet/integrated`. Rejection or supersession during validation prevents promotion. A conflict becomes `rework`; a failed gate becomes `failed`. Either leaves accepted integration and author files unchanged. Semantic conflict resolution returns to the author.
+
+Validation ownership and result files are durable. A replacement receiver waits for and reconciles an orphan validator after an interrupted receiver; evidence-bearing candidates are preserved rather than force-removed. A transient validation failure can be requeued at its unchanged SHA with `fleet retry <submission-id>` after fixing the environment. Acceptance rebuilds the running integration preview, and records a visible refresh error without reverting accepted source if that separate build fails.
 
 Reject without integration:
 
