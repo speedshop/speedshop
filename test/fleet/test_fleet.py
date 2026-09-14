@@ -286,6 +286,63 @@ class FleetTest(unittest.TestCase):
         self.assertEqual(validator_pid, self.state()[-1]["validation_pid"])
         self.assertTrue(candidate.exists(), "dirty evidence-bearing candidate must be preserved")
 
+    def test_retry_preserves_modified_candidate_and_validates_fresh_committed_tree(self):
+        self.commit_change(self.root, "broken\n", "candidate")
+        self.fleet("submit", "-m", "candidate")
+        item = self.state()[-1]
+        self.configure_validation("printf 'fixed\\n' > index.html; false")
+        self.fleet("receive", item["id"], check=False)
+        first_attempt = Path(self.state()[-1]["candidate_path"])
+        self.assertEqual("fixed\n", (first_attempt / "index.html").read_text())
+        self.configure_validation("grep -q fixed index.html")
+        self.fleet("retry", item["id"])
+        self.fleet("receive", item["id"], check=False)
+        retried = self.state()[-1]
+        self.assertEqual("failed", retried["status"])
+        self.assertNotEqual(first_attempt, Path(retried["candidate_path"]))
+        self.assertTrue(first_attempt.exists())
+        self.assertEqual(str(first_attempt), retried["preserved_attempts"][-1]["path"])
+        integrated = command("git", "show", "fleet/integrated:index.html", cwd=self.root).stdout
+        self.assertEqual("baseline\n", integrated)
+
+    def test_retry_rebuilds_candidate_after_integration_parent_advances(self):
+        self.commit_change(self.root, "A\n", "candidate A")
+        self.fleet("submit", "-m", "A")
+        submission_a = self.state()[-1]
+        self.configure_validation("false")
+        self.fleet("receive", submission_a["id"], check=False)
+        old_candidate = self.state()[-1]["candidate_path"]
+        worker = self.worktrees / "worker-1"
+        (worker / "B.txt").write_text("B\n")
+        command("git", "add", "B.txt", cwd=worker)
+        command("git", "commit", "--no-gpg-sign", "-m", "B", cwd=worker)
+        self.fleet("submit", "-m", "B", cwd=worker)
+        submission_b = self.state()[-1]
+        self.configure_validation("true")
+        self.fleet("receive", submission_b["id"])
+        advanced_head = command("git", "rev-parse", "fleet/integrated", cwd=self.root).stdout.strip()
+        self.fleet("retry", submission_a["id"])
+        self.fleet("receive", submission_a["id"])
+        final_a = next(item for item in self.state() if item["id"] == submission_a["id"])
+        self.assertEqual("accepted", final_a["status"])
+        self.assertNotEqual(old_candidate, final_a["candidate_path"])
+        self.assertEqual(advanced_head, final_a["integration_parent"])
+        self.assertEqual("A\n", command("git", "show", "fleet/integrated:index.html", cwd=self.root).stdout)
+        self.assertEqual("B\n", command("git", "show", "fleet/integrated:B.txt", cwd=self.root).stdout)
+
+    def test_successful_validator_that_mutates_tracked_bytes_cannot_promote(self):
+        self.commit_change(self.root, "candidate\n", "candidate")
+        self.fleet("submit", "-m", "candidate")
+        item = self.state()[-1]
+        before = command("git", "rev-parse", "fleet/integrated", cwd=self.root).stdout.strip()
+        self.configure_validation("printf 'mutated\\n' > index.html; true")
+        self.fleet("receive", item["id"], check=False)
+        result = self.state()[-1]
+        self.assertEqual("failed", result["status"])
+        self.assertIn("changed the committed candidate tree", result["reason"])
+        self.assertEqual(before, command("git", "rev-parse", "fleet/integrated", cwd=self.root).stdout.strip())
+        self.assertEqual("mutated\n", (Path(result["candidate_path"]) / "index.html").read_text())
+
     def test_validation_failure_can_restart_at_same_sha(self):
         self.commit_change(self.root, "candidate\n", "candidate")
         self.fleet("submit", "-m", "candidate")

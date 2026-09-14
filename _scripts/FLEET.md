@@ -49,7 +49,9 @@ The integration agent runs `fleet pending`, verifies each pinned SHA, reviews it
 
 `fleet receive` merges one reviewed submission in an isolated candidate worktree, validates, rechecks queue eligibility under the promotion lock, and only then fast-forwards `fleet/integrated`. Rejection or supersession during validation prevents promotion. A conflict becomes `rework`; a failed gate becomes `failed`. Either leaves accepted integration and author files unchanged. Semantic conflict resolution returns to the author.
 
-Validation ownership and result files are durable. A replacement receiver waits for and reconciles an orphan validator after an interrupted receiver; evidence-bearing candidates are preserved rather than force-removed. A transient validation failure can be requeued at its unchanged SHA with `fleet retry <submission-id>` after fixing the environment. Acceptance rebuilds the running integration preview, and records a visible refresh error without reverting accepted source if that separate build fails.
+Validation ownership and result files are durable. Before and after validation, fleet verifies that the candidate's actual HEAD and tracked index/worktree exactly match the recorded commit; only those exact validated bytes can be promoted. A validator that changes tracked bytes cannot produce acceptance.
+
+A replacement receiver waits for and reconciles an orphan validator after an interrupted receiver. Retry reuses a candidate only when its original integration parent is still current and its tracked tree remains exact. Otherwise, the old attempt and attempt-specific log are preserved as evidence while a new candidate is built from the current integration head. A transient validation failure can be requeued at its unchanged submission SHA with `fleet retry <submission-id>` after fixing the environment. Acceptance rebuilds the running integration preview, and records a visible refresh error without reverting accepted source if that separate build fails.
 
 Reject without integration:
 

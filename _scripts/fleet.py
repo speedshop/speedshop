@@ -452,6 +452,14 @@ def remove_candidate_after_acceptance(submission_id: str, candidate: Path, integ
     update_if_status(submission_id, ("accepted",), fields)
 
 
+def candidate_has_exact_tree(candidate: Path, expected_head: str) -> bool:
+    if not candidate.exists():
+        return False
+    actual_head = git("rev-parse", "HEAD", cwd=candidate, check=False)
+    tracked_changes = git("status", "--porcelain", "--untracked-files=no", cwd=candidate, check=False)
+    return actual_head == expected_head and not tracked_changes
+
+
 def finalize_validation(submission_id: str) -> bool:
     cfg = config()
     integration_path = Path(cfg["worktrees"]["integration"])
@@ -480,11 +488,27 @@ def finalize_validation(submission_id: str) -> bool:
             "reason": f"Validation failed with exit {exit_code}; candidate preserved at {item['candidate_path']}; see {item['validation_log']}",
         })
         return False
+    candidate = Path(item["candidate_path"])
+    if not candidate_has_exact_tree(candidate, item["candidate_head"]):
+        update_if_status(submission_id, ("validating",), {
+            "status": "failed",
+            "failed_at": now(),
+            "reason": f"Validator changed the committed candidate tree; unpromoted evidence preserved at {candidate}",
+        })
+        return False
 
     with locked("queue"):
         values = submissions()
         current_item = submission_by_id(values, submission_id)
         if not current_item or current_item["status"] != "validating":
+            return False
+        if not candidate_has_exact_tree(Path(current_item["candidate_path"]), current_item["candidate_head"]):
+            current_item.update({
+                "status": "failed",
+                "failed_at": now(),
+                "reason": f"Candidate changed before promotion; unpromoted evidence preserved at {current_item['candidate_path']}",
+            })
+            save_json(state_root() / "submissions.json", values)
             return False
         ensure_clean(integration_path)
         current_head = git("rev-parse", cfg["integration_branch"], cwd=integration_path)
@@ -516,7 +540,16 @@ def finalize_validation(submission_id: str) -> bool:
 
 def start_validation(item: dict, candidate: Path, log: Path) -> bool:
     cfg = config()
-    result_path = state_root() / "validation" / f"{item['id']}.result"
+    candidate_head = item.get("candidate_head", "")
+    if not candidate_has_exact_tree(candidate, candidate_head):
+        update_if_status(item["id"], ("preparing",), {
+            "status": "failed",
+            "failed_at": now(),
+            "reason": f"Candidate does not match recorded commit {candidate_head}; evidence preserved at {candidate}",
+        })
+        return False
+    attempt = item.get("active_attempt", 1)
+    result_path = state_root() / "validation" / f"{item['id']}-attempt-{attempt}.result"
     temporary_result = result_path.with_suffix(".tmp")
     result_path.parent.mkdir(parents=True, exist_ok=True)
     result_path.unlink(missing_ok=True)
@@ -552,8 +585,45 @@ def receive_one(item: dict) -> bool:
     integration_path = Path(cfg["worktrees"]["integration"])
     ensure_clean(integration_path)
     current = git("rev-parse", cfg["integration_branch"], cwd=integration_path)
-    if not update_if_status(item["id"], ("queued",), {"status": "preparing", "integration_parent": current, "processing_started_at": now()}):
-        return False
+
+    with locked("queue"):
+        values = submissions()
+        current_item = submission_by_id(values, item["id"])
+        if not current_item or current_item["status"] != "queued":
+            return False
+        old_candidate = Path(current_item["candidate_path"]) if current_item.get("candidate_path") else None
+        old_head = current_item.get("candidate_head")
+        old_parent = current_item.get("integration_parent")
+        reusable = bool(old_candidate and old_head and old_parent == current and candidate_has_exact_tree(old_candidate, old_head))
+        attempts = list(current_item.get("preserved_attempts", []))
+        if old_candidate and not reusable:
+            reason = "integration parent changed" if old_parent != current else "candidate no longer matches its recorded clean commit"
+            attempts.append({
+                "attempt": current_item.get("active_attempt", 1),
+                "path": str(old_candidate),
+                "candidate_head": old_head,
+                "integration_parent": old_parent,
+                "validation_log": current_item.get("validation_log"),
+                "validation_result": current_item.get("validation_result"),
+                "preserved_at": now(),
+                "reason": reason,
+            })
+        attempt = current_item.get("active_attempt", 1) if reusable else current_item.get("active_attempt", 0) + 1
+        candidate = old_candidate if reusable else state_root() / "candidates" / f"{item['id']}-attempt-{attempt}"
+        current_item.update({
+            "status": "preparing",
+            "integration_parent": current,
+            "processing_started_at": now(),
+            "active_attempt": attempt,
+            "candidate_path": str(candidate),
+            "preserved_attempts": attempts,
+        })
+        if not reusable:
+            current_item.pop("candidate_head", None)
+            current_item.pop("validation_pid", None)
+            current_item.pop("validation_result", None)
+            current_item.pop("validation_log", None)
+        save_json(state_root() / "submissions.json", values)
 
     if run("git", "merge-base", "--is-ancestor", item["head"], current, cwd=integration_path, check=False).returncode == 0:
         with locked("queue"):
@@ -566,17 +636,15 @@ def receive_one(item: dict) -> bool:
         refresh_integration_preview(item["id"])
         return True
 
-    candidate = state_root() / "candidates" / item["id"]
-    log = state_root() / "logs" / f"integrate-{item['id']}.log"
-    latest = submission_by_id(submissions(), item["id"])
-    reusable = candidate.exists() and latest and latest.get("candidate_head") and latest.get("integration_parent") == current
+    log = state_root() / "logs" / f"integrate-{item['id']}-attempt-{attempt}.log"
     if reusable:
-        return start_validation(latest, candidate, log)
+        prepared = submission_by_id(submissions(), item["id"])
+        return start_validation(prepared, candidate, log) if prepared else False
     if candidate.exists():
         update_if_status(item["id"], ("preparing",), {
             "status": "failed",
             "failed_at": now(),
-            "reason": f"Existing candidate preserved for inspection: {candidate}",
+            "reason": f"New attempt path already exists and was preserved for inspection: {candidate}",
         })
         return False
 
@@ -587,11 +655,18 @@ def receive_one(item: dict) -> bool:
     if merge.returncode:
         conflicts = git("diff", "--name-only", "--diff-filter=U", cwd=candidate, check=False)
         reason = f"Conflict against integration {current}; candidate preserved at {candidate}: {conflicts or merge.stderr.strip()}"
-        update_if_status(item["id"], ("preparing",), {"status": "rework", "reason": reason, "failed_at": now(), "candidate_path": str(candidate)})
+        update_if_status(item["id"], ("preparing",), {"status": "rework", "reason": reason, "failed_at": now()})
         return False
     git("commit", "--no-gpg-sign", "-m", f"Integrate {item['title']} ({item['id']})", cwd=candidate, capture=False)
     candidate_head = git("rev-parse", "HEAD", cwd=candidate)
-    if not update_if_status(item["id"], ("preparing",), {"candidate_path": str(candidate), "candidate_head": candidate_head}):
+    if not candidate_has_exact_tree(candidate, candidate_head):
+        update_if_status(item["id"], ("preparing",), {
+            "status": "failed",
+            "failed_at": now(),
+            "reason": f"Fresh candidate does not match its committed tree; evidence preserved at {candidate}",
+        })
+        return False
+    if not update_if_status(item["id"], ("preparing",), {"candidate_head": candidate_head}):
         return False
     prepared = submission_by_id(submissions(), item["id"])
     return start_validation(prepared, candidate, log) if prepared else False
