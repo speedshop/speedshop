@@ -101,7 +101,9 @@ def branch_exists(branch: str) -> bool:
 
 def bootstrap(args) -> None:
     root = repository_root()
-    ensure_clean(root)
+    tracked_changes = git("status", "--porcelain", "--untracked-files=no", cwd=root)
+    if tracked_changes:
+        raise SystemExit(f"Tracked or staged changes must be checkpointed before bootstrap:\n{tracked_changes}")
     state_root().mkdir(parents=True, exist_ok=True)
     base = git("rev-parse", args.base, cwd=root)
     worktree_root = Path(args.worktree_root).expanduser().resolve() if args.worktree_root else root.parent / ".worktrees" / "speedshop-fleet"
