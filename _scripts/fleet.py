@@ -81,6 +81,13 @@ def now() -> str:
     return dt.datetime.now(dt.timezone.utc).isoformat()
 
 
+def heading(text: str) -> None:
+    if sys.stdout.isatty() and shutil.which("gum"):
+        subprocess.run(["gum", "style", "--bold", "--foreground", "14", text], check=False)
+    else:
+        print(text)
+
+
 def lane_for_path(path: Path, cfg: dict) -> str:
     resolved = path.resolve()
     for lane, lane_path in cfg["worktrees"].items():
@@ -361,7 +368,7 @@ def submit(args) -> None:
     print(f"Submitted {submission_id} at immutable SHA {head}")
     print(f"Preview: {url}")
     if requires_signoff:
-        print(f"SIGN THIS OFF PLEASE: fleet approve {submission_id} {head}")
+        heading(f"SIGN THIS OFF PLEASE: fleet approve {submission_id} {head}")
     else:
         print("Ready for integration")
         wake_integrator()
@@ -508,7 +515,7 @@ def sync(args) -> None:
 
 def show_status(_args) -> None:
     cfg = config()
-    print("LANES")
+    heading("LANES")
     current_claims = claims()
     servers = load_json(state_root() / "servers.json", {})
     for lane in LANES:
@@ -520,7 +527,7 @@ def show_status(_args) -> None:
         planned_url = f"http://127.0.0.1:{cfg['live_ports'][lane]}/threadpilot.html"
         preview_state = preview_value.get("url", planned_url) if preview_value and pid_alive(preview_value.get("pid", 0)) else f"stopped: {planned_url}"
         print(f"  {lane:11} {head:8} {'DIRTY' if dirty else 'clean':5} | {claim_value.get('task', 'unclaimed')} | {preview_state}")
-    print("SUBMISSIONS")
+    heading("SUBMISSIONS")
     values = submissions()
     if not values:
         print("  none")
