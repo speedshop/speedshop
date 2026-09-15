@@ -8,7 +8,7 @@
 
 @font-face {
   font-family: "Redaction 70";
-  src: url("/assets/fonts/redaction/Redaction70-Italic.woff2") format("woff2");
+  src: url("/assets/fonts/redaction/Redaction70-Wordmark-Subset.woff2") format("woff2");
   font-style: italic;
   font-weight: 400;
   font-display: swap;
@@ -16,9 +16,9 @@
 
 @font-face {
   font-family: "Redaction 70";
-  src: url("/assets/fonts/redaction/Redaction70-Bold.woff2") format("woff2");
+  src: url("/assets/fonts/redaction/Redaction70-Regular.woff2") format("woff2");
   font-style: normal;
-  font-weight: 700;
+  font-weight: 400;
   font-display: swap;
 }
 
@@ -185,7 +185,7 @@ body.threadpilot {
 .threadpilot :is(h2, h3, h4) em {
   font-family: "Redaction 70", Georgia, serif;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--tp-magenta);
 }
 .threadpilot-page > .row {

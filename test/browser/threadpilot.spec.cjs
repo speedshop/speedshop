@@ -3,6 +3,42 @@ const { test, expect } = require("@playwright/test");
 
 const CHART_IDS = ["chart-threads", "chart-latency", "chart-throughput"];
 
+test.describe("Threadpilot typography", () => {
+  test("loads the subset italic wordmark and regular emphasis fonts", async ({
+    page,
+  }) => {
+    await page.goto("/threadpilot.html");
+    await page.evaluate(() => document.fonts.ready);
+
+    const wordmark = page.locator(".threadpilot-hero h1");
+    const emphasis = page.locator(".threadpilot-lead h2 em");
+
+    await expect(wordmark).toHaveCSS("font-family", /Redaction 70/);
+    await expect(wordmark).toHaveCSS("font-style", "italic");
+    await expect(wordmark).toHaveCSS("font-weight", "400");
+    await expect(emphasis).toHaveCSS("font-family", /Redaction 70/);
+    await expect(emphasis).toHaveCSS("font-style", "normal");
+    await expect(emphasis).toHaveCSS("font-weight", "400");
+    await expect(emphasis).toHaveCSS("color", "rgb(255, 85, 255)");
+
+    const loadedFontUrls = await page.evaluate(() =>
+      performance
+        .getEntriesByType("resource")
+        .map((entry) => entry.name)
+        .filter((url) => url.includes("/assets/fonts/redaction/")),
+    );
+    expect(loadedFontUrls).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("Redaction70-Regular.woff2"),
+        expect.stringContaining("Redaction70-Wordmark-Subset.woff2"),
+      ]),
+    );
+    expect(loadedFontUrls.some((url) => url.includes("Redaction70-Bold"))).toBe(
+      false,
+    );
+  });
+});
+
 test.describe("Threadpilot benchmark preview", () => {
   test("reveals dense single-pixel series from left to right", async ({
     page,
