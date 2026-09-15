@@ -1,0 +1,23 @@
+---
+sitemap: false
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Threadpilot visualization</title>
+<link rel="preload" href="atlas.png" as="image">
+<link rel="stylesheet" href="style.css">
+<script type="module" src="dist/player.js"></script>
+</head>
+<body>
+<section id="stage" aria-label="Threadpilot processed video"><canvas aria-label="Animated ASCII video"></canvas></section>
+<nav aria-label="Playback controls">
+  <span role="status" aria-live="polite">Loading renderer...</span>
+  <div><button id="play" type="button" disabled>Play</button><button id="audio-toggle" type="button">Play music</button></div>
+</nav>
+<video src="dist/video.mp4" muted loop playsinline preload="none"></video>
+<audio src="dist/music.m4a" loop preload="metadata"></audio>
+</body>
+</html>

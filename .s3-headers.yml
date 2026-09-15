@@ -3,6 +3,10 @@
 # and uploaded with the specified Content-Type header.
 
 content_types:
+  - pattern: "*.mp4"
+    content_type: "video/mp4"
+  - pattern: "*.m4a"
+    content_type: "audio/mp4"
   - pattern: "*.txt"
     content_type: "text/plain; charset=utf-8"
   - pattern: "*.md"
