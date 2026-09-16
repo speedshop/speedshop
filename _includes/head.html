@@ -40,7 +40,7 @@
       }
       return import('/assets/js/viz/' + vizName + '.js');
     };
-    {% if page.url == "/" %}window.vizP = matchMedia('(min-width: 769px)').matches ? window.vizLoad() : null;{% endif %}
+    {% if page.url == "/" %}window.vizP = window.vizLoad();{% endif %}
   </script>
   <script src="/assets/js/app.js" async></script>
 

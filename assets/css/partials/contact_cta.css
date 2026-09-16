@@ -1,0 +1,79 @@
+/* Shared boxed invitation: homepage, retainer, and article footers. */
+.contact-cta {
+  border: var(--ui-border-width) solid var(--color-secondary);
+  padding: var(--rhythm-main) var(--ui-space-md);
+  margin: var(--rhythm-main) 0;
+  text-align: center;
+  scroll-margin-top: var(--rhythm-main);
+}
+
+.post .contact-cta {
+  margin: 0;
+}
+
+.contact-cta .contact-cta-title {
+  background: none;
+  color: inherit;
+  font-size: 3.5rem;
+  line-height: 1.2;
+  padding: 0;
+  margin: 0 0 var(--rhythm-side);
+}
+
+.contact-cta .contact-cta-copy {
+  font-size: 2rem;
+  line-height: 1.5;
+  max-width: 62rem;
+  margin: 0 auto var(--rhythm-side);
+}
+
+.contact-cta .cta-links {
+  justify-content: center;
+  gap: var(--ui-space-sm);
+}
+
+.contact-cta .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 4.4rem;
+  height: auto;
+  line-height: 1.5;
+  padding: var(--ui-space-sm) var(--ui-space-md);
+  border-radius: 0;
+  margin: 0;
+}
+
+.contact-cta .button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
+}
+
+.contact-cta .cta-separator {
+  margin: 0;
+}
+
+.contact-cta-email {
+  display: inline-flex;
+  align-items: center;
+  min-height: 4.4rem;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+  font-size: 1.6rem;
+}
+
+@media (max-width: 544px) {
+  .contact-cta .contact-cta-title {
+    font-size: 3.2rem;
+  }
+
+  .contact-cta .contact-cta-copy {
+    font-size: 1.6rem;
+    line-height: var(--rhythm-main);
+  }
+}
+
+@media (max-width: 359px) {
+  .contact-cta .cta-separator {
+    display: none;
+  }
+}

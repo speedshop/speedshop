@@ -1,9 +1,9 @@
-<div class="row">
-  <div class="column">
-    <p class="cta-links">
-      <a class="button" href="https://savvycal.com/nateberkopec/join-the-retainer">Book a call</a>
-      <span class="cta-separator">|</span>
-      <a href="mailto:nate.berkopec+sales@speedshop.co">Email us instead</a>
-    </p>
+<section class="contact-cta" id="contact-cta" aria-labelledby="contact-cta-title">
+  <h2 class="contact-cta-title" id="contact-cta-title">{{ include.title | default: "Speed is a feature." | escape }}</h2>
+  <p class="contact-cta-copy">{{ include.copy | default: "We're a Ruby on Rails performance consultancy. We help you make your application faster and cut scaling costs." | escape }}</p>
+  <div class="cta-links">
+    <a class="button" href="https://savvycal.com/nateberkopec/join-the-retainer">Book a call</a>
+    <span class="cta-separator" aria-hidden="true">|</span>
+    <a class="contact-cta-email" href="mailto:nate.berkopec+sales@speedshop.co">Email us instead</a>
   </div>
-</div>
+</section>

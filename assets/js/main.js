@@ -256,12 +256,34 @@ function init() {
   });
 
   function viz() {
-    var desktop = matchMedia('(min-width: 769px)');
+    var mobileLayout = matchMedia('(max-width: 768px), (max-width: 940px) and (orientation: landscape)');
     var reduced = matchMedia('(prefers-reduced-motion: reduce)');
     var canvas = null;
     var inst = null;
     var bootCancel = null;
     var bootToken = 0;
+    var inView = true;
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.target === canvas) {
+          inView = entry.isIntersecting;
+          update();
+        }
+      });
+    });
+
+    function placeHomeCta() {
+      var content = document.querySelector('.home-content');
+      var cta = document.querySelector('.home-page .contact-cta');
+      if (!content || !cta) return;
+
+      // Keep keyboard and screen-reader order aligned with the responsive layout.
+      if (mobileLayout.matches && cta.nextElementSibling !== content) {
+        content.before(cta);
+      } else if (!mobileLayout.matches && content.nextElementSibling !== cta) {
+        content.after(cta);
+      }
+    }
 
     function listenMedia(q, f) {
       if (q.addEventListener) {
@@ -281,6 +303,8 @@ function init() {
 
     function unmount() {
       stopBoot();
+      observer.disconnect();
+      inView = true;
       if (inst) {
         inst.stop();
         inst = null;
@@ -306,7 +330,7 @@ function init() {
       }
 
       inst.resize();
-      if (desktop.matches && document.visibilityState !== 'hidden') {
+      if (inView && document.visibilityState !== 'hidden') {
         inst.start(reduced.matches);
       } else {
         inst.stop();
@@ -315,7 +339,7 @@ function init() {
 
     function mount() {
       var nextCanvas = document.getElementById('sslogocanvas');
-      if (!nextCanvas || !window.vizLoad || !desktop.matches) {
+      if (!nextCanvas || !window.vizLoad) {
         unmount();
         return;
       }
@@ -334,6 +358,7 @@ function init() {
       }
 
       canvas = nextCanvas;
+      observer.observe(canvas);
       canvas.dataset.viz = '1';
       var token = bootToken;
       var moduleP = window.vizP || window.vizLoad();
@@ -368,6 +393,7 @@ function init() {
     }
 
     function sync() {
+      placeHomeCta();
       if (inst) {
         update();
       } else {
@@ -375,14 +401,13 @@ function init() {
       }
     }
 
-    listenMedia(desktop, sync);
     listenMedia(reduced, sync);
     document.addEventListener('visibilitychange', sync);
     window.addEventListener('resize', sync);
     window.addEventListener('pagehide', unmount);
     document.addEventListener('pjax:send', unmount);
     document.addEventListener('pjax:complete', sync);
-    mount();
+    sync();
   }
 
   viz();

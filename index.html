@@ -10,7 +10,13 @@ layout: default
       <div class="home-wordmark">
         {% include speedshop_wordmark.svg %}
       </div>
-      <p>
+      <div id="big-black-bar">
+        <canvas id="sslogocanvas" aria-hidden="true" style="display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 500ms"></canvas>
+      </div>
+      {% include contact_cta.html %}
+
+      <div class="home-content">
+      <p class="home-desktop-intro">
         Speedshop is a Ruby on Rails performance consultancy that
         optimizes the full stack - frontend, backend and environment - to generate
         revenue and cut scaling costs for businesses on Rails through tools, information and training.
@@ -172,12 +178,8 @@ layout: default
           specific organization.
         </li>
       </ul>
-
-      {% include contact_cta.html %}
+      </div>
 
     </div>
   </div>
-</div>
-<div id="big-black-bar" class="visible-desktop">
-  <canvas id="sslogocanvas" style="display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 500ms"></canvas>
 </div>
