@@ -79,6 +79,23 @@ test.describe('Animation lifecycle', () => {
     expect(afterBack.activeCount).toBeGreaterThan(0);
   });
 
+  test('pauses the portrait homepage animation while it is offscreen', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 664 });
+    await installAnimationFrameTracker(page);
+    await page.goto('/?viz=ttt');
+    await expect(page.locator('#sslogocanvas')).toHaveCSS('opacity', '1');
+
+    await page.evaluate(() => window.scrollTo(0, 900));
+    await expect.poll(async () => (await animationFrameSnapshot(page)).activeCount).toBe(0);
+    const paused = await animationFrameSnapshot(page);
+    await page.waitForTimeout(250);
+    expect((await animationFrameSnapshot(page)).firedCount).toBe(paused.firedCount);
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect.poll(async () => (await animationFrameSnapshot(page)).firedCount)
+      .toBeGreaterThan(paused.firedCount);
+  });
+
   test('cleans up the retainer canvas animation on PJAX send', async ({ page }) => {
     await installAnimationFrameTracker(page);
 
