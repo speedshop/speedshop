@@ -4,11 +4,5 @@ html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
 body { background: #080c09; color: #ffffee; font: 12px/1.4 ui-monospace, monospace; }
 #stage { width: 100%; height: 100%; }
 canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
-nav { position: absolute; inset: auto 12px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-nav > span, button { padding: 8px 11px; background: #080c09; }
-nav div { display: flex; gap: 8px; }
-button { border: 1px solid #98a59b; border-radius: 2px; color: inherit; font: inherit; cursor: pointer; }
-button:hover, button:focus-visible { border-color: #ffffee; }
-button:disabled { opacity: 0.5; cursor: wait; }
 video, audio { display: none; }
-[data-error=true] { color: #ffb4a8; }
+[role=alert] { position: absolute; bottom: 12px; left: 12px; margin: 0; padding: 8px 11px; background: #080c09; color: #ffb4a8; }

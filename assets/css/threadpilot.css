@@ -113,6 +113,39 @@ body.threadpilot {
   background: #080b08;
 }
 
+#threadpilot-audio-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid #98a59b;
+  border-radius: 2px;
+  background: #080c09;
+  color: #ffffee;
+  cursor: pointer;
+}
+
+#threadpilot-audio-toggle:hover,
+#threadpilot-audio-toggle:focus-visible {
+  border-color: #ffffee;
+}
+
+#threadpilot-audio-toggle svg {
+  width: 24px;
+  height: 24px;
+}
+
+#threadpilot-audio-toggle[data-muted=true] .sound-on,
+#threadpilot-audio-toggle[data-muted=false] .sound-off {
+  display: none;
+}
+
 .threadpilot-hero-visual {
   position: absolute;
   inset: 0;
