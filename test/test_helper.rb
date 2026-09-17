@@ -92,11 +92,7 @@ module TestHelper
   end
 
   def self.wait_for_expected_site_files!
-    expected = [
-      File.join(SITE_DIR, "sitemap.xml"),
-      File.join(SITE_DIR, "llms.txt"),
-      File.join(SITE_DIR, "llms-full.txt")
-    ]
+    expected = [File.join(SITE_DIR, "sitemap.xml")]
 
     100.times do
       return if expected.all? { |path| File.exist?(path) }

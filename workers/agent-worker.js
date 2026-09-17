@@ -1,12 +1,8 @@
 /**
  * Agent-ready content negotiation worker
  *
- * Implements Mintlify's agent-ready documentation pattern:
- * - Serves markdown when Accept: text/markdown header is present
- * - Adds Link header advertising llms.txt on all responses
- * - Adds X-Robots-Tag: noindex, nofollow on markdown responses
- *
- * https://www.mintlify.com/blog/context-for-agents
+ * Serves markdown when Accept: text/markdown is present and adds
+ * X-Robots-Tag: noindex, nofollow to markdown responses.
  *
  * Local development:
  *   1. Start static server: caddy run --config Caddyfile
@@ -36,10 +32,6 @@ function getMarkdownPath(pathname) {
 
 function addAgentHeaders(response, isMarkdown = false) {
   const headers = new Headers(response.headers);
-
-  // Advertise llms.txt on all responses
-  headers.set("Link", `<${SITE_URL}/llms.txt>; rel="llms-txt"`);
-  headers.set("X-Llms-Txt", "/llms.txt");
 
   // Prevent search engines from indexing markdown variants
   if (isMarkdown) {
@@ -77,9 +69,7 @@ function isStaticAsset(pathname) {
     pathname.endsWith(".ttf") ||
     pathname.endsWith(".pdf") ||
     pathname.endsWith(".epub") ||
-    pathname.endsWith(".md") ||
-    pathname === "/llms.txt" ||
-    pathname === "/llms-full.txt"
+    pathname.endsWith(".md")
   );
 }
 

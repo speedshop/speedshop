@@ -19,37 +19,6 @@ class SiteTest < Minitest::Test
     http.request(request)
   end
 
-  # llms.txt tests
-
-  def test_llms_txt_exists
-    response = get("/llms.txt")
-    assert_equal "200", response.code
-    assert_includes response["content-type"], "text/plain"
-  end
-
-  def test_llms_txt_has_expected_structure
-    response = get("/llms.txt")
-    body = response.body
-
-    assert_includes body, "# Speedshop"
-    assert_includes body, "## Blog Posts"
-    assert_match(/\[.+\]\(https:\/\/www\.speedshop\.co\/.+\.md\)/, body)
-  end
-
-  def test_llms_full_txt_exists
-    response = get("/llms-full.txt")
-    assert_equal "200", response.code
-    assert_includes response["content-type"], "text/plain"
-  end
-
-  def test_llms_full_txt_has_content
-    response = get("/llms-full.txt")
-    body = response.body
-
-    assert_includes body, "# Speedshop - Full Content"
-    assert body.length > 10_000, "llms-full.txt should have substantial content"
-  end
-
   # Markdown file tests
 
   def test_blog_post_markdown_available_at_index
@@ -60,14 +29,6 @@ class SiteTest < Minitest::Test
   def test_blog_post_markdown_available_at_slug
     response = get("/blog/the-complete-guide-to-rails-caching.md")
     assert_equal "200", response.code
-  end
-
-  def test_markdown_has_llms_header
-    response = get("/blog/the-complete-guide-to-rails-caching/index.md")
-    body = response.body
-
-    assert_match(/<!--.*llms\.txt.*-->/, body,
-      "Markdown files should have llms.txt reference header (requires pandoc_converter.rb update)")
   end
 
   def test_markdown_has_no_pandoc_artifacts
@@ -110,26 +71,7 @@ class SiteTest < Minitest::Test
     assert_includes response["content-type"], "text/html"
   end
 
-  # Agent header tests (requires Cloudflare worker in production)
-
-  def test_link_header_advertises_llms_txt
-    skip "Agent headers require Cloudflare worker" if localhost?
-
-    response = get("/")
-    link_header = response["link"]
-
-    assert link_header, "Link header should be present"
-    assert_includes link_header, "llms.txt"
-    assert_includes link_header, 'rel="llms-txt"'
-  end
-
-  def test_x_llms_txt_header_present
-    skip "Agent headers require Cloudflare worker" if localhost?
-
-    response = get("/")
-
-    assert_equal "/llms.txt", response["x-llms-txt"]
-  end
+  # Markdown response header tests (requires Cloudflare worker in production)
 
   def test_vary_header_includes_accept
     skip "Vary header requires Cloudflare worker" if localhost?
@@ -249,12 +191,6 @@ class SiteTest < Minitest::Test
   def test_robots_txt_exists
     response = get("/robots.txt")
     assert_equal "200", response.code
-  end
-
-  def test_robots_txt_allows_llms_txt
-    response = get("/robots.txt")
-    assert_includes response.body, "llms.txt",
-      "robots.txt should explicitly allow llms.txt (requires robots.txt update)"
   end
 
   def test_404_for_missing_page
