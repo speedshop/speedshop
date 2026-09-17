@@ -139,6 +139,7 @@ end
 
 Jekyll::Hooks.register :site, :after_init do |site|
   client_notes_path = ENV["CLIENT_NOTES_PATH"]
+  generated_data_fixtures_path = ENV["GENERATED_DATA_FIXTURES_PATH"]
 
   data_dir = File.join(site.source, "_data")
   FileUtils.mkdir_p(data_dir)
@@ -150,7 +151,9 @@ Jekyll::Hooks.register :site, :after_init do |site|
   histogram_path = File.join(site.source, Speedshop::SlaReplyHistogram::DEFAULT_OUTPUT_PATH)
 
   fallback_client_notes_path = File.expand_path("../client_notes", site.source)
-  archive_source_path = if client_notes_path && Dir.exist?(client_notes_path)
+  archive_source_path = if generated_data_fixtures_path && Dir.exist?(generated_data_fixtures_path)
+    generated_data_fixtures_path
+  elsif client_notes_path && Dir.exist?(client_notes_path)
     client_notes_path
   elsif Dir.exist?(fallback_client_notes_path)
     fallback_client_notes_path
@@ -158,6 +161,15 @@ Jekyll::Hooks.register :site, :after_init do |site|
 
   four_line_archive = Speedshop::FourLineArchiveGenerator.generate(client_notes_path: archive_source_path)
   File.write(four_line_archive_path, "#{JSON.pretty_generate(four_line_archive)}\n")
+
+  if generated_data_fixtures_path && Dir.exist?(generated_data_fixtures_path)
+    FileUtils.cp(File.join(generated_data_fixtures_path, "sla_status.json"), sla_status_path)
+    FileUtils.cp(File.join(generated_data_fixtures_path, "availability.json"), availability_path)
+    FileUtils.cp(File.join(generated_data_fixtures_path, "holidays.ics"), holidays_path)
+    Speedshop::SlaReplyHistogram.write_placeholder(histogram_path)
+    Speedshop::SlaStatusData.normalize_file!(sla_status_path)
+    next
+  end
 
   unless client_notes_path && Dir.exist?(client_notes_path)
     # CI and local dev often don't have the private client notes repo checked out.

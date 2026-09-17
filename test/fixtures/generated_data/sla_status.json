@@ -1,0 +1,22 @@
+{
+  "sla_policy": "Fixture policy: replies within one business day.",
+  "generated_at": "2026-01-31",
+  "start_date": "2026-01-01",
+  "end_date": "2026-01-31",
+  "performance": {
+    "last_30_days": 100,
+    "last_90_days": 100,
+    "last_6_months": 100
+  },
+  "days": {
+    "2026-01-05": "green",
+    "2026-01-06": "green"
+  },
+  "reply_histogram": {
+    "count": 0,
+    "bin_width_hours": 0,
+    "max_hours": null,
+    "percentiles": {"p50": null, "p75": null, "p95": null, "p99": null},
+    "bins": []
+  }
+}

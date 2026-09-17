@@ -1,0 +1,10 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//speedshop//deploy-validation-fixture//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:fixture-holiday@speedshop.co
+DTSTART;VALUE=DATE:20260101
+SUMMARY:Fixture Holiday
+END:VEVENT
+END:VCALENDAR
