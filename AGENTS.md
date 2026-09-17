@@ -62,14 +62,10 @@ test/
   integration/    # HTTP integration tests
 ```
 
-## Agent-Ready Documentation
+## Markdown Content Negotiation
 
-This site implements the [Mintlify agent-ready pattern](https://www.mintlify.com/blog/context-for-agents):
-
-- `/llms.txt` - Index of all content with markdown links
-- `/llms-full.txt` - Full text of all blog posts
-- `Accept: text/markdown` header returns markdown instead of HTML
-- `Link: </llms.txt>; rel="llms-txt"` header on all responses
+The site returns Markdown instead of HTML when a request includes an
+`Accept: text/markdown` header.
 
 ## Key Files
 

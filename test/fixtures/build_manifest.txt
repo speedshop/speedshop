@@ -26,8 +26,6 @@ status.*
 [files]
 feed.xml
 holidays.ics
-llms-full.txt
-llms.txt
 robots.txt
 sitemap.xml
 
