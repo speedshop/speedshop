@@ -9,13 +9,13 @@
   },
   "dependencies": {
     "pjax": "^0.2.8",
-    "quicklink": "^3.0.1"
+    "quicklink": "^3.0.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
-    "esbuild": "^0.28.1",
-    "prettier": "^3.8.1",
+    "esbuild": "^0.28.2",
+    "prettier": "^3.9.7",
     "purgecss": "^8.0.0",
-    "wrangler": "^4.103.0"
+    "wrangler": "^4.133.0"
   }
 }
