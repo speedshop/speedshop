@@ -6,6 +6,7 @@ permalink: /four-line-fridays.html
 sitemap: false
 ---
 
+{% assign lines = site.data.four_line_archive.lines %}
 <div class="container four-line-page">
   <div class="row" style="margin-top: 3.5rem">
     <div class="column">
@@ -14,131 +15,46 @@ sitemap: false
       <p>Here, you can view and search every line from every Four Line Fridays issue.</p>
       {% include mailchimp.html %}
 
-      <label for="four-line-search">Search</label>
-      <input id="four-line-search" type="search" placeholder="Try: queue, Sidekiq, LLM, Puma" autocomplete="off">
+      <div id="four-line-search-controls" hidden>
+        <label for="four-line-search">Search</label>
+        <input id="four-line-search" type="search" placeholder="Try: queue, Sidekiq, LLM, Puma" autocomplete="off">
+      </div>
 
-      <p class="four-line-result-count" id="four-line-result-count"></p>
-      <p class="four-line-no-results" id="four-line-no-results" hidden>No matching lines.</p>
+      <p class="four-line-result-count" id="four-line-result-count">{{ lines.size }} result{% unless lines.size == 1 %}s{% endunless %}</p>
+      <p class="four-line-no-results" id="four-line-no-results"{% unless lines.size == 0 %} hidden{% endunless %}>No matching lines.</p>
 
-      <ul class="four-line-results" id="four-line-results"></ul>
+      <ul class="four-line-results" id="four-line-results">
+        {% for line in lines %}
+          {% assign issue_date = line.issue_date | date: "%b %-d, %Y" %}
+          <li class="four-line-result" id="{{ line.id | escape }}" data-search="{{ line.line_text | append: ' ' | append: line.issue_date | downcase | escape }}">
+            <p class="four-line-meta">{{ issue_date }}</p>
+            <p class="four-line-text">{{ line.line_html }} <a class="four-line-permalink" href="#{{ line.id | escape }}" aria-label="Permalink to line from {{ issue_date }}">#</a></p>
+          </li>
+        {% endfor %}
+      </ul>
     </div>
   </div>
 </div>
 
-<script id="four-line-archive-data" type="application/json">{{ site.data.four_line_archive | jsonify }}</script>
-
 <script>
 (function() {
-  var dataElement = document.getElementById('four-line-archive-data');
   var input = document.getElementById('four-line-search');
-  var list = document.getElementById('four-line-results');
+  var items = document.querySelectorAll('.four-line-result');
   var count = document.getElementById('four-line-result-count');
   var noResults = document.getElementById('four-line-no-results');
 
-  if (!dataElement || !input || !list || !count || !noResults) {
-    return;
-  }
-
-  var payload = JSON.parse(dataElement.textContent || '{}');
-  var lines = Array.isArray(payload.lines) ? payload.lines : [];
-
-  function debounce(fn, wait) {
-    var timer = null;
-
-    return function() {
-      var args = arguments;
-      var self = this;
-      clearTimeout(timer);
-      timer = setTimeout(function() {
-        fn.apply(self, args);
-      }, wait);
-    };
-  }
-
-  function normalize(value) {
-    return (value || '').toLowerCase().trim();
-  }
-
-  function formatDate(value) {
-    var date = new Date(value + 'T00:00:00');
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
-
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  }
-
-  var items = [];
-  lines.forEach(function(line) {
-    var item = document.createElement('li');
-    item.className = 'four-line-result';
-    item.id = line.id;
-
-    var meta = document.createElement('p');
-    meta.className = 'four-line-meta';
-    meta.textContent = formatDate(line.issue_date);
-
-    var content = document.createElement('p');
-    content.className = 'four-line-text';
-    content.innerHTML = line.line_html || '';
-
-    var permalink = document.createElement('a');
-    permalink.href = '#' + line.id;
-    permalink.className = 'four-line-permalink';
-    permalink.textContent = '#';
-    permalink.setAttribute('aria-label', 'Permalink to line from ' + formatDate(line.issue_date));
-    content.appendChild(document.createTextNode(' '));
-    content.appendChild(permalink);
-
-    item.appendChild(meta);
-    item.appendChild(content);
-    list.appendChild(item);
-
-    item._haystack = normalize((line.line_text || '') + ' ' + (line.issue_date || ''));
-    items.push(item);
-  });
-
-  function search(query) {
-    var normalized = normalize(query);
+  document.getElementById('four-line-search-controls').hidden = false;
+  input.addEventListener('input', function() {
+    var query = input.value.toLowerCase().trim();
     var matched = 0;
 
     items.forEach(function(item) {
-      var visible = !normalized || item._haystack.indexOf(normalized) !== -1;
-      item.hidden = !visible;
-      if (visible) matched++;
+      item.hidden = !item.dataset.search.includes(query);
+      if (!item.hidden) matched++;
     });
 
     count.textContent = matched + ' result' + (matched === 1 ? '' : 's');
     noResults.hidden = matched > 0;
-  }
-
-  function scrollToPermalink() {
-    var target = document.getElementById(window.location.hash.slice(1));
-    if (!target || !list.contains(target)) return;
-
-    if (target.hidden) {
-      input.value = '';
-      search('');
-    }
-    target.scrollIntoView();
-  }
-
-  input.addEventListener('input', debounce(function(event) {
-    search(event.target.value);
-  }, 120));
-  window.addEventListener('hashchange', scrollToPermalink);
-  document.addEventListener('pjax:complete', function cleanup() {
-    if (!list.isConnected) {
-      window.removeEventListener('hashchange', scrollToPermalink);
-      document.removeEventListener('pjax:complete', cleanup);
-    }
   });
-
-  search('');
-  scrollToPermalink();
 })();
 </script>

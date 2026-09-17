@@ -7,6 +7,12 @@ const lines = Array.from({ length: 40 }, (_, index) => ({
   line_html: `Archive entry ${index} with a <a href="https://example.com/">resource</a>.`,
   line_text: `Archive entry ${index} with a resource.`,
 }));
+const entries = lines.map(line => `
+  <li class="four-line-result" id="${line.id}" data-search="${line.line_text.toLowerCase()} ${line.issue_date}">
+    <p class="four-line-meta">Jan 2, 2026</p>
+    <p class="four-line-text">${line.line_html} <a class="four-line-permalink" href="#${line.id}" aria-label="Permalink to line from Jan 2, 2026">#</a></p>
+  </li>
+`).join('');
 const targetId = lines[30].id;
 
 test.beforeEach(async ({ page }) => {
@@ -17,8 +23,8 @@ test.beforeEach(async ({ page }) => {
     await route.fulfill({
       response,
       body: html.replace(
-        /(<script id="four-line-archive-data" type="application\/json">)[\s\S]*?(<\/script>)/,
-        (_, open, close) => open + JSON.stringify({ lines }) + close,
+        /(<ul class="four-line-results" id="four-line-results">)[\s\S]*?(<\/ul>)/,
+        (_, open, close) => open + entries + close,
       ),
     });
   });
@@ -40,16 +46,31 @@ for (const width of [1280, 390]) {
   });
 }
 
-test('links survive filtering and hash navigation reveals a hidden entry', async ({ page }) => {
+test('a permalink selected from search opens the full archive on reload', async ({ page }) => {
   await page.goto('/four-line-fridays.html');
   const input = page.locator('#four-line-search');
   await input.fill('Archive entry 30 ');
   await expect(page.locator('.four-line-result:visible')).toHaveCount(1);
   await page.locator('.four-line-result:visible .four-line-permalink').click();
   await expect(page).toHaveURL(new RegExp(`#${targetId}$`));
-  await input.fill('no matching entry');
-  await expect(page.locator('.four-line-result:visible')).toHaveCount(0);
-  await page.evaluate(id => { window.location.hash = id; }, lines[20].id);
+  await page.reload();
   await expect(input).toHaveValue('');
-  await expect(page.locator(`[id="${lines[20].id}"]`)).toBeInViewport();
+  await expect(page.locator('.four-line-result:visible')).toHaveCount(lines.length);
+  await expect(page.locator(`[id="${targetId}"]`)).toBeInViewport();
+});
+
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('renders entries and follows native permalinks', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto(`/four-line-fridays.html#${targetId}`);
+    await expect(page.locator('.four-line-result')).toHaveCount(lines.length);
+    await expect(page.locator('#four-line-search-controls')).toBeHidden();
+    const target = page.locator(`[id="${targetId}"]`);
+    await expect(target).toBeInViewport();
+    await page.locator('.four-line-permalink').first().click();
+    await expect(page).toHaveURL(new RegExp(`#${lines[0].id}$`));
+    await expect(page.locator('.four-line-result').first()).toBeInViewport();
+  });
 });
