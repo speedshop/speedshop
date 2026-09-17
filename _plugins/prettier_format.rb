@@ -1,15 +1,10 @@
 Jekyll::Hooks.register :site, :post_write do |site|
   puts "🎨 Running Prettier on site assets..."
 
-  # Run prettier on all HTML, CSS, and JS files
-  prettier_cmd = <<~CMD
-    "#{File.join(site.source, "node_modules", ".bin", "prettier")}" \
-      --write \
-      "#{site.dest}/**/*.{html,css,js}" \
-      --ignore-path .prettierignore
-  CMD
+  cache_dir = Jekyll::Cache.disk_cache_enabled ? File.join(Jekyll::Cache.cache_dir, "Speedshop-Prettier") : ""
+  formatter = File.join(site.source, "_scripts", "format.mjs")
 
-  unless system(prettier_cmd)
+  unless system("node", formatter, site.dest, cache_dir)
     puts "❌ Prettier formatting failed"
     next
   end

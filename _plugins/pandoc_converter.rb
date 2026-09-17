@@ -1,4 +1,6 @@
 require "fileutils"
+require "etc"
+require_relative "pandoc_cache"
 
 Jekyll::Hooks.register :site, :post_write do |site|
   next if ENV["SKIP_PANDOC"] == "1"
@@ -6,9 +8,9 @@ Jekyll::Hooks.register :site, :post_write do |site|
   post_paths = Dir["#{site.dest}/**/*"].select { |p| p.end_with?(".html") }
   next if post_paths.empty?
 
-  pandoc_opts = "--lua-filter #{site.source}/_pandoc/url_filter.lua --resource-path=#{site.dest} --pdf-engine=xelatex"
+  cache = Speedshop::PandocCache.new(site)
+  pandoc_opts = ["--lua-filter", "#{site.source}/_pandoc/url_filter.lua", "--resource-path=#{site.dest}", "--pdf-engine=xelatex"]
 
-  # Build mapping: blog slug -> source markdown path
   source_paths = {}
   site.posts.docs.each do |post|
     if post.url =~ %r{/blog/([^/]+)/?$}
@@ -17,97 +19,52 @@ Jekyll::Hooks.register :site, :post_write do |site|
   end
 
   errors = []
-  alias_md_paths = []
-  alias_pdf_paths = []
-  alias_epub_paths = []
+  aliases = []
   mutex = Mutex.new
+  queue = Queue.new
 
-  threads = post_paths.flat_map do |pp|
-    base_path = pp.sub(/\.html$/, "")
-    blog_match = pp.match(%r{/blog/([^/]+)/index\.html$})
+  post_paths.sort_by { |path| -File.size(path) }.each do |path|
+    base_path = path.sub(/\.html$/, "")
+    blog_match = path.match(%r{/blog/([^/]+)/index\.html$})
 
     if blog_match
-      slug = blog_match[1]
-      alias_md_paths << {
-        source: "#{base_path}.md",
-        target: File.join(site.dest, "blog", "#{slug}.md")
-      }
-      alias_pdf_paths << {
-        source: "#{base_path}.pdf",
-        target: File.join(site.dest, "blog", "#{slug}.pdf")
-      }
-      alias_epub_paths << {
-        source: "#{base_path}.epub",
-        target: File.join(site.dest, "blog", "#{slug}.epub")
-      }
+      %w[md pdf epub].each do |format|
+        aliases << ["#{base_path}.#{format}", File.join(site.dest, "blog", "#{blog_match[1]}.#{format}")]
+      end
     end
 
-    # For blog posts, copy source markdown directly instead of converting HTML
+    formats = %w[epub md pdf]
     if blog_match && source_paths[blog_match[1]]
-      source_file = source_paths[blog_match[1]]
-      content = File.read(source_file, encoding: "UTF-8")
-      body = content.sub(/\A---\n.+?\n---\n*/m, "") # Strip front matter
+      content = File.read(source_paths[blog_match[1]], encoding: "UTF-8")
+      body = content.sub(/\A---\n.+?\n---\n*/m, "")
       File.write("#{base_path}.md", body, encoding: "UTF-8")
+      formats = %w[epub pdf]
+    end
 
-      # Only generate EPUB and PDF from HTML for blog posts
-      [
-        Thread.new do
-          output = `pandoc #{pandoc_opts} -o #{base_path}.epub #{pp} 2>&1`
-          mutex.synchronize { errors << "EPUB #{pp}: #{output}" } unless $?.success?
-        end,
-        Thread.new do
-          output = `pandoc #{pandoc_opts} -o #{base_path}.pdf #{pp} 2>&1`
-          mutex.synchronize { errors << "PDF #{pp}: #{output}" } unless $?.success?
+    formats.each { |format| queue << [path, "#{base_path}.#{format}", format] }
+  end
+
+  queue.close
+  Array.new([Etc.nprocessors, queue.size].min) do
+    Thread.new do
+      while (job = queue.pop)
+        input, destination, format = job
+        cache.fetch(input, destination) do
+          output, status = Open3.capture2e("pandoc", *pandoc_opts, "-o", destination, input)
+          mutex.synchronize { errors << "#{format.upcase} #{input}: #{output}" } unless status.success?
+          status.success?
         end
-      ]
-    else
-      # Non-blog HTML: use Pandoc for all formats
-      [
-        Thread.new do
-          output = `pandoc #{pandoc_opts} -o #{base_path}.epub #{pp} 2>&1`
-          mutex.synchronize { errors << "EPUB #{pp}: #{output}" } unless $?.success?
-        end,
-        Thread.new do
-          output = `pandoc #{pandoc_opts} -o #{base_path}.md #{pp} 2>&1`
-          mutex.synchronize { errors << "MD #{pp}: #{output}" } unless $?.success?
-        end,
-        Thread.new do
-          output = `pandoc #{pandoc_opts} -o #{base_path}.pdf #{pp} 2>&1`
-          mutex.synchronize { errors << "PDF #{pp}: #{output}" } unless $?.success?
-        end
-      ]
+      end
     end
-  end
+  end.each(&:value)
 
-  threads.map(&:join)
-
-  alias_md_paths.each do |paths|
-    next unless File.exist?(paths[:source])
+  aliases.each do |source, target|
+    next unless File.exist?(source)
 
     begin
-      FileUtils.cp(paths[:source], paths[:target])
+      FileUtils.cp(source, target)
     rescue => e
-      errors << "MD alias #{paths[:target]}: #{e.message}"
-    end
-  end
-
-  alias_pdf_paths.each do |paths|
-    next unless File.exist?(paths[:source])
-
-    begin
-      FileUtils.cp(paths[:source], paths[:target])
-    rescue => e
-      errors << "PDF alias #{paths[:target]}: #{e.message}"
-    end
-  end
-
-  alias_epub_paths.each do |paths|
-    next unless File.exist?(paths[:source])
-
-    begin
-      FileUtils.cp(paths[:source], paths[:target])
-    rescue => e
-      errors << "EPUB alias #{paths[:target]}: #{e.message}"
+      errors << "#{File.extname(target).delete_prefix(".").upcase} alias #{target}: #{e.message}"
     end
   end
 
