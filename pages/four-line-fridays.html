@@ -76,6 +76,7 @@ sitemap: false
   lines.forEach(function(line) {
     var item = document.createElement('li');
     item.className = 'four-line-result';
+    item.id = line.id;
 
     var meta = document.createElement('p');
     meta.className = 'four-line-meta';
@@ -84,6 +85,14 @@ sitemap: false
     var content = document.createElement('p');
     content.className = 'four-line-text';
     content.innerHTML = line.line_html || '';
+
+    var permalink = document.createElement('a');
+    permalink.href = '#' + line.id;
+    permalink.className = 'four-line-permalink';
+    permalink.textContent = '#';
+    permalink.setAttribute('aria-label', 'Permalink to line from ' + formatDate(line.issue_date));
+    content.appendChild(document.createTextNode(' '));
+    content.appendChild(permalink);
 
     item.appendChild(meta);
     item.appendChild(content);
@@ -107,10 +116,29 @@ sitemap: false
     noResults.hidden = matched > 0;
   }
 
+  function scrollToPermalink() {
+    var target = document.getElementById(window.location.hash.slice(1));
+    if (!target || !list.contains(target)) return;
+
+    if (target.hidden) {
+      input.value = '';
+      search('');
+    }
+    target.scrollIntoView();
+  }
+
   input.addEventListener('input', debounce(function(event) {
     search(event.target.value);
   }, 120));
+  window.addEventListener('hashchange', scrollToPermalink);
+  document.addEventListener('pjax:complete', function cleanup() {
+    if (!list.isConnected) {
+      window.removeEventListener('hashchange', scrollToPermalink);
+      document.removeEventListener('pjax:complete', cleanup);
+    }
+  });
 
   search('');
+  scrollToPermalink();
 })();
 </script>
