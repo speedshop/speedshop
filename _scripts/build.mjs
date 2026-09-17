@@ -83,7 +83,7 @@ async function buildJS() {
   const result = await esbuild.build({
     entryPoints: JS_ENTRYPOINTS,
     bundle: true,
-    minify: true,
+    minify: false,
     treeShaking: true,
     outdir: jsOutDir,
     entryNames: '[name]-[hash]',
@@ -105,7 +105,7 @@ async function buildCSS() {
   const result = await esbuild.build({
     entryPoints: CSS_ENTRYPOINTS,
     bundle: true,
-    minify: true,
+    minify: false,
     outdir: cssOutDir,
     entryNames: '[name]-[hash]',
     assetNames: '[name]-[hash]',
