@@ -2,6 +2,7 @@ require "minitest/autorun"
 require "jekyll"
 require "ostruct"
 require "tmpdir"
+require "fileutils"
 
 require_relative "../../_plugins/prettier_format"
 
@@ -24,17 +25,14 @@ class PrettierFormatTest < Minitest::Test
 
   def run_hook(prettier_exit_status:)
     Dir.mktmpdir do |directory|
-      npx_path = File.join(directory, "npx")
-      File.write(npx_path, "#!/bin/sh\nexit #{prettier_exit_status}\n")
-      File.chmod(0o755, npx_path)
+      prettier_path = File.join(directory, "node_modules", ".bin", "prettier")
+      FileUtils.mkdir_p(File.dirname(prettier_path))
+      File.write(prettier_path, "#!/bin/sh\nexit #{prettier_exit_status}\n")
+      File.chmod(0o755, prettier_path)
 
-      original_path = ENV.fetch("PATH")
-      ENV["PATH"] = "#{directory}:#{original_path}"
       capture_io do
-        prettier_hook.call OpenStruct.new(dest: directory)
+        prettier_hook.call OpenStruct.new(source: directory, dest: directory)
       end.first
-    ensure
-      ENV["PATH"] = original_path
     end
   end
 
