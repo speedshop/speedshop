@@ -72,16 +72,18 @@ jobs:
         key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.devcontainer/Dockerfile') }}
         restore-keys: |
           ${{ runner.os }}-gems-
-    - name: Build site in canonical container
+    - name: Build and validate deployable site in canonical container
+      env:
+        GENERATED_DATA_FIXTURES_PATH: test/fixtures/generated_data
       run: |
-        ./_scripts/canonical-env.sh '
+        ./_scripts/canonical-env.sh --env GENERATED_DATA_FIXTURES_PATH '
           set -euo pipefail
           mise trust --yes /workspaces/speedshop/mise.toml
           mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle
           mise install node pandoc
           mise exec -- npm ci
           mise exec -- bundle install --jobs 4 --retry 3
-          mise exec -- bundle exec jekyll build
+          mise exec -- bundle exec rake site:build_and_validate
         '
 
   test:

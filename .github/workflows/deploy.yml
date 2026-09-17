@@ -90,8 +90,7 @@ jobs:
               mise exec -- bundle exec rake validate:ruby_version
             fi
 
-            mise exec -- bundle exec jekyll build
-            mise exec -- bundle exec rake validate:generated_data
+            mise exec -- bundle exec rake site:build_and_validate
             mise exec -- bundle exec ruby _scripts/s3_deploy.rb
             mise exec -- aws s3 sync card/ s3://www.speedshop.co/card/ --cache-control "max-age=86400"
             mise exec -- npx wrangler deploy --config workers/card-wrangler.toml

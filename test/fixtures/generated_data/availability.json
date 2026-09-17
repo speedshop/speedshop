@@ -1,0 +1,7 @@
+{
+  "months": [
+    {"label": "Jan 2026", "status": "available"},
+    {"label": "Feb 2026", "status": "limited"},
+    {"label": "Mar 2026", "status": "unavailable"}
+  ]
+}

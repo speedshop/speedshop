@@ -1,5 +1,7 @@
-require "json"
 require "rake/testtask"
+require "rbconfig"
+
+require_relative "_scripts/generated_site_validator"
 
 Rake::TestTask.new(:test) do |t|
   t.libs << "test/ruby"
@@ -24,6 +26,14 @@ task :lint do
 end
 
 task default: [:lint, :test]
+
+namespace :site do
+  desc "Build and validate the exact site artifact that is safe to upload"
+  task :build_and_validate do
+    sh RbConfig.ruby, "-S", "jekyll", "build"
+    Rake::Task["validate:generated_data"].invoke
+  end
+end
 
 namespace :validate do
   desc "Run all validations"
@@ -71,87 +81,16 @@ namespace :validate do
   desc "Validate generated data files in _site exist and have required content"
   task :generated_data do
     site_dir = File.join(__dir__, "_site")
+    abort "Site directory not found at #{site_dir}. Run 'bundle exec jekyll build' first." unless Dir.exist?(site_dir)
 
-    unless Dir.exist?(site_dir)
-      abort "Site directory not found at #{site_dir}. Run 'bundle exec jekyll build' first."
-    end
-
-    errors = []
-
-    # Validate SLA status data is rendered in status.html
-    status_file = File.join(site_dir, "status.html")
-    if File.exist?(status_file)
-      content = File.read(status_file)
-
-      # Check that the policy text was rendered (not empty)
-      if content.include?("<b>Policy: </b></p>") || content.include?("<b>Policy: </b>\n")
-        errors << "status.html: SLA policy is empty - data generation likely failed"
-      end
-
-      # Check that performance stats have actual values
-      if content.match?(/<span class="stat-value[^"]*">\s*%\s*<\/span>/)
-        errors << "status.html: Performance percentages are empty - data generation likely failed"
-      end
-
-      # Check that statusData is not null in the JavaScript
-      if content.include?("var statusData = null;")
-        errors << "status.html: statusData is null - days data was not generated"
-      end
-
-      # Check that dates are not empty
-      if content.include?("new Date('');")
-        errors << "status.html: Start/end dates are empty - data generation likely failed"
-      end
-
-      puts "Validated status.html"
-    else
-      errors << "status.html not found in _site"
-    end
-
-    # Validate holidays.ics exists and has content
-    holidays_file = File.join(site_dir, "holidays.ics")
-    if File.exist?(holidays_file)
-      content = File.read(holidays_file)
-      if content.length < 100 || !content.include?("BEGIN:VCALENDAR")
-        errors << "holidays.ics: File is empty or invalid"
-      else
-        puts "Validated holidays.ics"
-      end
-    else
-      errors << "holidays.ics not found in _site"
-    end
-
-    # Validate Four Line Fridays archive when private client notes are available.
-    four_line_fridays_file = File.join(site_dir, "four-line-fridays.html")
-    if File.exist?(four_line_fridays_file)
-      content = File.read(four_line_fridays_file)
-      archive_json = content[%r{<script id="four-line-archive-data" type="application/json">(.*?)</script>}m, 1]
-
-      if archive_json.nil?
-        errors << "four-line-fridays.html: Archive JSON script tag is missing"
-      else
-        archive = JSON.parse(archive_json)
-        if ENV["CLIENT_NOTES_PATH"] && Dir.exist?(ENV["CLIENT_NOTES_PATH"]) && archive["line_count"].to_i.zero?
-          errors << "four-line-fridays.html: FLF archive is empty despite CLIENT_NOTES_PATH being set"
-        else
-          puts "Validated four-line-fridays.html"
-        end
-      end
-    else
-      errors << "four-line-fridays.html not found in _site"
-    end
-
-    if errors.any?
-      abort <<~ERROR
-        Data validation failed with #{errors.length} error(s):
-
-        #{errors.map { |e| "  - #{e}" }.join("\n")}
-
-        This usually means the data generation step failed during the Jekyll build.
-        Check that CLIENT_NOTES_PATH is set and the rake tasks completed successfully.
-      ERROR
-    end
-
-    puts "All data validations passed!"
+    archive_source_configured = [ENV["GENERATED_DATA_FIXTURES_PATH"], ENV["CLIENT_NOTES_PATH"]].compact.any? { |path| Dir.exist?(path) }
+    validator = Speedshop::GeneratedSiteValidator.new(
+      site_dir: site_dir,
+      data_dir: File.join(__dir__, "_data"),
+      archive_source_configured: archive_source_configured
+    )
+    validator.validate!
+  rescue Speedshop::GeneratedSiteValidator::ValidationError => error
+    abort error.message
   end
 end
