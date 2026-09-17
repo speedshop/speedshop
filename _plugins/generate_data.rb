@@ -185,7 +185,7 @@ Jekyll::Hooks.register :site, :after_init do |site|
   Jekyll.logger.info "Generating SLA/availability data from #{client_notes_path}..."
 
   def run_command(cmd, description)
-    return if system(cmd)
+    return if system(*cmd)
 
     raise "Failed to #{description}: command '#{cmd}' exited with status #{$?.exitstatus}"
   end
@@ -193,10 +193,12 @@ Jekyll::Hooks.register :site, :after_init do |site|
   Bundler.with_unbundled_env do
     Dir.chdir(client_notes_path) do
       run_command("bundle install --quiet", "install client_notes dependencies")
-      run_command("bundle exec rake sla:generate_json[#{data_dir}/sla_status.json]", "generate SLA status JSON")
-      run_command("bundle exec rake sla:generate_holidays_ics[#{site.source}/holidays.ics]", "generate holidays ICS")
-      run_command("bundle exec rake availability:generate_json[#{data_dir}/availability.json]",
-        "generate availability JSON")
+      run_command([
+        "bundle", "exec", "rake",
+        "sla:generate_json[#{sla_status_path}]",
+        "sla:generate_holidays_ics[#{holidays_path}]",
+        "availability:generate_json[#{availability_path}]"
+      ], "generate SLA, holidays and availability data")
     end
   end
 
