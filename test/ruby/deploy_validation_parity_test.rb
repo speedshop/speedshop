@@ -11,5 +11,11 @@ class DeployValidationParityTest < Minitest::Test
     assert_includes build_workflow, SHARED_COMMAND
     assert_includes deploy_workflow, SHARED_COMMAND
     assert_includes build_workflow, "GENERATED_DATA_FIXTURES_PATH"
+    build_job = deploy_workflow.split("\n  deploy:", 2).first
+    assert_includes build_job, "WEBSITE_SNAPSHOT_URL"
+    assert_includes build_job, "--proto '=https'"
+    assert_includes build_job, "--max-filesize 5242880"
+    refute_includes build_job, "secrets."
+    refute_includes build_job, "aws s3api get-object"
   end
 end

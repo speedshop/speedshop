@@ -68,9 +68,13 @@ class StructuredDataTest < Minitest::Test
 
   def self.site
     @site ||= begin
+      previous = ENV["GENERATED_DATA_FIXTURES_PATH"]
+      ENV["GENERATED_DATA_FIXTURES_PATH"] = File.join(root_dir, "test/fixtures/generated_data")
       site = Jekyll::Site.new(Jekyll.configuration({"source" => root_dir}))
       site.read
       site
+    ensure
+      ENV["GENERATED_DATA_FIXTURES_PATH"] = previous
     end
   end
 

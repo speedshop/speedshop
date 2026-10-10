@@ -6,8 +6,6 @@ compile = false
 
 [tools]
 # Source of truth for this repo's shared toolchain.
-# Explicit exception: deploy may temporarily use .client_notes/.ruby-version
-# when invoking client_notes-related build steps.
 ruby = "4.0.3"
 node = "22.22.3"
 python = "3.12.0"
@@ -41,7 +39,7 @@ chmod +x .git/hooks/pre-commit
 
 [tasks.build]
 description = "Build the site"
-run = "bundle exec jekyll build"
+run = "GENERATED_DATA_FIXTURES_PATH=test/fixtures/generated_data bundle exec jekyll build"
 
 [tasks.dev]
 description = "Start the local development stack and follow logs"
@@ -157,7 +155,13 @@ run = "bundle exec rake test:links"
 [tasks.test]
 description = "Run all tests and linters"
 depends = ["test:integration"]
+run = "mise run test:website-snapshot"
+
+[tasks."test:website-snapshot"]
+description = "Exercise snapshot security and freshness through production builds"
+run = "bundle exec ruby test/system/website_snapshot_test.rb"
 
 [tasks."test:ci"]
 description = "Run tests for CI (no local workers)"
 depends = ["test:links"]
+run = "mise run test:website-snapshot"

@@ -83,11 +83,10 @@ namespace :validate do
     site_dir = File.join(__dir__, "_site")
     abort "Site directory not found at #{site_dir}. Run 'bundle exec jekyll build' first." unless Dir.exist?(site_dir)
 
-    archive_source_configured = [ENV["GENERATED_DATA_FIXTURES_PATH"], ENV["CLIENT_NOTES_PATH"]].compact.any? { |path| Dir.exist?(path) }
     validator = Speedshop::GeneratedSiteValidator.new(
       site_dir: site_dir,
       data_dir: File.join(__dir__, "_data"),
-      archive_source_configured: archive_source_configured
+      archive_source_configured: true
     )
     validator.validate!
   rescue Speedshop::GeneratedSiteValidator::ValidationError => error

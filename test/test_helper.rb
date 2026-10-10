@@ -47,7 +47,7 @@ module TestHelper
     Dir.chdir(ROOT_DIR) do
       Bundler.with_unbundled_env do
         system(
-          {"PATH" => original_path},
+          {"PATH" => original_path, "GENERATED_DATA_FIXTURES_PATH" => File.join(ROOT_DIR, "test/fixtures/generated_data"), "JEKYLL_ENV" => "test"},
           RbConfig.ruby, "-S", "bundle", "exec", "jekyll", "build", "--quiet",
           "--destination", SITE_DIR,
           exception: true

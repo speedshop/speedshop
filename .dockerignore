@@ -1,6 +1,5 @@
 .git
 .gitignore
-.client_notes
 .devcontainer/.cache
 .pi
 .terraform
