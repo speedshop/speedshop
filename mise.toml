@@ -8,7 +8,6 @@ compile = false
 # Source of truth for this repo's shared toolchain.
 ruby = "4.0.3"
 node = "22.22.3"
-python = "3.12.0"
 pandoc = "3.9.0.2"
 terraform = "1.14.6"
 awscli = "2.34.1"
@@ -28,12 +27,7 @@ cat > .git/hooks/pre-commit <<'EOF'
 #!/bin/sh
 test "${HK:-1}" = "0" || exec "__MISE_PATH__" exec -- hk run pre-commit "$@"
 EOF
-MISE_PATH="$mise_path" python - <<'PY'
-import os
-from pathlib import Path
-path = Path('.git/hooks/pre-commit')
-path.write_text(path.read_text().replace('__MISE_PATH__', os.environ['MISE_PATH']))
-PY
+MISE_PATH="$mise_path" ruby -e 'path = ".git/hooks/pre-commit"; File.write(path, File.read(path).sub("__MISE_PATH__", ENV.fetch("MISE_PATH")))'
 chmod +x .git/hooks/pre-commit
 '''
 
