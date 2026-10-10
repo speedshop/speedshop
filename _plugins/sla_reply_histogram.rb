@@ -1,164 +1,20 @@
-require "date"
 require "fileutils"
-require "time"
-require "yaml"
 
 module Speedshop
   module SlaReplyHistogram
-    INBOX_LINE_PATTERN = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) - Inbox clearing completed$/
     DEFAULT_OUTPUT_PATH = File.join("assets", "generated", "sla-reply-histogram.svg")
-    PERCENTILES = {"p50" => 0.50, "p75" => 0.75, "p95" => 0.95, "p99" => 0.99}.freeze
-    BUSINESS_HOUR_START = 5
-    BUSINESS_HOUR_END = 13
     SLA_HOURS = 24
 
     module_function
 
-    def generate(client_notes_path:, output_path:, cutoff_date: "2026-01-01")
-      inbox_log_path = File.join(client_notes_path.to_s, "client_notes", "logs", "inbox.log")
-      holidays_path = File.join(client_notes_path.to_s, "client_notes", "data", "japanese_holidays.yml")
-
-      samples = reply_hours(
-        inbox_log_path: inbox_log_path,
-        holidays_path: holidays_path,
-        cutoff_date: Date.parse(cutoff_date)
-      )
-      stats = stats_for(samples)
-
+    def generate(stats:, output_path:)
       FileUtils.mkdir_p(File.dirname(output_path))
-      File.write(output_path, render_svg(samples: samples, stats: stats))
-
+      File.write(output_path, render_svg(stats: stats))
       stats
     end
 
-    def write_placeholder(output_path)
-      stats = stats_for([])
-      FileUtils.mkdir_p(File.dirname(output_path))
-      File.write(output_path, render_svg(samples: [], stats: stats))
-      stats
-    end
-
-    def reply_hours(inbox_log_path:, holidays_path:, cutoff_date: Date.new(2026, 1, 1))
-      holidays = load_holidays(holidays_path)
-      entries = parse_inbox_log(inbox_log_path)
-        .select { |time| business_date_for(time) >= cutoff_date }
-        .sort
-
-      entries.each_cons(2).map do |previous_entry, next_entry|
-        business_hours_between(previous_entry, next_entry, holidays: holidays)
-      end
-    end
-
-    def parse_inbox_log(path)
-      return [] unless File.exist?(path)
-
-      File.readlines(path).filter_map do |line|
-        match = line.match(INBOX_LINE_PATTERN)
-        Time.strptime("#{match[1]} #{match[2]}", "%Y-%m-%d %H:%M:%S") if match
-      end
-    end
-
-    def load_holidays(path)
-      return Set.new unless File.exist?(path)
-
-      YAML.load_file(path).map { |holiday| Date.parse(holiday.fetch("date")) }.to_set
-    end
-
-    def business_hours_between(start_time, end_time, holidays: Set.new)
-      return 0.0 unless end_time > start_time
-
-      total_seconds = 0.0
-      current_date = start_time.to_date - 1
-      end_date = end_time.to_date
-
-      while current_date <= end_date
-        if business_day?(current_date, holidays)
-          window_start = business_window_start(current_date)
-          window_end = business_window_end(current_date)
-          interval_start = [start_time, window_start].max
-          interval_end = [end_time, window_end].min
-          total_seconds += interval_end - interval_start if interval_end > interval_start
-        end
-
-        current_date += 1
-      end
-
-      total_seconds / 3600.0
-    end
-
-    def business_date_for(time)
-      if overnight_business_window? && time.hour < (BUSINESS_HOUR_END % 24)
-        time.to_date - 1
-      else
-        time.to_date
-      end
-    end
-
-    def overnight_business_window?
-      BUSINESS_HOUR_END >= 24
-    end
-
-    def business_window_start(date)
-      Time.local(date.year, date.month, date.day, BUSINESS_HOUR_START, 0, 0)
-    end
-
-    def business_window_end(date)
-      business_window_start(date) + ((BUSINESS_HOUR_END - BUSINESS_HOUR_START) * 60 * 60)
-    end
-
-    def business_day?(date, holidays)
-      ![0, 6].include?(date.wday) && !holidays.include?(date)
-    end
-
-    def stats_for(samples)
-      sorted = samples.sort
-      percentiles = PERCENTILES.transform_values { |p| quantile(sorted, p) }
-      bins = bins_for(sorted)
-
-      {
-        "count" => sorted.length,
-        "bin_width_hours" => bins.first ? bins.first.fetch("width") : 0,
-        "max_hours" => sorted.last,
-        "percentiles" => percentiles,
-        "bins" => bins
-      }
-    end
-
-    def quantile(sorted_values, percentile)
-      return nil if sorted_values.empty?
-
-      position = (sorted_values.length - 1) * percentile
-      lower_index = position.floor
-      upper_index = position.ceil
-      lower = sorted_values[lower_index]
-      upper = sorted_values[upper_index]
-
-      lower + ((upper - lower) * (position - lower_index))
-    end
-
-    def bins_for(sorted_values)
-      return [] if sorted_values.empty?
-
-      max_value = sorted_values.last
-      width = 1
-      upper_bound = ((max_value / width).floor + 1) * width
-      bin_count = [(upper_bound / width).ceil, 1].max
-      bins = Array.new(bin_count) do |index|
-        lower = index * width
-        upper = lower + width
-        {"lower" => lower, "upper" => upper, "width" => width, "count" => 0}
-      end
-
-      sorted_values.each do |value|
-        index = [(value / width).floor, bins.length - 1].min
-        bins[index]["count"] += 1
-      end
-
-      bins
-    end
-
-    def render_svg(samples:, stats:)
-      return render_empty_svg if samples.empty?
+    def render_svg(stats:)
+      return render_empty_svg if stats.fetch("count").zero?
 
       bins = stats.fetch("bins")
       width = 900
@@ -236,11 +92,11 @@ module Speedshop
       <<~SVG
         <svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc" viewBox="0 0 900 260" width="900" height="260">
           <title id="title">Hours until reply histogram unavailable</title>
-          <desc id="desc">No inbox log entries were available during this build.</desc>
+          <desc id="desc">No reply-time samples were available in the website snapshot.</desc>
           #{svg_styles}
           <rect class="background" width="100%" height="100%" rx="12"/>
           <text class="title" x="40" y="52">Hours until reply</text>
-          <text class="empty" x="40" y="118">No inbox log data was available during this build.</text>
+          <text class="empty" x="40" y="118">No reply-time samples were available in the website snapshot.</text>
         </svg>
       SVG
     end
