@@ -16,7 +16,7 @@ The producer checks exact fields, coverage, dates, enums, text limits, control c
 
 These checks catch unintended fields and malformed projections. They do not prove that every permitted text field is free of private information. Producer code retains automatic publication authority; it must never serialize raw client records or credentials into allowed text fields.
 
-The website independently validates the downloaded data and renders sanitized newsletter HTML, numeric histogram SVG, and escaped calendar text. Malformed JSON errors do not quote input into public logs. Production refuses snapshots older than 24 hours or more than five minutes in the future, and refuses fixture mode. Failed builds leave the deployed site unchanged. Generation time is not a claim that every underlying business record was recently edited.
+The website independently validates the downloaded data, rejects empty holiday and newsletter collections, and renders sanitized newsletter HTML, numeric histogram SVG, and escaped calendar text. Malformed JSON errors do not quote input into public logs. Production refuses snapshots older than 24 hours or more than five minutes in the future, and refuses fixture mode. Failed builds leave the deployed site unchanged. Generation time is not a claim that every underlying business record was recently edited.
 
 ## Storage and access
 
@@ -34,7 +34,7 @@ Producer Actions variables:
 
 The website needs no R2 credentials. Its only snapshot setting is the Actions variable `WEBSITE_SNAPSHOT_URL`, containing the public HTTPS URL. Downloading uses bounded HTTPS requests; building holds no deployment credentials. Deployment uses a validated artifact in a separate job.
 
-Producer publication runs on `main` pushes and daily at 23:17 UTC. Website deployment runs daily at 00:00 UTC. Publication requires no human approval. Concurrent exports can publish in completion order, and GitHub schedules are not guaranteed; the freshness gate is authoritative.
+Producer publication runs on `main` pushes, at 17 minutes past each hour from 00:00 through 17:00 UTC, and at 23:17 UTC (19 scheduled exports daily). Website deployment runs daily at 00:00 UTC. Publication requires no human approval. Concurrent exports can publish in completion order, and GitHub schedules are not guaranteed; the freshness gate is authoritative.
 
 ## Cutover
 
@@ -63,4 +63,4 @@ bundle exec rake site:build_and_validate
 mise run test:website-snapshot
 ```
 
-The system tests cover fresh, stale, future, missing, malformed, and unexpected-field snapshots, sanitized rendering, payload-free diagnostics, and refusal of production fixture mode.
+The system tests cover fresh, stale, future, missing, malformed, unexpected-field, and empty-collection snapshots, preservation of previous output after rejection, sanitized rendering, payload-free diagnostics, and refusal of production fixture mode.

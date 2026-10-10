@@ -61,6 +61,14 @@ class WebsiteSnapshotSystemTest < Minitest::Test
     assert_equal "previous deployment", File.read(sentinel)
   end
 
+  def test_empty_holidays_refuse_to_build_and_preserve_previous_output
+    assert_empty_collection_rejected("holidays")
+  end
+
+  def test_empty_archive_refuses_to_build_and_preserve_previous_output
+    assert_empty_collection_rejected("archive")
+  end
+
   def test_future_timestamp_refuses_to_build
     @payload["generated_at"] = (Time.now + 3600).utc.iso8601
     output, status = build
@@ -97,6 +105,17 @@ class WebsiteSnapshotSystemTest < Minitest::Test
   end
 
   private
+
+  def assert_empty_collection_rejected(collection)
+    @payload[collection] = []
+    FileUtils.mkdir_p(@destination)
+    sentinel = File.join(@destination, "existing.html")
+    File.write(sentinel, "previous deployment")
+    output, status = build
+    refute status.success?
+    assert_includes output, "Website snapshot #{collection} must not be empty"
+    assert_equal "previous deployment", File.read(sentinel)
+  end
 
   def build(write: true, fixtures: nil)
     File.write(@path, JSON.generate(@payload)) if write
