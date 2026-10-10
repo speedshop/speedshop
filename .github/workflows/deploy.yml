@@ -2,14 +2,17 @@ name: Deploy
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
   schedule:
-    - cron: '0 0 * * *'  # Daily at midnight UTC
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: website-deploy
+  cancel-in-progress: false
 
 env:
   DEVCONTAINER_IMAGE: speedshop-devcontainer
@@ -17,104 +20,126 @@ env:
   CANONICAL_ENV_HOME: ${{ github.workspace }}/.cache/canonical-home
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-      with:
-        persist-credentials: false
-    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-      with:
-        repository: speedshop/client_notes
-        token: ${{ secrets.CLIENT_NOTES_PAT }}
-        path: .client_notes
-    - name: Determine deploy Ruby source
-      id: deploy_ruby
-      run: |
-        ruby_version=$(awk -F'"' '/^ruby = / { print $2 }' mise.toml)
-        ruby_source=mise.toml
-
-        if [ -f .client_notes/.ruby-version ]; then
-          ruby_version=$(tr -d '\n' < .client_notes/.ruby-version)
-          ruby_source=.client_notes/.ruby-version
-        fi
-
-        echo "Using Ruby $ruby_version from $ruby_source"
-        echo "value=$ruby_version" >> "$GITHUB_OUTPUT"
-        echo "source=$ruby_source" >> "$GITHUB_OUTPUT"
-    - uses: ./.github/actions/canonical-image
-      with:
-        ruby-version: ${{ steps.deploy_ruby.outputs.value }}
-    - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
-      with:
-        path: .cache/canonical-home
-        key: ${{ runner.os }}-canonical-home-v1-${{ hashFiles('mise.toml', '.client_notes/.ruby-version', '.devcontainer/Dockerfile') }}
-        restore-keys: |
-          ${{ runner.os }}-canonical-home-v1-
-    - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
-      with:
-        path: vendor/bundle
-        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock', 'mise.toml', '.client_notes/.ruby-version', '.devcontainer/Dockerfile') }}
-        restore-keys: |
-          ${{ runner.os }}-gems-
-    - name: Deploy site from canonical container
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: us-east-1
-        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CLOUDFLARE_TOKEN }}
-        CLIENT_NOTES_PATH: .client_notes
-        DEPLOY_RUBY: ${{ steps.deploy_ruby.outputs.value }}
-        DEPLOY_RUBY_SOURCE: ${{ steps.deploy_ruby.outputs.source }}
-        CANONICAL_ENV_RUBY_VERSION: ${{ steps.deploy_ruby.outputs.value }}
-        S3_BUCKET: www.speedshop.co
-      run: |
-        ./_scripts/canonical-env.sh \
-          --env AWS_ACCESS_KEY_ID \
-          --env AWS_SECRET_ACCESS_KEY \
-          --env AWS_DEFAULT_REGION \
-          --env CLOUDFLARE_API_TOKEN \
-          --env CLIENT_NOTES_PATH \
-          --env DEPLOY_RUBY \
-          --env DEPLOY_RUBY_SOURCE \
-          --env S3_BUCKET \
-          '
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          persist-credentials: false
+      - name: Determine Ruby version
+        id: ruby
+        run: echo "version=$(awk -F'\"' '/^ruby = / { print $2; exit }' mise.toml)" >> "$GITHUB_OUTPUT"
+      - uses: ./.github/actions/canonical-image
+        with:
+          ruby-version: ${{ steps.ruby.outputs.version }}
+      - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+        with:
+          path: .cache/canonical-home
+          key: ${{ runner.os }}-canonical-home-v2-${{ hashFiles('mise.toml', '.devcontainer/Dockerfile') }}
+          restore-keys: ${{ runner.os }}-canonical-home-v2-
+      - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-website-gems-v2-${{ hashFiles('Gemfile.lock', 'mise.toml', '.devcontainer/Dockerfile') }}
+          restore-keys: ${{ runner.os }}-website-gems-v2-
+      - name: Download public website snapshot
+        env:
+          SNAPSHOT_URL: ${{ vars.WEBSITE_SNAPSHOT_URL }}
+        run: |
+          test -n "$SNAPSHOT_URL"
+          mkdir -p tmp
+          curl --fail --silent --show-error --proto '=https' --tlsv1.2 \
+            --retry 3 --max-time 60 --max-filesize 5242880 \
+            --output tmp/website-snapshot.json "$SNAPSHOT_URL"
+      - name: Build and validate site without deployment credentials
+        env:
+          WEBSITE_SNAPSHOT_PATH: tmp/website-snapshot.json
+          JEKYLL_ENV: production
+        run: |
+          ./_scripts/canonical-env.sh --env WEBSITE_SNAPSHOT_PATH --env JEKYLL_ENV '
             set -euo pipefail
             mise trust --yes /workspaces/speedshop/mise.toml
             mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle
-            mise install node pandoc awscli
+            mise install node pandoc
             mise exec -- npm ci
             mise exec -- bundle install --jobs 4 --retry 3
-
-            if [ "${DEPLOY_RUBY_SOURCE}" = "mise.toml" ]; then
-              mise exec -- bundle exec rake validate:ruby_version
-            fi
-
+            mise exec -- bundle exec rake validate:ruby_version
             mise exec -- bundle exec rake site:build_and_validate
-            mise exec -- bundle exec ruby _scripts/s3_deploy.rb
-            mise exec -- aws s3 sync card/ s3://www.speedshop.co/card/ --cache-control "max-age=86400"
-            mise exec -- npx wrangler deploy --config workers/card-wrangler.toml
           '
-    - name: Cloudflare Purge Cache
-      uses: jakejarvis/cloudflare-purge-action@eee6dba0236093358f25bb1581bd615dc8b3d8e3 # v0.3.0
-      env:
-        CLOUDFLARE_ZONE: ${{ secrets.CLOUDFLARE_ZONE }}
-        CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
-    - name: Report scheduled deploy to Dead Man's Snitch
-      if: ${{ always() && github.event_name == 'schedule' }}
-      env:
-        DEAD_MANS_SNITCH_URL: https://nosnch.in/447fc8972e
-        JOB_STATUS: ${{ job.status }}
-        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      run: |
-        status=1
-        if [ "$JOB_STATUS" = "success" ]; then
-          status=0
-        fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: website
+          path: _site/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
 
-        if ! curl --fail --silent --show-error \
-          --data-urlencode "s=$status" \
-          --data-urlencode "m=deploy $JOB_STATUS: $RUN_URL" \
-          "$DEAD_MANS_SNITCH_URL" >/dev/null; then
-          echo "::warning::Dead Man's Snitch check-in failed"
-        fi
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: website
+          path: _site
+      - name: Determine Ruby version
+        id: ruby
+        run: echo "version=$(awk -F'\"' '/^ruby = / { print $2; exit }' mise.toml)" >> "$GITHUB_OUTPUT"
+      - uses: ./.github/actions/canonical-image
+        with:
+          ruby-version: ${{ steps.ruby.outputs.version }}
+      - name: Install deployment tools
+        run: |
+          ./_scripts/canonical-env.sh '
+            set -euo pipefail
+            mise trust --yes /workspaces/speedshop/mise.toml
+            mise install node awscli
+            mise exec -- npm ci
+          '
+      - name: Deploy validated artifact
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CLOUDFLARE_TOKEN }}
+          S3_BUCKET: www.speedshop.co
+        run: |
+          ./_scripts/canonical-env.sh \
+            --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env AWS_DEFAULT_REGION \
+            --env CLOUDFLARE_API_TOKEN --env S3_BUCKET '
+              set -euo pipefail
+              mise exec -- ruby _scripts/s3_deploy.rb
+              mise exec -- aws s3 sync card/ s3://www.speedshop.co/card/ --cache-control "max-age=86400"
+              mise exec -- npx --no-install wrangler deploy --config workers/card-wrangler.toml
+            '
+      - name: Cloudflare Purge Cache
+        uses: jakejarvis/cloudflare-purge-action@eee6dba0236093358f25bb1581bd615dc8b3d8e3
+        env:
+          CLOUDFLARE_ZONE: ${{ secrets.CLOUDFLARE_ZONE }}
+          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+
+  report:
+    needs: [build, deploy]
+    if: ${{ always() && github.event_name == 'schedule' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Report scheduled deploy to Dead Man's Snitch
+        env:
+          DEAD_MANS_SNITCH_URL: https://nosnch.in/447fc8972e
+          BUILD_STATUS: ${{ needs.build.result }}
+          DEPLOY_STATUS: ${{ needs.deploy.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          status=1
+          if [ "$BUILD_STATUS" = success ] && [ "$DEPLOY_STATUS" = success ]; then
+            status=0
+          fi
+          if ! curl --fail --silent --show-error \
+            --data-urlencode "s=$status" \
+            --data-urlencode "m=build $BUILD_STATUS, deploy $DEPLOY_STATUS: $RUN_URL" \
+            "$DEAD_MANS_SNITCH_URL" >/dev/null; then
+            echo "::warning::Dead Man's Snitch check-in failed"
+          fi
