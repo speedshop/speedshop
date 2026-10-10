@@ -18,7 +18,8 @@ CACHE_CONTROL = {
 # File patterns and their cache control settings
 CACHE_RULES = [
   # Images - immutable (1 year)
-  {patterns: %w[*.jpg *.jpeg *.png *.gif *.svg *.ico], cache: :immutable},
+  {patterns: %w[*.jpg *.jpeg *.png *.gif *.ico], cache: :immutable},
+  {patterns: %w[*.svg], cache: :one_hour},
   # Fingerprinted JS - immutable (pattern: name-hash.js where hash is 8 hex chars)
   {patterns: %w[*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].js], cache: :immutable},
   # Non-fingerprinted JS/CSS - 1 day
@@ -30,7 +31,7 @@ CACHE_RULES = [
 
 def main
   bucket = ENV.fetch("S3_BUCKET") { abort "S3_BUCKET environment variable required" }
-  forbidden_dirs = %w[client_notes .client_notes].map { |dir| File.join(SITE_DIR, dir) }
+  forbidden_dirs = %w[tmp vendor node_modules].map { |dir| File.join(SITE_DIR, dir) }
   forbidden_dirs.each do |dir|
     next unless Dir.exist?(dir)
 

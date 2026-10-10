@@ -19,7 +19,6 @@ mise.lock
 _data/
 assets/generated/
 holidays.ics
-!test/fixtures/generated_data/holidays.ics
 
 # Playwright test output
 test-results/

@@ -32,8 +32,8 @@ include:
    - .well-known
 exclude:
    - _scripts
-   - client_notes
-   - .client_notes
+   - snapshot.json
+   - website-snapshot.json
    - card
    - wercker.yml
    - Gemfile

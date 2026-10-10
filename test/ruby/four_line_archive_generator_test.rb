@@ -1,51 +1,40 @@
+require "json"
 require "minitest/autorun"
 
 require_relative "../../_plugins/four_line_archive_generator"
 
 class FourLineArchiveGeneratorTest < Minitest::Test
-  FIXTURE_CLIENT_NOTES_PATH = File.expand_path("../fixtures/client_notes", __dir__)
-  CURRENT_LAYOUT_CLIENT_NOTES_PATH = File.expand_path("../fixtures/current_client_notes", __dir__)
+  def snapshot
+    JSON.parse(File.read(File.expand_path("../fixtures/generated_data/snapshot.json", __dir__)))
+  end
 
-  def test_default_payload_defaults_to_empty_archive
-    result = Speedshop::FourLineArchiveGenerator.default_payload
-
+  def test_generate_empty_archive
+    result = Speedshop::FourLineArchiveGenerator.generate(lines: [], generated_at: "2026-01-17T00:00:00Z")
     assert_equal 0, result["issue_count"]
     assert_equal 0, result["line_count"]
     assert_equal [], result["lines"]
   end
 
-  def test_generate_defaults_when_archive_directory_is_missing
-    non_default = Speedshop::FourLineArchiveGenerator.generate(client_notes_path: FIXTURE_CLIENT_NOTES_PATH)
-    refute_equal Speedshop::FourLineArchiveGenerator.default_payload, non_default
-
-    result = Speedshop::FourLineArchiveGenerator.generate(client_notes_path: "/path/that/does/not/exist")
-    assert_equal Speedshop::FourLineArchiveGenerator.default_payload, result
-  end
-
-  def test_generate_extracts_numbered_lines_with_html_and_text
-    result = Speedshop::FourLineArchiveGenerator.generate(client_notes_path: FIXTURE_CLIENT_NOTES_PATH)
-
-    assert_equal 2, result["issue_count"]
-    assert_equal 8, result["line_count"]
-
-    newest_first = result["lines"].first
-    assert_equal "2026-01-10", newest_first["issue_date"]
-    refute_includes newest_first.keys, "line_number"
-
-    linked_line = result["lines"].find { |line| line["line_text"] == "First line link with context." }
-    assert_match(/^2026-01-03-/, linked_line["id"])
-    assert_includes linked_line["line_html"], "<a href=\"https://example.com/one\""
-  end
-
-  def test_generate_extracts_archive_from_current_client_notes_layout
-    result = Speedshop::FourLineArchiveGenerator.generate(client_notes_path: CURRENT_LAYOUT_CLIENT_NOTES_PATH)
-
+  def test_generate_renders_archive_html_and_text
+    data = snapshot
+    result = Speedshop::FourLineArchiveGenerator.generate(lines: data.fetch("archive"), generated_at: data.fetch("generated_at"))
     assert_equal 1, result["issue_count"]
     assert_equal 4, result["line_count"]
-
-    linked_line = result["lines"].find { |line| line["line_text"] == "Second current-layout line with a link." }
+    linked_line = result["lines"].find { |line| line["line_text"] == "Second public line with a link." }
     refute_nil linked_line
-    assert_equal "2026-01-17", linked_line["issue_date"]
-    assert_includes linked_line["line_html"], "<a href=\"https://example.com/current\""
+    assert_match(/^2026-01-17-/, linked_line["id"])
+    assert_includes linked_line["line_html"], '<a href="https://example.com/"'
+  end
+
+  def test_generate_discards_executable_content_and_attributes
+    html = Speedshop::FourLineArchiveGenerator.markdown_to_inline_html('<script>alert(1)</script><svg onload="alert(2)"></svg><a href="https://example.com" onclick="alert(3)">link</a>')
+    refute_match(/script|svg|onclick|alert/, html)
+    assert_includes html, 'href="https://example.com"'
+  end
+
+  def test_generate_discards_unsafe_link_schemes
+    html = Speedshop::FourLineArchiveGenerator.markdown_to_inline_html("[bad](javascript:alert%281%29) and **good**")
+    refute_includes html, "javascript:"
+    assert_includes html, "<strong>good</strong>"
   end
 end

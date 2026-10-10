@@ -29,7 +29,7 @@ module.exports = defineConfig({
   ],
 
   webServer: {
-    command: `cd .. && mise exec -- bundle exec jekyll build --quiet && PORT=${TEST_SERVER_PORT} node test/browser/server.cjs`,
+    command: `cd .. && GENERATED_DATA_FIXTURES_PATH=test/fixtures/generated_data mise exec -- bundle exec jekyll build --quiet && PORT=${TEST_SERVER_PORT} node test/browser/server.cjs`,
     url: TEST_SERVER_URL,
     reuseExistingServer: false,
     timeout: 60000,

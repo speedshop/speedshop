@@ -4,58 +4,9 @@ require "json"
 
 require_relative "four_line_archive_generator"
 require_relative "sla_reply_histogram"
+require_relative "website_snapshot"
 
 module Speedshop
-  module GenerateDataDefaults
-    module_function
-
-    def sla_status
-      {
-        "sla_policy" => "",
-        "generated_at" => "1970-01-01",
-        "start_date" => "1970-01-01",
-        "end_date" => "1970-01-01",
-        "performance" => {
-          "last_30_days" => 0,
-          "last_90_days" => 0,
-          "last_6_months" => 0
-        },
-        "days" => {},
-        "reply_histogram" => {
-          "count" => 0,
-          "bin_width_hours" => 0,
-          "max_hours" => nil,
-          "percentiles" => {
-            "p50" => nil,
-            "p75" => nil,
-            "p95" => nil,
-            "p99" => nil
-          },
-          "bins" => []
-        }
-      }
-    end
-
-    def availability
-      {
-        "months" => [
-          {"label" => "Jan 1970", "status" => "available"},
-          {"label" => "Feb 1970", "status" => "available"},
-          {"label" => "Mar 1970", "status" => "available"}
-        ]
-      }
-    end
-
-    def holidays_ics
-      <<~ICS
-        BEGIN:VCALENDAR
-        VERSION:2.0
-        PRODID:-//speedshop//generated//EN
-        END:VCALENDAR
-      ICS
-    end
-  end
-
   module SlaStatusData
     CUTOFF_DATE = "2026-01-01"
     PASS_FAIL_STATUSES = %w[green red].freeze
@@ -67,24 +18,14 @@ module Speedshop
 
     module_function
 
-    def normalize_file!(path, cutoff_date: CUTOFF_DATE, today: current_japan_date)
-      return unless File.exist?(path)
-
-      payload = JSON.parse(File.read(path))
+    def normalize!(payload, cutoff_date: CUTOFF_DATE, today: current_japan_date)
       visible_start_date = [payload["start_date"], cutoff_date].compact.max || cutoff_date
-
       payload["start_date"] = visible_start_date
-      payload["holidays"] = Array(payload["holidays"]).select do |holiday|
-        holiday["date"] && holiday["date"] >= visible_start_date
-      end
-      payload["days"] = Hash(payload["days"] || {}).each_with_object({}) do |(date, status), filtered_days|
-        filtered_days[date] = status if date >= visible_start_date
-      end
-      payload["reply_histogram"] ||= Speedshop::GenerateDataDefaults.sla_status.fetch("reply_histogram")
-
-      recalculate_performance!(payload, today) if suppress_current_business_status!(payload, today)
-
-      File.write(path, "#{JSON.pretty_generate(payload)}\n")
+      payload["holidays"] = Array(payload["holidays"]).select { |holiday| holiday["date"] && holiday["date"] >= visible_start_date }
+      payload["days"] = Hash(payload["days"] || {}).select { |date, _status| date >= visible_start_date }
+      suppress_current_business_status!(payload, today)
+      recalculate_performance!(payload, today)
+      payload
     end
 
     def current_japan_date
@@ -92,121 +33,70 @@ module Speedshop
     end
 
     def suppress_current_business_status!(payload, today)
-      status = payload.fetch("days", {})[today.to_s]
-      return false unless PASS_FAIL_STATUSES.include?(status)
+      return false unless PASS_FAIL_STATUSES.include?(payload.fetch("days", {})[today.to_s])
 
       payload["days"][today.to_s] = "future"
       true
     end
 
     def recalculate_performance!(payload, today)
-      return unless payload["performance"].is_a?(Hash)
-
-      PERFORMANCE_WINDOWS.each do |key, start_date_for|
-        next unless payload["performance"].key?(key)
-
-        statuses = statuses_between(payload.fetch("days", {}), start_date_for.call(today), today)
-        payload["performance"][key] = performance_percentage(statuses)
+      payload["performance"] = PERFORMANCE_WINDOWS.transform_values do |start_date_for|
+        statuses = payload.fetch("days").filter_map do |date, status|
+          status if PASS_FAIL_STATUSES.include?(status) && Date.iso8601(date).between?(start_date_for.call(today), today - 1)
+        end
+        statuses.empty? ? 0 : (statuses.count("green") * 100.0 / statuses.length).round(1)
       end
     end
+  end
 
-    def statuses_between(days, start_date, end_date)
-      days.filter_map do |date, status|
-        status if PASS_FAIL_STATUSES.include?(status) && date_in_range?(date, start_date, end_date)
+  module WebsiteCalendar
+    module_function
+
+    def render(holidays)
+      lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Speedshop//Japanese Holidays//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "X-WR-CALNAME:Speedshop SLA Holidays"]
+      holidays.each do |holiday|
+        date = Date.iso8601(holiday.fetch("date"))
+        name = holiday.fetch("name").gsub(/[\\\n,;]/) { |character| (character == "\n") ? "\\n" : "\\#{character}" }
+        lines.concat([
+          "BEGIN:VEVENT",
+          "DTSTART;VALUE=DATE:#{date.strftime("%Y%m%d")}",
+          "DTEND;VALUE=DATE:#{(date + 1).strftime("%Y%m%d")}",
+          "SUMMARY:#{name}",
+          "DESCRIPTION:Speedshop SLA does not apply on this day",
+          "TRANSP:TRANSPARENT",
+          "UID:#{date.strftime("%Y%m%d")}-speedshop-holiday@speedshop.co",
+          "END:VEVENT"
+        ])
       end
-    end
-
-    def date_in_range?(date, start_date, end_date)
-      date = Date.parse(date)
-      date >= start_date && date < end_date
-    end
-
-    def performance_percentage(statuses)
-      return 0 if statuses.empty?
-
-      (statuses.count("green") * 100.0 / statuses.length).round(1)
-    end
-
-    def merge_reply_histogram!(path, stats)
-      return unless File.exist?(path)
-
-      payload = JSON.parse(File.read(path))
-      payload["reply_histogram"] = stats
-      File.write(path, "#{JSON.pretty_generate(payload)}\n")
+      (lines + ["END:VCALENDAR"]).join("\r\n") + "\r\n"
     end
   end
 end
 
 Jekyll::Hooks.register :site, :after_init do |site|
-  client_notes_path = ENV["CLIENT_NOTES_PATH"]
-  generated_data_fixtures_path = ENV["GENERATED_DATA_FIXTURES_PATH"]
+  fixtures = ENV["GENERATED_DATA_FIXTURES_PATH"]
+  raise "Production builds cannot use website data fixtures" if fixtures && ENV["JEKYLL_ENV"] == "production"
 
+  path = fixtures ? File.join(fixtures, "snapshot.json") : ENV["WEBSITE_SNAPSHOT_PATH"]
+  snapshot = Speedshop::WebsiteSnapshot.load(path, check_freshness: !fixtures)
   data_dir = File.join(site.source, "_data")
   FileUtils.mkdir_p(data_dir)
 
-  sla_status_path = File.join(data_dir, "sla_status.json")
-  availability_path = File.join(data_dir, "availability.json")
-  four_line_archive_path = File.join(data_dir, "four_line_archive.json")
-  holidays_path = File.join(site.source, "holidays.ics")
-  histogram_path = File.join(site.source, Speedshop::SlaReplyHistogram::DEFAULT_OUTPUT_PATH)
-
-  fallback_client_notes_path = File.expand_path("../client_notes", site.source)
-  archive_source_path = if generated_data_fixtures_path && Dir.exist?(generated_data_fixtures_path)
-    generated_data_fixtures_path
-  elsif client_notes_path && Dir.exist?(client_notes_path)
-    client_notes_path
-  elsif Dir.exist?(fallback_client_notes_path)
-    fallback_client_notes_path
-  end
-
-  four_line_archive = Speedshop::FourLineArchiveGenerator.generate(client_notes_path: archive_source_path)
-  File.write(four_line_archive_path, "#{JSON.pretty_generate(four_line_archive)}\n")
-
-  if generated_data_fixtures_path && Dir.exist?(generated_data_fixtures_path)
-    FileUtils.cp(File.join(generated_data_fixtures_path, "sla_status.json"), sla_status_path)
-    FileUtils.cp(File.join(generated_data_fixtures_path, "availability.json"), availability_path)
-    FileUtils.cp(File.join(generated_data_fixtures_path, "holidays.ics"), holidays_path)
-    Speedshop::SlaReplyHistogram.write_placeholder(histogram_path)
-    Speedshop::SlaStatusData.normalize_file!(sla_status_path)
-    next
-  end
-
-  unless client_notes_path && Dir.exist?(client_notes_path)
-    # CI and local dev often don't have the private client notes repo checked out.
-    # Ensure required build artifacts exist so the built site is stable and tests pass.
-    File.write(sla_status_path, "#{JSON.pretty_generate(Speedshop::GenerateDataDefaults.sla_status)}\n") unless File.exist?(sla_status_path)
-    File.write(availability_path, "#{JSON.pretty_generate(Speedshop::GenerateDataDefaults.availability)}\n") unless File.exist?(availability_path)
-    File.write(holidays_path, Speedshop::GenerateDataDefaults.holidays_ics) unless File.exist?(holidays_path)
-    Speedshop::SlaReplyHistogram.write_placeholder(histogram_path)
-    Speedshop::SlaStatusData.normalize_file!(sla_status_path)
-    next
-  end
-
-  Jekyll.logger.info "Generating SLA/availability data from #{client_notes_path}..."
-
-  def run_command(cmd, description)
-    return if system(*cmd)
-
-    raise "Failed to #{description}: command '#{cmd}' exited with status #{$?.exitstatus}"
-  end
-
-  Bundler.with_unbundled_env do
-    Dir.chdir(client_notes_path) do
-      run_command("bundle install --quiet", "install client_notes dependencies")
-      run_command([
-        "bundle", "exec", "rake",
-        "sla:generate_json[#{sla_status_path}]",
-        "sla:generate_holidays_ics[#{holidays_path}]",
-        "availability:generate_json[#{availability_path}]"
-      ], "generate SLA, holidays and availability data")
-    end
-  end
-
-  histogram_stats = Speedshop::SlaReplyHistogram.generate(
-    client_notes_path: client_notes_path,
-    output_path: histogram_path,
-    cutoff_date: Speedshop::SlaStatusData::CUTOFF_DATE
+  sla = snapshot.fetch("sla").merge(
+    "generated_at" => snapshot.fetch("generated_at"),
+    "sla_policy" => "Respond within 2 business days (Mon-Fri, excluding Japanese holidays)",
+    "holidays" => snapshot.fetch("holidays"),
+    "reply_histogram" => snapshot.fetch("reply_histogram")
   )
-  Speedshop::SlaStatusData.merge_reply_histogram!(sla_status_path, histogram_stats)
-  Speedshop::SlaStatusData.normalize_file!(sla_status_path)
+  Speedshop::SlaStatusData.normalize!(sla)
+  availability = {"months" => snapshot.fetch("availability").map do |month|
+    {"label" => Date.strptime(month.fetch("month"), "%Y-%m").strftime("%B %Y"), "status" => month.fetch("status")}
+  end}
+  archive = Speedshop::FourLineArchiveGenerator.generate(lines: snapshot.fetch("archive"), generated_at: snapshot.fetch("generated_at"))
+
+  {"sla_status" => sla, "availability" => availability, "four_line_archive" => archive}.each do |name, payload|
+    File.write(File.join(data_dir, "#{name}.json"), "#{JSON.pretty_generate(payload)}\n")
+  end
+  File.write(File.join(site.source, "holidays.ics"), Speedshop::WebsiteCalendar.render(snapshot.fetch("holidays")))
+  Speedshop::SlaReplyHistogram.generate(stats: snapshot.fetch("reply_histogram"), output_path: File.join(site.source, Speedshop::SlaReplyHistogram::DEFAULT_OUTPUT_PATH))
 end
