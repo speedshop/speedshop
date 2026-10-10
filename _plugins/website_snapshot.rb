@@ -72,6 +72,7 @@ module Speedshop
     def validate_holidays!
       holidays = @payload["holidays"]
       array!(holidays, 200)
+      check!(!holidays.empty?, "Website snapshot holidays must not be empty")
       holidays.each do |holiday|
         object!(holiday, %w[date name])
         date!(holiday["date"])
@@ -82,6 +83,7 @@ module Speedshop
 
     def validate_archive!(today)
       array!(@payload["archive"], 10000)
+      check!(!@payload["archive"].empty?, "Website snapshot archive must not be empty")
       @payload["archive"].each do |line|
         object!(line, %w[issue_date markdown])
         check!(date!(line["issue_date"]) <= today, "Unreleased newsletter issue")
