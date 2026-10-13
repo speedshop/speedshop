@@ -3,7 +3,6 @@
 html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
 body { background: #080c09; color: #ffffee; font: 12px/1.4 ui-monospace, monospace; }
 #stage { width: 100%; height: 100%; }
-canvas, picture, img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
-img { object-fit: cover; }
+canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
 video, audio { display: none; }
 [role=alert] { position: absolute; bottom: 12px; left: 12px; margin: 0; padding: 8px 11px; background: #080c09; color: #ffb4a8; }

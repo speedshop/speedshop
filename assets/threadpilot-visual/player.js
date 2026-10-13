@@ -5,7 +5,7 @@ const video = document.querySelector('video');
 const music = document.querySelector('audio');
 const errorMessage = document.querySelector('[role=alert]');
 const audioToggle = window.frameElement?.ownerDocument.querySelector('#threadpilot-audio-toggle');
-let renderer, frameRequest, mediaURL;
+let renderer, frameRequest, mediaURL, stillImage;
 let stopped = true, failed = false, lastTime = 0;
 
 function report(error) {
@@ -37,7 +37,7 @@ function resize() {
   if (!renderer || failed) return;
   const bounds = canvas.getBoundingClientRect();
   renderer.resize(bounds.width, bounds.height);
-  if (stopped && video.readyState >= 2) renderer.draw(video, 0);
+  if (stopped && (stillImage || video.readyState >= 2)) renderer.draw(stillImage || video, 0);
 }
 async function loadSource(startTime) {
   const response = await fetch(video.currentSrc || video.src);
@@ -56,15 +56,14 @@ async function loadSource(startTime) {
 }
 async function start() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const picture = document.createElement('picture');
-    const source = document.createElement('source');
-    source.media = '(max-aspect-ratio: 1/1)';
-    source.srcset = 'still-portrait.png';
-    const image = document.createElement('img');
-    image.alt = 'Static ASCII artwork';
-    image.src = 'still-desktop.png';
-    picture.append(source, image);
-    canvas.replaceWith(picture);
+    stillImage = new Image();
+    stillImage.src = 'still.jpg';
+    stillImage.currentTime = 22.492708333333333;
+    [renderer] = await Promise.all([createRenderer(canvas), stillImage.decode()]);
+    resize();
+    new ResizeObserver(resize).observe(document.querySelector('#stage'));
+    canvas.setAttribute('aria-label', 'Static ASCII artwork');
+    canvas.dataset.ready = 'true';
     return;
   }
   [renderer] = await Promise.all([createRenderer(canvas), loadSource(5.607)]);resize();

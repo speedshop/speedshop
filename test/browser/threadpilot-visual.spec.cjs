@@ -8,7 +8,7 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     await page.setViewportSize(viewport);
     const stillRequests = [];
     page.on("request", request => {
-      if (/\/still-(desktop|portrait)\.png$/.test(request.url())) stillRequests.push(request);
+      if (request.url().endsWith("/still.jpg")) stillRequests.push(request);
     });
     await page.goto("/threadpilot.html");
     const frame = page.frameLocator(".threadpilot-hero-visual");
@@ -44,13 +44,18 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     page.on("request", request => requests.push(request.url()));
     await page.goto("/threadpilot.html");
     const frame = page.frameLocator(".threadpilot-hero-visual");
-    const image = frame.getByRole("img", { name: "Static ASCII artwork" });
-    await expect.poll(() => image.evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
-    await expect(image).toHaveJSProperty("currentSrc", new URL(`/assets/threadpilot-visual/still-${viewport.width === 390 ? "portrait" : "desktop"}.png`, page.url()).href);
-    await expect(frame.locator("canvas")).toHaveCount(0);
+    const canvas = frame.locator("canvas");
+    await expect(canvas).toHaveAttribute("data-ready", "true");
+    await expect(canvas).toHaveAttribute("aria-label", "Static ASCII artwork");
+    await expect(canvas).not.toHaveAttribute("data-frames");
+    const pixels = await canvas.evaluate(canvas => canvas.toDataURL());
+    await page.waitForTimeout(300);
+    expect(await canvas.evaluate(canvas => canvas.toDataURL())).toBe(pixels);
+    await page.setViewportSize({ width: viewport.width + 20, height: viewport.height });
+    await expect.poll(() => canvas.evaluate(canvas => canvas.width)).toBe(viewport.width + 20);
     await expect(frame.locator("video")).toHaveJSProperty("paused", true);
     expect(requests.filter(url => url.endsWith("/dist/video.mp4"))).toHaveLength(0);
-    expect(requests.filter(url => /\/still-(desktop|portrait)\.png$/.test(url))).toHaveLength(1);
+    expect(requests.filter(url => url.endsWith("/still.jpg"))).toHaveLength(1);
     await expect(frame.getByRole("button")).toHaveCount(0);
   });
 }
