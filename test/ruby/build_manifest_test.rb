@@ -61,7 +61,7 @@ class BuildManifestTest < Minitest::Test
     end
 
     manifest[:pages].each do |page|
-      %w[.html .md .pdf .epub].each do |ext|
+      %w[.html .pdf .epub].each do |ext|
         assert entries.include?("#{page}#{ext}"), "Expected page variant '#{page}#{ext}' not found in _site root"
       end
     end
@@ -149,7 +149,7 @@ class BuildManifestTest < Minitest::Test
     allowed = []
 
     manifest[:pages].each do |page|
-      %w[.html .md .pdf .epub].each { |ext| allowed << "#{page}#{ext}" }
+      %w[.html .pdf .epub].each { |ext| allowed << "#{page}#{ext}" }
     end
 
     allowed + manifest[:files]
