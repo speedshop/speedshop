@@ -55,11 +55,22 @@ async function loadSource(startTime) {
   });
 }
 async function start() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const picture = document.createElement('picture');
+    const source = document.createElement('source');
+    source.media = '(max-aspect-ratio: 1/1)';
+    source.srcset = 'still-portrait.png';
+    const image = document.createElement('img');
+    image.alt = 'Static ASCII artwork';
+    image.src = 'still-desktop.png';
+    picture.append(source, image);
+    canvas.replaceWith(picture);
+    return;
+  }
   [renderer] = await Promise.all([createRenderer(canvas), loadSource(5.607)]);resize();
   new ResizeObserver(resize).observe(document.querySelector('#stage'));
   canvas.dataset.ready = 'true';
   renderer.draw(video, 0);
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   try { await video.play();startLoop(); }
   catch (error) {
     if (error.name !== 'NotAllowedError') throw error;

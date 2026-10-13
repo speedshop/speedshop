@@ -8,7 +8,14 @@ document selectors, styles, and lifecycle from the site's charts and PJAX.
 The parent page supplies the heading and a fixed mute/unmute icon in the
 viewport's top-right corner. The embedded player binds that same-origin parent
 control to its audio; the frame itself fills the hero. Music starts only
-on request. Reduced motion displays a still frame instead of autoplaying.
+on request. Reduced motion displays pre-rendered ASCII artwork from video timestamp
+22.492708 seconds (frame-selection candidate 07), instead of loading the video.
+`still-desktop.png` was rendered at 1440 × 600; `still-portrait.png` uses the
+390 × 844 mobile viewport's hero dimensions. Both use the existing renderer's
+default settings, with a fresh renderer drawing the selected frame at dt=0.
+Only reduced-motion clients create the picture element and request a still;
+normal clients request neither PNG. Portrait aspect ratios select the portrait
+artwork; other aspect ratios select the desktop artwork.
 
 Renderer source, shaders, atlas, license, built JavaScript, and selected video
 and audio are all copied into this directory and committed. Nothing loads from
