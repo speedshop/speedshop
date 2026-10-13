@@ -11,13 +11,6 @@ Jekyll::Hooks.register :site, :post_write do |site|
   cache = Speedshop::PandocCache.new(site)
   pandoc_opts = ["--lua-filter", "#{site.source}/_pandoc/url_filter.lua", "--resource-path=#{site.dest}", "--pdf-engine=xelatex"]
 
-  source_paths = {}
-  site.posts.docs.each do |post|
-    if post.url =~ %r{/blog/([^/]+)/?$}
-      source_paths[$1] = File.join(site.source, post.relative_path)
-    end
-  end
-
   errors = []
   aliases = []
   mutex = Mutex.new
@@ -28,20 +21,12 @@ Jekyll::Hooks.register :site, :post_write do |site|
     blog_match = path.match(%r{/blog/([^/]+)/index\.html$})
 
     if blog_match
-      %w[md pdf epub].each do |format|
+      %w[pdf epub].each do |format|
         aliases << ["#{base_path}.#{format}", File.join(site.dest, "blog", "#{blog_match[1]}.#{format}")]
       end
     end
 
-    formats = %w[epub md pdf]
-    if blog_match && source_paths[blog_match[1]]
-      content = File.read(source_paths[blog_match[1]], encoding: "UTF-8")
-      body = content.sub(/\A---\n.+?\n---\n*/m, "")
-      File.write("#{base_path}.md", body, encoding: "UTF-8")
-      formats = %w[epub pdf]
-    end
-
-    formats.each { |format| queue << [path, "#{base_path}.#{format}", format] }
+    %w[epub pdf].each { |format| queue << [path, "#{base_path}.#{format}", format] }
   end
 
   queue.close
@@ -72,6 +57,6 @@ Jekyll::Hooks.register :site, :post_write do |site|
     Jekyll.logger.error "Pandoc", "Errors during conversion:"
     errors.each { |e| Jekyll.logger.error "Pandoc", e }
   else
-    Jekyll.logger.info "Pandoc", "Converted #{post_paths.size} HTML files to epub/md/pdf"
+    Jekyll.logger.info "Pandoc", "Converted #{post_paths.size} HTML files to epub/pdf"
   end
 end

@@ -5,7 +5,6 @@ file = ".env"
 compile = false
 
 [tools]
-# Source of truth for this repo's shared toolchain.
 ruby = "4.0.3"
 node = "22.22.3"
 pandoc = "3.9.0.2"
@@ -38,7 +37,7 @@ run = "GENERATED_DATA_FIXTURES_PATH=test/fixtures/generated_data bundle exec jek
 [tasks.dev]
 description = "Start the local development stack and follow logs"
 depends = ["build"]
-run = "pitchfork start -l --force && pitchfork logs jekyll static worker --tail"
+run = "pitchfork start -l --force && pitchfork logs jekyll static --tail"
 
 [tasks."dev:bg"]
 description = "Start the local development stack in the background"
@@ -47,11 +46,11 @@ run = "pitchfork start -l --force"
 
 [tasks."dev:stop"]
 description = "Stop the local development stack"
-run = "pitchfork stop jekyll static worker"
+run = "pitchfork stop jekyll static"
 
 [tasks.serve]
 description = "Serve the local development stack with HTTPS"
-run = "pitchfork start -l --force && pitchfork logs jekyll static worker --tail"
+run = "pitchfork start -l --force && pitchfork logs jekyll static --tail"
 
 [tasks.lint]
 description = "Run all linters"
@@ -71,75 +70,13 @@ depends = ["test:ruby"]
 run = "npm test"
 
 [tasks."test:integration"]
-description = "Run integration tests against local Cloudflare worker"
+description = "Run integration tests against an isolated static site"
 depends = ["test:links"]
-dir = "{{config_root}}"
-run = """
-#!/usr/bin/env bash
-set -e
-
-cleanup() {
-  echo "Cleaning up..."
-  pkill -f 'caddy run --config Caddyfile' 2>/dev/null || true
-  pkill -f 'wrangler dev --config workers/wrangler.toml --port 8787' 2>/dev/null || true
-}
-trap cleanup EXIT
-
-# Start static file server with local HTTPS and HTTP/2
-printf 'Starting Caddy static server...\n'
-caddy run --config Caddyfile > /tmp/caddy.log 2>&1 &
-
-for i in {1..20}; do
-  if curl --silent --show-error --output /dev/null https://localhost:4000/ 2>/dev/null; then
-    echo "Caddy ready"
-    break
-  fi
-  echo "Waiting for Caddy... ($i)"
-  sleep 1
-done
-
-# Verify local HTTPS + HTTP/2
-http_version=$(curl --silent --show-error --output /dev/null --write-out '%{http_version}' --http2 https://localhost:4000/)
-if [ "$http_version" != "2" ]; then
-  echo "Error: Expected HTTP/2 from local Caddy server, got HTTP/$http_version"
-  cat /tmp/caddy.log
-  exit 1
-fi
-
-# Start Cloudflare worker using local node_modules
-echo "Starting Cloudflare worker..."
-./node_modules/.bin/wrangler dev --config workers/wrangler.toml --port 8787 > /tmp/wrangler.log 2>&1 &
-
-# Wait for wrangler to be ready
-for i in {1..20}; do
-  if curl --silent --show-error --output /dev/null http://localhost:8787/ 2>/dev/null; then
-    echo "Wrangler ready"
-    break
-  fi
-  echo "Waiting for wrangler... ($i)"
-  sleep 1
-done
-
-# Verify servers are running
-if ! curl --silent --show-error --output /dev/null https://localhost:4000/ 2>/dev/null; then
-  echo "Error: Caddy not responding"
-  cat /tmp/caddy.log
-  exit 1
-fi
-
-if ! curl --silent --show-error --output /dev/null http://localhost:8787/ 2>/dev/null; then
-  echo "Error: Wrangler not responding"
-  cat /tmp/wrangler.log
-  exit 1
-fi
-
-echo "Running integration tests..."
-BASE_URL=http://localhost:8787 bundle exec ruby test/integration/site_test.rb
-"""
+run = "bundle exec ruby test/integration/site_test.rb"
 
 [tasks."test:integration:prod"]
 description = "Run integration tests against production"
-run = "BASE_URL=https://www.speedshop.co bundle exec ruby test/integration/site_test.rb"
+run = "BASE_URL=https://www.speedshop.co bundle exec ruby test/integration/site_test.rb && BASE_URL=https://www.speedshop.co bundle exec ruby test/system/markdown_test.rb"
 
 [tasks."test:links"]
 description = "Run built-site link integrity checks"
@@ -156,6 +93,6 @@ description = "Exercise snapshot security and freshness through production build
 run = "bundle exec ruby test/system/website_snapshot_test.rb"
 
 [tasks."test:ci"]
-description = "Run tests for CI (no local workers)"
+description = "Run tests for CI"
 depends = ["test:links"]
 run = "mise run test:website-snapshot"

@@ -2,9 +2,12 @@ require "minitest/autorun"
 require "net/http"
 require "uri"
 require "json"
+require_relative "../test_helper"
+
+TestHelper.ensure_site_built! unless ENV["BASE_URL"]
 
 class SiteTest < Minitest::Test
-  BASE_URL = ENV.fetch("BASE_URL", "https://localhost:4000")
+  BASE_URL = TestHelper.base_url
 
   def get(path, headers = {})
     uri = URI.parse("#{BASE_URL}#{path}")
@@ -19,19 +22,25 @@ class SiteTest < Minitest::Test
     http.request(request)
   end
 
-  # Markdown file tests
-
   def test_blog_post_markdown_available_at_index
+    skip "Markdown requires Cloudflare" if localhost?
+
     response = get("/blog/the-complete-guide-to-rails-caching/index.md")
     assert_equal "200", response.code
+    assert_includes response["content-type"], "text/markdown"
   end
 
   def test_blog_post_markdown_available_at_slug
-    response = get("/blog/the-complete-guide-to-rails-caching.md")
+    skip "Markdown requires Cloudflare" if localhost?
+
+    response = get("/blog/the-complete-guide-to-rails-caching.md", {"Accept" => "text/html"})
     assert_equal "200", response.code
+    assert_includes response["content-type"], "text/markdown"
   end
 
   def test_markdown_has_no_pandoc_artifacts
+    skip "Markdown requires Cloudflare" if localhost?
+
     response = get("/blog/the-complete-guide-to-rails-caching/index.md")
     body = response.body
 
@@ -41,18 +50,18 @@ class SiteTest < Minitest::Test
       "Markdown should not have Pandoc attribute syntax ({.class})")
   end
 
-  def test_markdown_preserves_liquid_tags
+  def test_markdown_renders_liquid_tags
+    skip "Markdown requires Cloudflare" if localhost?
+
     response = get("/blog/the-complete-guide-to-rails-caching/index.md")
     body = response.body
 
-    assert_match(/\{%\s*(marginnote_lazy|sidenote)/, body,
-      "Markdown should preserve Liquid tags like marginnote_lazy and sidenote")
+    refute_match(/\{%\s*(marginnote_lazy|sidenote)/, body,
+      "Markdown should contain rendered content, not Liquid source")
   end
 
-  # Content negotiation tests (requires Cloudflare worker in production)
-
   def test_accept_markdown_returns_markdown
-    skip "Content negotiation requires Cloudflare worker" if localhost?
+    skip "Content negotiation requires Cloudflare" if localhost?
 
     response = get("/blog/the-complete-guide-to-rails-caching/", {
       "Accept" => "text/markdown"
@@ -71,27 +80,22 @@ class SiteTest < Minitest::Test
     assert_includes response["content-type"], "text/html"
   end
 
-  # Markdown response header tests (requires Cloudflare worker in production)
-
   def test_vary_header_includes_accept
-    skip "Vary header requires Cloudflare worker" if localhost?
+    skip "Markdown requires Cloudflare" if localhost?
 
-    response = get("/")
+    response = get("/", {"Accept" => "text/markdown"})
 
     assert response["vary"], "Vary header should be present"
     assert_includes response["vary"].downcase, "accept"
   end
 
-  def test_markdown_has_noindex_header
-    skip "X-Robots-Tag requires Cloudflare worker" if localhost?
+  def test_markdown_has_content_signal_header
+    skip "Markdown requires Cloudflare" if localhost?
 
     response = get("/blog/the-complete-guide-to-rails-caching.md")
 
-    assert response["x-robots-tag"], "X-Robots-Tag should be present on markdown"
-    assert_includes response["x-robots-tag"].downcase, "noindex"
+    assert_includes response["content-signal"], "ai-train=yes"
   end
-
-  # Card endpoint tests (requires card Cloudflare worker - separate from agent worker)
 
   def test_card_returns_text_by_default
     skip "Card endpoint requires production Cloudflare worker" unless production?
@@ -242,10 +246,7 @@ class SiteTest < Minitest::Test
 
   private
 
-  # Returns true if testing against static file server (no worker)
-  # Returns false if testing against wrangler dev (port 8787) or production
   def localhost?
-    return false if BASE_URL.include?(":8787") # wrangler dev
     BASE_URL.include?("localhost") || BASE_URL.include?("127.0.0.1")
   end
 

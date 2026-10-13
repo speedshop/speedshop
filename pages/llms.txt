@@ -1,0 +1,20 @@
+---
+layout: null
+permalink: /llms.txt
+sitemap: false
+---
+# Speedshop
+
+> Ruby on Rails performance consulting, scaling, and optimization.
+
+Request a page with `Accept: text/markdown` to receive Markdown instead of HTML. Explicit Markdown URLs also work without a special header: append `.md` to a page URL, use `/retainer.md`, or use `/blog/post/index.md`.
+
+## Pages
+
+- [Homepage]({{ '/' | absolute_url }})
+- [Performance retainer]({{ '/retainer.html' | absolute_url }})
+- [Rails Performance Slack]({{ '/slack.html' | absolute_url }})
+
+## Blog posts
+{% for post in site.posts %}
+- [{{ post.title }}]({{ post.url | absolute_url }}): {{ post.summary | strip_html | strip_newlines | truncate: 160 }}{% endfor %}
