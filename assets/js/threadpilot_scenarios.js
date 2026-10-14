@@ -6,7 +6,9 @@
   try {
     const response = await fetch("/assets/data/threadpilot_scenarios.json");
     if (!response.ok) throw new Error(`Benchmark data: HTTP ${response.status}`);
-    measurements = (await response.json()).scenarios;
+    const dataset = await response.json();
+    if (dataset.validation) throw new Error("Short validation runs are not performance comparisons");
+    measurements = dataset.scenarios;
   } catch (error) {
     console.warn("Measured benchmark data unavailable; showing labeled estimates.", error);
   }
@@ -51,9 +53,11 @@
 
   function scenario(kind) {
     const changing = kind === "changing";
-    const recording = measurements[kind]?.io === workloads[kind] ? measurements[kind] : null;
+    const workload = measurements[kind];
+    const selected = workload?.io === workloads[kind] ? workload : workload?.[workloads[kind]];
+    const recording = selected?.runs?.adaptive?.status !== "failed" && selected?.runs?.adaptive?.summary ? selected : null;
     const duration = recording ? Math.ceil(recording.runs.adaptive.duration) : changing ? 720 : 120;
-    const ioBands = changing ? recording?.ioBands || [[180, 360], [540, 720]] : [];
+    const ioBands = changing ? recording?.runs.adaptive.ioBands || recording?.ioBands || [[180, 360], [540, 720]] : [];
     const service = kind === "high" ? 250 : 100;
     const adaptive = { threads: [], throughput: [], latency: [] };
     const fixed = { threads: [], throughput: [], latency: [] };
@@ -87,6 +91,7 @@
       duration,
       ioBands,
       measured: { adaptive: false, fixed: false },
+      scatterLatency: recording?.latencyWindow === "individual",
       throughput: {
         adaptive: mean(tunedSummary.map((sample) => sample.throughput)),
         fixed: mean(fixedSummary.map((sample) => sample.throughput)),
@@ -100,13 +105,13 @@
     };
     if (recording) {
       for (const [name, run] of [["adaptive", recording.runs.adaptive], ["fixed", recording.runs[baseline]]]) {
-        if (!run) continue;
+        if (!run?.summary || run.status === "failed") continue;
         data[name] = run;
         data.measured[name] = true;
         data.throughput[name] = run.summary.throughput;
         data.latency[name] = run.summary.latency;
       }
-      data.duration = Math.max(recording.runs.adaptive.duration, recording.runs[baseline]?.duration || duration);
+      data.duration = Math.max(data.adaptive.duration, data.measured.fixed ? data.fixed.duration : duration);
     }
     return data;
   }
@@ -137,8 +142,8 @@
     write("[data-baseline-label]", `Fixed · ${baseline} ${baseline === 1 ? "thread" : "threads"} · ${data.measured.fixed ? "measured" : "estimated"}`);
     write("[data-throughput-heading]", `${measured ? "Measured" : "Estimated"} throughput`);
     write("[data-latency-heading]", `${measured ? "Measured" : "Estimated"} ${kind === "high" ? "request queueing" : "processing p99"}${measured && kind === "high" ? " (median)" : ""}`);
-    write("[data-latency-label]", kind === "high" ? `Request queueing${measured ? " (median)" : ""}` : "Processing p99");
-    write("[data-latency-axis]", `Milliseconds${measured ? " · 10-second windows" : ""} · lower is better`);
+    write("[data-latency-label]", data.scatterLatency ? kind === "high" ? "Request queueing" : "Processing latency" : kind === "high" ? `Request queueing${measured ? " (median)" : ""}` : "Processing p99");
+    write("[data-latency-axis]", `Milliseconds${data.scatterLatency ? " · individual observations" : measured ? " · 10-second windows" : ""} · lower is better`);
     write("[data-thread-axis]", kind === "changing" ? data.measured.adaptive ? "Threadpilot's workload phases" : "Following the workload" : "Finding a smaller or larger pool");
     write("[data-throughput-claim]", `${(data.throughput.adaptive / data.throughput.fixed).toFixed(1)}x`);
     write("[data-throughput-detail]", `${format(data.throughput.adaptive)} vs ${format(data.throughput.fixed)} ${units}`);
@@ -260,24 +265,42 @@
     }
     if (kind === "changing") {
       ctx.textBaseline = "top";
-      const end = data.measured.adaptive ? data.adaptive.duration : data.duration;
-      const boundaries = [...new Set([0, ...data.ioBands.flat(), end])].filter((second) => second <= end).sort((a, b) => a - b);
-      for (let phase = 1; phase < boundaries.length; phase += 1) {
-        const center = (boundaries[phase - 1] + boundaries[phase]) / 2;
-        const ioHeavy = data.ioBands.some(([start, stop]) => center >= start && center < stop);
-        if (x(boundaries[phase]) - x(boundaries[phase - 1]) > 26 * dpr) label(ctx, ioHeavy ? "I/O" : "CPU", x(center), 0);
-        const column = Math.round(x(boundaries[phase]));
-        for (let row = top; row < bottom; row += 8) ctx.fillRect(column, row, 1, 1);
+      for (const [index, name, prefix, color] of [[0, "adaptive", "TP", "#55ffff"], [1, "fixed", "Fixed", "#ff55ff"]]) {
+        const run = data[name];
+        const end = run.duration || data.duration;
+        const bands = run.ioBands || data.ioBands;
+        const phases = run.phases;
+        const edges = phases?.length ? phases.flatMap((phase) => [phase.start, phase.end]) : bands.flat();
+        const boundaries = [...new Set([0, ...edges, end])].filter((second) => second >= 0 && second <= end).sort((a, b) => a - b);
+        ctx.fillStyle = color;
+        for (let phase = 1; phase < boundaries.length; phase += 1) {
+          const start = boundaries[phase - 1];
+          const stop = boundaries[phase];
+          const center = (start + stop) / 2;
+          const active = phases?.length ? phases.filter((phase) => center >= phase.start && center < phase.end) : null;
+          const ioHeavy = active ? active.some((phase) => phase.io >= 50) : bands.some(([start, stop]) => center >= start && center < stop);
+          const cpuHeavy = active ? active.some((phase) => phase.io < 50) : !ioHeavy;
+          const text = ioHeavy && cpuHeavy ? "Mixed" : ioHeavy ? "I/O" : cpuHeavy ? "CPU" : "Idle";
+          const y = Math.round(index * 12 * dpr);
+          if (x(stop) - x(start) > ctx.measureText(`${prefix} ${text}`).width + 8 * dpr) label(ctx, `${prefix} ${text}`, x(center), y);
+          const column = Math.round(x(stop));
+          for (let row = top + index * 4; row < bottom; row += 8) ctx.fillRect(column, row, 1, 1);
+        }
       }
     }
     for (const [series, color, dashed] of [[tuned, "#55ffff", false], [fixed, "#ff55ff", true]]) {
-      for (let index = 1; index < series.length; index += 1) {
-        line(ctx, x(series[index - 1][0]), y(series[index - 1][1]), x(series[index][0]), y(series[index][1]), color, dashed);
+      if (key === "latency" && data.scatterLatency) {
+        ctx.fillStyle = color;
+        for (const [second, value] of series) ctx.fillRect(Math.round(x(second)), Math.round(y(value)), 1, 1);
+      } else {
+        for (let index = 1; index < series.length; index += 1) {
+          line(ctx, x(series[index - 1][0]), y(series[index - 1][1]), x(series[index][0]), y(series[index][1]), color, dashed);
+        }
       }
     }
-    const name = key === "threads" ? "thread count" : key === "throughput" ? "throughput" : kind === "high" ? "request queueing" : "processing p99";
+    const name = key === "threads" ? "thread count" : key === "throughput" ? "throughput" : kind === "high" ? "request queueing" : data.scatterLatency ? "processing latency" : "processing p99";
     const source = data.measured.fixed ? "Measured comparison" : data.measured.adaptive ? "Measured Threadpilot; estimated fixed baseline" : "Estimates, not measured results";
-    canvas.setAttribute("aria-label", `${name}: Threadpilot versus ${baseline} fixed threads at ${workloads[kind]}% I/O${kind === "changing" ? ", alternating with 10% I/O" : ""}. ${source}.${data.measured.fixed && key === "latency" ? ` Ten-second ${kind === "high" ? "median queueing" : "processing p99"} windows.` : ""}`);
+    canvas.setAttribute("aria-label", `${name}: Threadpilot versus ${baseline} fixed threads at ${workloads[kind]}% I/O${kind === "changing" ? ", alternating with 10% I/O" : ""}. ${source}.${kind === "changing" ? " Cyan TP and magenta Fixed phase labels show each run's own timing; Mixed means CPU-heavy and I/O-heavy jobs overlap." : ""}${key === "latency" && data.scatterLatency ? " Individual request/job observations shown as scatter points." : data.measured.fixed && key === "latency" ? ` Ten-second ${kind === "high" ? "median queueing" : "processing p99"} windows.` : ""}`);
     align(canvas);
   }
 
