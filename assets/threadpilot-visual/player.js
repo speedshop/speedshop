@@ -2,9 +2,8 @@ import { createRenderer } from './renderer.js';
 
 const canvas = document.querySelector('canvas');
 const video = document.querySelector('video');
-const music = document.querySelector('audio');
 const errorMessage = document.querySelector('[role=alert]');
-const audioToggle = window.frameElement?.ownerDocument.querySelector('#threadpilot-audio-toggle');
+const settings = canvas.dataset.size ? { size: Number(canvas.dataset.size) } : {};
 let renderer, frameRequest, mediaURL, stillImage;
 let stopped = true, failed = false, lastTime = 0;
 
@@ -70,14 +69,14 @@ async function start() {
     stillImage = new Image();
     stillImage.src = 'still.jpg';
     stillImage.currentTime = 22.492708333333333;
-    [renderer] = await Promise.all([createRenderer(canvas), stillImage.decode()]);
+    [renderer] = await Promise.all([createRenderer(canvas, settings), stillImage.decode()]);
     resize();
     observeSize();
     canvas.setAttribute('aria-label', 'Static ASCII artwork');
     canvas.dataset.ready = 'true';
     return;
   }
-  [renderer] = await Promise.all([createRenderer(canvas), loadSource(5.607)]);resize();
+  [renderer] = await Promise.all([createRenderer(canvas, settings), loadSource(5.607)]);resize();
   observeSize();
   canvas.dataset.ready = 'true';
   renderer.draw(video, 0);
@@ -87,29 +86,7 @@ async function start() {
   }
 }
 
-if (audioToggle) {
-  const controls = new AbortController();
-  audioToggle.addEventListener('click', async () => {
-    try {
-      if (music.paused) {
-        if (!music.hasAttribute('src')) music.src = music.dataset.src;
-        await music.play();
-      } else music.pause();
-    }
-    catch (error) { report(error); }
-  }, { signal: controls.signal });
-  function updateAudioControl() {
-    const label = music.paused ? 'Unmute music' : 'Mute music';
-    audioToggle.setAttribute('aria-label', label);
-    audioToggle.title = label;
-    audioToggle.dataset.muted = String(music.paused);
-  }
-  music.addEventListener('play', updateAudioControl);
-  music.addEventListener('pause', updateAudioControl);
-  window.addEventListener('pagehide', () => controls.abort(), { once: true });
-}
 video.addEventListener('error', () => report(new Error('Could not load video.')));
-music.addEventListener('error', () => report(new Error('Could not load music.')));
 canvas.addEventListener('webglcontextlost', event => { event.preventDefault();report(new Error('Renderer lost - reload to continue.')); });
 window.addEventListener('error', event => report(event.error || event.message));
 window.addEventListener('unhandledrejection', event => report(event.reason));

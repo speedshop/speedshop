@@ -5,10 +5,12 @@ Copied from `~/src/tries/2026-09-14-threadpilot-visual/production` at commit
 
 The Threadpilot hero embeds `index.html` in an iframe to isolate the player's
 document selectors, styles, and lifecycle from the site's charts and PJAX.
-The parent page supplies the heading and a fixed mute/unmute icon in the
-viewport's top-right corner. The embedded player binds that same-origin parent
-control to its audio; the frame itself fills the hero. The audio has no `src`
-until the first unmute click, so it makes no music requests on page load.
+The parent page supplies the heading, the music, and a fixed mute/unmute icon
+in the viewport's top-right corner. `assets/js/threadpilot_music.js` binds that
+single control to the page's one audio element, so any number of embedded
+players share it; the frame itself fills the hero and has no audio. The audio
+has no `src` until the first unmute click, so it makes no music requests on page
+load.
 Playback uses the native audio element's progressive buffering, not a full-file
 fetch or blob. The agent worker forwards asset requests, including `Range` and
 `If-Range`, so S3 can return partial content. Browsers control how far ahead to

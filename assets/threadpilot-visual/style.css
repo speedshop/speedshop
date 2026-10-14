@@ -4,5 +4,5 @@ html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
 body { background: #000; color: #fff; font: 12px/1.4 ui-monospace, monospace; }
 #stage { width: 100%; height: 100%; }
 canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
-video, audio { display: none; }
+video { display: none; }
 [role=alert] { position: absolute; bottom: 12px; left: 12px; margin: 0; padding: 8px 11px; background: #000; color: #fff; }

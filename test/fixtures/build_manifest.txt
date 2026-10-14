@@ -23,6 +23,7 @@ threadpilot.*
 slack.*
 status.*
 threadpilot-success.*
+threadpilot-previz.*
 
 [files]
 feed.xml

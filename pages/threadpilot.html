@@ -27,8 +27,9 @@ stylesheet: /assets/css/threadpilot.css
     </g>
   </svg>
 </button>
+<audio id="threadpilot-music" data-src="/assets/threadpilot-visual/dist/music.m4a" loop preload="none"></audio>
 <header class="threadpilot-hero">
-  <iframe class="threadpilot-hero-visual" src="/assets/threadpilot-visual/index.html" title="Threadpilot animated visualization and music control" allow="autoplay"></iframe>
+  <iframe class="threadpilot-hero-visual" src="/assets/threadpilot-visual/index.html" title="Threadpilot animated visualization"></iframe>
   <h1 aria-label="Threadpilot">{% include threadpilot_wordmark.svg %}</h1>
 </header>
 <script>
@@ -298,6 +299,7 @@ threads ???, ???</code></pre>
   </div>
 
   {% include threadpilot_pricing_comparison.html heading="Stop guessing. Start tuning." %}
+  <script src="/assets/js/threadpilot_music.js" defer></script>
   <script src="/assets/js/threadpilot_benchmark.js" defer></script>
   <script src="/assets/js/threadpilot_scenarios.js" defer></script>
   <script src="/assets/js/threadpilot_headings.js" defer></script>

@@ -1,0 +1,666 @@
+---
+layout: default
+title: Threadpilot - Nine-box previz
+permalink: /threadpilot-previz.html
+sitemap: false
+body_class: threadpilot
+stylesheet: /assets/css/threadpilot.css
+---
+
+<style>
+  body.threadpilot {
+    --tp9-row: calc(100svh / 3);
+    --tp-yellow: #ffff55;
+    --tp-red: #ff5555;
+    --tp-green: #55ff55;
+    --tp-purple: #aa00aa;
+    --tp-gray: #aaaaaa;
+    --tp-dim: #555555;
+  }
+
+  .tp9 {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr);
+    grid-template-rows: var(--tp9-row) var(--tp9-row) auto;
+  }
+
+  .tp9-cell {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    container-type: size;
+  }
+
+  .tp9-bottom-side {
+    align-self: start;
+    height: var(--tp9-row);
+  }
+
+  .tp9-word {
+    display: grid;
+    place-items: center;
+    isolation: isolate;
+  }
+
+  .tp9-word iframe {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .threadpilot .tp9-word h1 {
+    margin: 0;
+    line-height: 0;
+  }
+
+  .tp9-word svg {
+    display: block;
+    width: 84cqw;
+    pointer-events: none;
+  }
+
+  .tp9-word-pilot svg {
+    width: calc(84cqw * 2860 / 3715);
+  }
+
+  .tp9-pitch {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 6%;
+  }
+
+  .threadpilot .tp9-pitch h2 {
+    margin: 0 0 0.35em;
+    font-size: min(9.2cqw, 25cqh);
+    line-height: 1;
+  }
+
+  .tp9-pitch p {
+    margin: 0;
+    font-size: min(3.3cqw, 8.5cqh);
+    line-height: 1.35;
+  }
+
+  .tp9-inline-wordmark {
+    display: inline-flex;
+    vertical-align: -0.05em;
+  }
+
+  .tp9-inline-wordmark svg {
+    display: block;
+    height: 0.8em;
+    width: calc(0.8em * 3715 / 700);
+  }
+
+  .tp9-inline-wordmark svg + svg {
+    width: calc(0.8em * 2860 / 700);
+    margin-left: calc(0.8em * -55 / 700);
+  }
+
+  .tp9-label {
+    margin: 0;
+    color: var(--tp-gray);
+    font-size: 1.2rem;
+    letter-spacing: 0.15em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .tp9-creators {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2.4rem;
+    padding: 0 10%;
+  }
+
+  .tp9-creator-list {
+    display: flex;
+    gap: 3.2rem;
+  }
+
+  .tp9-creator {
+    flex: none;
+    margin: 0;
+  }
+
+  .tp9-creator img {
+    display: block;
+    width: min(32cqw, 48cqh);
+    height: auto;
+    image-rendering: pixelated;
+  }
+
+  .tp9-creator figcaption {
+    margin-top: 1.2rem;
+    font-size: 1.4rem;
+    line-height: 1.4;
+  }
+
+  .tp9-skunkworks {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    margin: 0;
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+
+  .tp9-skunkworks a {
+    color: var(--tp-white);
+    line-height: 0;
+  }
+
+  .tp9-skunkworks svg {
+    display: block;
+    width: 9rem;
+    height: auto;
+    shape-rendering: crispEdges;
+  }
+
+  .tp9-creator b {
+    display: block;
+    font-weight: normal;
+    color: var(--tp-cyan);
+  }
+
+  .tp9-logos {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2.4rem;
+    padding: 0 10%;
+  }
+
+  .tp9-logo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5cqh 5cqw;
+  }
+
+  .tp9-logo-grid > * {
+    display: grid;
+    place-items: center;
+    height: 11cqh;
+  }
+
+  .tp9-logo-grid img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .tp9-logo-placeholder {
+    border: 1px dotted var(--tp-dim);
+    color: var(--tp-dim);
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+  }
+
+  .tp9-sim {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 19% 23%;
+    gap: 1.6rem;
+    padding: 2.4rem 1.6rem;
+    font-size: 1.1rem;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .tp9-sim-window {
+    position: relative;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    border: 3px double var(--tp-cyan);
+    background: #000;
+  }
+
+  .tp9-sim-window::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(transparent 0 2px, rgb(0 0 0 / 0.35) 2px 3px);
+    pointer-events: none;
+  }
+
+  .tp9-sim-plot {
+    position: relative;
+    min-height: 0;
+    margin: 0.6rem 0.6rem 0;
+    border-left: 1px solid var(--tp-gray);
+    border-bottom: 1px solid var(--tp-gray);
+    background-image:
+      repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgb(85 255 255 / 0.18) calc(10% - 1px) 10%),
+      repeating-linear-gradient(transparent 0 calc(20% - 1px), rgb(85 255 255 / 0.18) calc(20% - 1px) 20%);
+  }
+
+  .tp9-sim-plot svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .tp9-sim-plot polyline {
+    fill: none;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+    shape-rendering: crispEdges;
+  }
+
+  .tp9-sim-plot .redline {
+    position: absolute;
+    inset: 12% 0 auto;
+    border-top: 1px dashed var(--tp-red);
+    color: var(--tp-red);
+    font-size: 0.9rem;
+    text-align: right;
+  }
+
+  .tp9-sim-readout {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0.6rem;
+  }
+
+  .tp9-sim-readout div {
+    border-top: 2px solid currentColor;
+    padding-top: 0.3rem;
+  }
+
+  .tp9-sim-readout dt {
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+  }
+
+  .tp9-sim-readout dd {
+    margin: 0;
+    color: #fff;
+    font-size: 1.6rem;
+    white-space: nowrap;
+  }
+
+  .tp9-p99 { color: var(--tp-magenta); stroke: var(--tp-magenta); }
+  .tp9-mem { color: var(--tp-yellow); stroke: var(--tp-yellow); }
+  .tp9-rps { color: var(--tp-cyan); stroke: var(--tp-cyan); }
+  .tp9-thr { color: #fff; stroke: #fff; }
+
+  .tp9-lamps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .tp9-hazard {
+    height: 1.2rem;
+    background: repeating-linear-gradient(-45deg, var(--tp-yellow) 0 6px, #000 6px 12px);
+  }
+
+  .tp9-lamp {
+    --lamp: var(--tp-yellow);
+    --lamp-off: #aa5500;
+    display: grid;
+    place-items: center;
+    flex: 1;
+    padding: 0.4rem;
+    border: 2px solid var(--lamp);
+    outline: 1px solid var(--lamp);
+    outline-offset: -5px;
+    background: #000;
+    color: var(--lamp);
+    font-weight: bold;
+    letter-spacing: 0.08em;
+    text-align: center;
+    animation: tp9-lamp 0.9s steps(1) infinite;
+  }
+
+  .tp9-lamp-master {
+    --lamp: var(--tp-red);
+    --lamp-off: #aa0000;
+    flex: 1.6;
+    font-size: 1.3rem;
+  }
+
+  .tp9-lamp:nth-child(3) { animation-delay: -0.2s; }
+  .tp9-lamp:nth-child(4) { animation-delay: -0.6s; }
+  .tp9-lamp:nth-child(5) { animation-delay: -0.35s; }
+
+  .tp9-lamp-nominal {
+    --lamp: var(--tp-green);
+    --lamp-off: #00aa00;
+    flex: 1.3;
+    margin-top: 0.6rem;
+    box-shadow: 0 0 1.6rem rgb(85 255 85 / 0.45);
+  }
+
+  .tp9-lamp[data-off] {
+    --lamp: var(--lamp-off);
+    border-color: var(--tp-dim);
+    outline-style: dashed;
+    box-shadow: none;
+    animation: none;
+  }
+
+  .tp9-pilot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 0;
+  }
+
+  .tp9-tune {
+    flex: none;
+    width: 100%;
+    height: 36cqh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: var(--tp-purple);
+    box-shadow:
+      inset 4px 4px 0 var(--tp-magenta),
+      inset -4px -4px 0 #550055,
+      0 0 0 2px #000,
+      0 0 0 4px var(--tp-magenta);
+    color: #fff;
+    font-family: "Redaction 35", Georgia, serif;
+    font-size: min(5.5cqw, 10cqh);
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    cursor: pointer;
+  }
+
+  .tp9-tune:active,
+  .tp9-tune[aria-pressed="true"] {
+    box-shadow:
+      inset 4px 4px 0 #550055,
+      inset -4px -4px 0 var(--tp-magenta),
+      0 0 0 2px #000,
+      0 0 0 4px var(--tp-magenta);
+  }
+
+  .tp9-hand {
+    display: block;
+    flex: none;
+    width: min(70%, 36cqh);
+    height: auto;
+    margin-top: 1rem;
+    pointer-events: none;
+    shape-rendering: crispEdges;
+  }
+
+  .tp9-content {
+    padding: 4rem 6% 8rem;
+    font-size: 1.6rem;
+    line-height: 1.8;
+  }
+
+  .tp9-content > :first-child {
+    margin-top: 0;
+  }
+
+  @keyframes tp9-lamp {
+    0% { background: var(--lamp); color: #000; }
+    50% { background: #000; color: var(--lamp); }
+  }
+</style>
+
+<button id="threadpilot-audio-toggle" type="button" aria-label="Unmute music" title="Unmute music" data-muted="true">
+  <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" shape-rendering="crispEdges">
+    <rect x="3" y="9" width="3" height="6"/>
+    <rect x="6" y="8" width="2" height="8"/>
+    <rect x="8" y="6" width="2" height="12"/>
+    <rect x="10" y="5" width="2" height="14"/>
+    <g class="sound-on">
+      <rect x="15" y="8" width="2" height="8"/>
+      <rect x="19" y="5" width="2" height="14"/>
+    </g>
+    <g class="sound-off">
+      <rect x="15" y="8" width="2" height="2"/>
+      <rect x="17" y="10" width="2" height="4"/>
+      <rect x="19" y="14" width="2" height="2"/>
+      <rect x="19" y="8" width="2" height="2"/>
+      <rect x="15" y="14" width="2" height="2"/>
+    </g>
+  </svg>
+</button>
+<audio id="threadpilot-music" data-src="/assets/threadpilot-visual/dist/music.m4a" loop preload="none"></audio>
+
+<header class="tp9">
+  <div class="tp9-cell tp9-word">
+    <iframe src="/assets/threadpilot-visual/previz-frame.html?scene=01" title="Threadpilot animated visualization" tabindex="-1"></iframe>
+    <h1 aria-label="Threadpilot">{% include threadpilot_wordmark_thread.svg %}</h1>
+  </div>
+
+  <div class="tp9-cell tp9-pitch">
+    <h2>Stop guessing your thread count</h2>
+    <p><span class="tp9-inline-wordmark" role="img" aria-label="Threadpilot">{% include threadpilot_wordmark_thread.svg %}{% include threadpilot_wordmark_pilot.svg %}</span> is thread-pool auto-tuning for <b>Puma</b> and <b>Sidekiq</b>, adjusted dynamically at runtime.</p>
+  </div>
+
+  <div class="tp9-cell tp9-word tp9-word-pilot">
+    <iframe src="/assets/threadpilot-visual/previz-frame.html?scene=02" title="Threadpilot animated visualization" tabindex="-1"></iframe>
+    {% include threadpilot_wordmark_pilot.svg %}
+  </div>
+
+  <div class="tp9-cell tp9-creators">
+    <p class="tp9-label">Created by</p>
+    <div class="tp9-creator-list">
+      <figure class="tp9-creator">
+        <img src="/assets/img/yuki.png" alt="Pixel art of Yuki Nishijima">
+        <figcaption><b>Yuki</b>Ruby core</figcaption>
+      </figure>
+      <figure class="tp9-creator">
+        <img src="/assets/img/nate.png" alt="Pixel art of Nate Berkopec">
+        <figcaption><b>Nate</b>Puma maintainer</figcaption>
+      </figure>
+    </div>
+    <p class="tp9-skunkworks">a <a href="/" aria-label="Speedshop">{% include speedshop_wordmark.svg %}</a> skunkworks product</p>
+  </div>
+
+  <div class="tp9-cell tp9-sim" aria-label="Simulated Ruby process under static concurrency">
+    <div class="tp9-sim-window">
+      <div class="tp9-sim-plot">
+        <div class="redline">SLO</div>
+        <svg viewBox="0 0 100 100" width="100" height="100" preserveAspectRatio="none" aria-hidden="true">
+          <polyline class="tp9-thr" data-series="thr"/>
+          <polyline class="tp9-mem" data-series="mem"/>
+          <polyline class="tp9-rps" data-series="rps"/>
+          <polyline class="tp9-p99" data-series="p99"/>
+        </svg>
+      </div>
+      <dl class="tp9-sim-readout">
+        <div class="tp9-p99"><dt>p99</dt><dd>1,840ms</dd></div>
+        <div class="tp9-mem"><dt>mem</dt><dd>1.92GB</dd></div>
+        <div class="tp9-rps"><dt>req/s</dt><dd>212</dd></div>
+        <div class="tp9-thr"><dt>threads</dt><dd>5</dd></div>
+      </dl>
+    </div>
+
+    <div class="tp9-lamps">
+      <div class="tp9-hazard"></div>
+      <div class="tp9-lamp tp9-lamp-master">Master caution</div>
+      <div class="tp9-lamp">P99 warn</div>
+      <div class="tp9-lamp">Mem warn</div>
+      <div class="tp9-lamp">RPS warn</div>
+      <div class="tp9-lamp tp9-lamp-nominal" data-off>Nominal</div>
+    </div>
+
+    <div class="tp9-pilot">
+      <button class="tp9-tune" type="button" aria-pressed="false">TUNE</button>
+      <svg class="tp9-hand" viewBox="0 0 24 54" width="24" height="54" aria-hidden="true"></svg>
+    </div>
+  </div>
+
+  <div class="tp9-cell tp9-logos">
+    <p class="tp9-label">Used in production at</p>
+    <div class="tp9-logo-grid">
+      <div><img src="/assets/img/client-logos/aviary-health.svg" alt="Aviary Health"></div>
+      <div><img src="/assets/img/client-logos/adquick.svg" alt="AdQuick"></div>
+      <div><img src="/assets/img/client-logos/atob.svg" alt="AtoB"></div>
+      <div class="tp9-logo-placeholder">LOGO</div>
+      <div class="tp9-logo-placeholder">LOGO</div>
+      <div class="tp9-logo-placeholder">LOGO</div>
+      <div class="tp9-logo-placeholder">LOGO</div>
+      <div class="tp9-logo-placeholder">LOGO</div>
+      <div class="tp9-logo-placeholder">LOGO</div>
+    </div>
+  </div>
+
+  <div class="tp9-cell tp9-word tp9-bottom-side">
+    <iframe src="/assets/threadpilot-visual/previz-frame.html?scene=03" title="Threadpilot animated visualization" tabindex="-1"></iframe>
+    {% include threadpilot_wordmark_thread.svg %}
+  </div>
+
+  <div class="tp9-content">
+    <p>For the last 10 years or so, every Rubyist has had this problem:</p>
+
+    <pre class="highlight"><code># config/sidekiq.yml
+:concurrency: ???</code></pre>
+
+    <pre class="highlight"><code># config/puma.rb
+threads ???, ???</code></pre>
+
+    <p><b>What number do you put here?!</b> How many threads is the right number? Most people will have this set to an env variable, like <code>RAILS_MAX_THREADS</code>, and they might not even be able to tell you what it's set to.</p>
+    <p>Are you even sure you know what number you're running today? How did you pick it? You probably Googled for 5 minutes or let Claude pick, or maybe you just shipped the defaults. Nothing broke, you moved on. But you're a curious engineer: <b>what gains did you leave on the table?</b></p>
+
+    <h3>Nobody understands the GVL</h3>
+    <p>The problem is that picking the right number of threads in a threadpool is very hard. Getting this answer correct requires extensive knowledge of the Global VM Lock (GVL), and in-depth observability in production which gives you a sense of your workload's I/O characteristics.</p>
+    <p>Maybe you read a Github issue that was a hundred comments long and realized that not even some of the most experienced Rails developers in the world could agree on a single "best" number. Maybe you accidentally crashed your Sidekiq process because your database pool wasn't set to the same number as your concurrency configuration. There's a nagging sense that this all ought to be easier.</p>
+    <p>Even Mike Perham (the author of Sidekiq) and Rails core members like byroot have changed their minds on the "right" number over the years. The defaults for Puma and Sidekiq have changed over the years - why? Who can stay on top of all of this?</p>
+  </div>
+
+  <div class="tp9-cell tp9-word tp9-word-pilot tp9-bottom-side">
+    <iframe src="/assets/threadpilot-visual/previz-frame.html?scene=04" title="Threadpilot animated visualization" tabindex="-1"></iframe>
+    {% include threadpilot_wordmark_pilot.svg %}
+  </div>
+</header>
+
+<script src="/assets/js/threadpilot_music.js" defer></script>
+<script>
+  (() => {
+    let seed = 7;
+    const random = () => {
+      seed = (seed * 16807) % 2147483647;
+      return seed / 2147483647;
+    };
+    const count = 120;
+    const series = { thr: [], mem: [], rps: [], p99: [] };
+    for (let i = 0; i < count; i++) {
+      const t = i / (count - 1);
+      const spike = random() < 0.12 + t * 0.25 ? random() * (0.25 + t * 0.55) : 0;
+      series.thr.push(78);
+      series.mem.push(70 - t * 38 - (i % 24) * 0.5 + random() * 2);
+      series.p99.push(Math.max(2, 72 - t * 30 - spike * 100 + random() * 6));
+      series.rps.push(46 + t * 14 + spike * 45 + random() * 5);
+    }
+    document.querySelectorAll(".tp9-sim-plot polyline").forEach((line) => {
+      const values = series[line.dataset.series];
+      line.setAttribute("points", values.map((y, i) => `${(i / (count - 1)) * 100},${y}`).join(" "));
+    });
+
+    const bones = new Set();
+    const joints = new Set();
+    const fill = (x, y, w, h, set = bones) => {
+      for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) set.add(`${x + i},${y + j}`);
+    };
+    const bone = (x0, y0, x1, y1, w = 2) => {
+      const steps = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
+      for (let s = 0; s <= steps; s++) {
+        fill(Math.round(x0 + ((x1 - x0) * s) / steps), Math.round(y0 + ((y1 - y0) * s) / steps), w, 1);
+      }
+    };
+    const fingers = [
+      [8, 4, [3, 4, 5], 11],
+      [12, 1, [3, 5, 6], 13],
+      [16, 3, [3, 4, 5], 15],
+      [20, 7, [2, 3, 4], 17],
+    ];
+    for (const [x, tip, segments, wrist] of fingers) {
+      let y = tip;
+      for (const length of segments) {
+        fill(x, y, 2, length);
+        fill(x - 1, y + length - 1, 1, 1, joints);
+        fill(x + 2, y + length - 1, 1, 1, joints);
+        y += length + 1;
+      }
+      bone(x, y, wrist, 31);
+    }
+    bone(9, 32, 4, 25);
+    bone(3, 23, 1, 19);
+    bone(1, 17, 1, 15);
+    fill(11, 33, 2, 2);
+    fill(14, 33, 2, 2);
+    fill(17, 33, 2, 2);
+    fill(12, 36, 3, 2);
+    fill(16, 36, 2, 2);
+    fill(12, 39, 3, 14);
+    fill(17, 39, 2, 14);
+    fill(11, 52, 5, 2);
+    fill(16, 52, 4, 2);
+    const hand = document.querySelector(".tp9-hand");
+    const path = (set, color) => `<path fill="${color}" d="${[...set].map((p) => { const [x, y] = p.split(","); return `M${x} ${y}h1v1h-1z`; }).join("")}"/>`;
+    hand.innerHTML = path(bones, "#fff") + path(joints, "#aaaaaa");
+
+    const pilot = document.querySelector(".tp9-pilot");
+    const tune = document.querySelector(".tp9-tune");
+    const nominal = document.querySelector(".tp9-lamp-nominal");
+    const [master, ...warnings] = document.querySelectorAll(".tp9-lamp:not(.tp9-lamp-nominal)");
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const offset = { x: 0, y: 0 };
+    let pointer = null;
+    let pressUntil = 0;
+    let bounceStart = -Infinity;
+    let lastFrame = performance.now();
+
+    function goal(now) {
+      const bounds = hand.getBoundingClientRect();
+      const tip = { x: bounds.left - offset.x + (bounds.width * 13) / 24, y: bounds.top - offset.y + bounds.width / 24 };
+      const button = tune.getBoundingClientRect();
+      const center = { x: button.left + button.width / 2, y: button.top + button.height / 2 };
+      if (now < pressUntil) return { x: center.x - tip.x, y: center.y - tip.y };
+      if (pointer) {
+        const overButton = pointer.x >= button.left && pointer.x <= button.right && pointer.y >= button.top && pointer.y <= button.bottom;
+        return { x: (overButton ? center.x : pointer.x) - tip.x, y: pointer.y - tip.y };
+      }
+      const t = (now - bounceStart) / 700;
+      return { x: 0, y: t < 1 ? -24 * Math.abs(Math.sin(t * 2 * Math.PI)) * (1 - t) : 0 };
+    }
+
+    function frame(now) {
+      const target = goal(now);
+      const ease = 1 - Math.exp(-(now - lastFrame) / 40);
+      lastFrame = now;
+      offset.x += (target.x - offset.x) * ease;
+      offset.y += (target.y - offset.y) * ease;
+      hand.style.transform = `translate(${offset.x}px, ${offset.y}px)`;
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+
+    setInterval(() => {
+      if (!pointer && !reduceMotion && tune.getAttribute("aria-pressed") === "false") bounceStart = performance.now();
+    }, 5000);
+    pilot.addEventListener("pointermove", (event) => {
+      pointer = { x: event.clientX, y: event.clientY };
+    });
+    pilot.addEventListener("pointerleave", () => {
+      pointer = null;
+    });
+
+    tune.addEventListener("click", () => {
+      pressUntil = performance.now() + 450;
+      if (tune.getAttribute("aria-pressed") === "true") return;
+      tune.setAttribute("aria-pressed", "true");
+      [...warnings, master].forEach((lamp, i) => setTimeout(() => lamp.setAttribute("data-off", ""), 700 * (i + 1)));
+      setTimeout(() => nominal.removeAttribute("data-off"), 700 * (warnings.length + 2));
+    });
+  })();
+</script>
