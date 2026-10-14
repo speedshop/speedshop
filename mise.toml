@@ -36,12 +36,10 @@ run = "GENERATED_DATA_FIXTURES_PATH=test/fixtures/generated_data bundle exec jek
 
 [tasks.dev]
 description = "Start the local development stack and follow logs"
-depends = ["build"]
 run = "pitchfork start -l --force && pitchfork logs jekyll static worker --tail"
 
 [tasks."dev:bg"]
 description = "Start the local development stack in the background"
-depends = ["build"]
 run = "pitchfork start -l --force"
 
 [tasks."dev:stop"]

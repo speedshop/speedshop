@@ -1,5 +1,5 @@
 [daemons.jekyll]
-run = "GENERATED_DATA_FIXTURES_PATH=test/fixtures/generated_data bundle exec jekyll build -w --force_polling --future --unpublished --drafts --trace --config _config.yml,_config_dev.yml"
+run = "GENERATED_DATA_FIXTURES_PATH=test/fixtures/generated_data bundle exec jekyll build -w --future --unpublished --drafts --trace --config _config.yml,_config_dev.yml"
 mise = true
 retry = 0
 ready_delay = 3
