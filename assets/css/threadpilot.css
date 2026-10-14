@@ -857,7 +857,7 @@ body.threadpilot {
   .threadpilot-fold-sim {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto auto;
-    height: max(30rem, calc(100svh - max(15svh, 16rem) - 17.6rem));
+    height: max(30rem, calc(100svh - max(15svh, 16rem) - 25.6rem));
     gap: 1.2rem;
     padding: 0 6% 2.4rem;
   }
@@ -915,24 +915,47 @@ body.threadpilot {
 
   .threadpilot-fold-creators,
   .threadpilot-fold-logos {
-    gap: 2rem;
-    padding: 4rem 6% 0;
+    gap: 1.2rem;
+    padding: 2rem 6% 0;
   }
 
   .threadpilot-fold-creator-list {
     gap: 2.4rem;
   }
 
+  .threadpilot-fold-creator {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
   .threadpilot-fold-creator img {
-    width: 12.8rem;
+    width: 5.6rem;
+  }
+
+  .threadpilot-fold-creator figcaption {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  .threadpilot-fold-skunkworks {
+    font-size: 1.2rem;
+  }
+
+  .threadpilot-fold-skunkworks svg {
+    width: 7.6rem;
   }
 
   .threadpilot-fold-logo-grid {
-    gap: 1.6rem;
+    gap: 2.4rem;
   }
 
   .threadpilot-fold-logo-grid > * {
-    height: 4.8rem;
+    height: 3.2rem;
+  }
+
+  .threadpilot-fold-logo-placeholder {
+    display: none;
   }
 
   .threadpilot-fold-intro {

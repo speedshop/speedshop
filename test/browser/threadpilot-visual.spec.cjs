@@ -67,7 +67,7 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     expect(await canvas.evaluate(canvas => canvas.width)).toBeGreaterThan(widthBefore);
     await expect(frame.locator("video")).toHaveJSProperty("paused", true);
     expect(requests.filter(url => url.endsWith(".mp4"))).toHaveLength(0);
-    expect(requests.filter(url => url.endsWith("/still.jpg"))).toHaveLength(4);
+    expect(requests.filter(url => url.endsWith("/still.jpg"))).toHaveLength(viewport.width < 640 ? 1 : 4);
     await expect(frame.getByRole("button")).toHaveCount(0);
   });
 }

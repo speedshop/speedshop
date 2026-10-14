@@ -30,7 +30,7 @@ stylesheet: /assets/css/threadpilot.css
 
 <div class="threadpilot-fold">
   <div class="threadpilot-fold-cell threadpilot-fold-word">
-    <iframe src="/assets/threadpilot-visual/index.html?scene=01" title="Threadpilot animated visualization" tabindex="-1"></iframe>
+    <iframe data-src="/assets/threadpilot-visual/index.html?scene=01" data-mobile-src="/assets/threadpilot-visual/index.html?scene=all" title="Threadpilot animated visualization" tabindex="-1"></iframe>
     <h1 aria-label="Threadpilot">{% include threadpilot_wordmark_thread.svg %}</h1>
     <span class="threadpilot-fold-word-tail">{% include threadpilot_wordmark_pilot.svg %}</span>
   </div>
@@ -41,7 +41,7 @@ stylesheet: /assets/css/threadpilot.css
   </div>
 
   <div class="threadpilot-fold-cell threadpilot-fold-word threadpilot-fold-word-pilot">
-    <iframe src="/assets/threadpilot-visual/index.html?scene=02" title="Threadpilot animated visualization" tabindex="-1"></iframe>
+    <iframe data-src="/assets/threadpilot-visual/index.html?scene=02" title="Threadpilot animated visualization" tabindex="-1"></iframe>
     {% include threadpilot_wordmark_pilot.svg %}
   </div>
 
@@ -110,7 +110,7 @@ stylesheet: /assets/css/threadpilot.css
   </div>
 
   <div class="threadpilot-fold-cell threadpilot-fold-word threadpilot-fold-bottom-side">
-    <iframe src="/assets/threadpilot-visual/index.html?scene=03" title="Threadpilot animated visualization" tabindex="-1"></iframe>
+    <iframe data-src="/assets/threadpilot-visual/index.html?scene=03" title="Threadpilot animated visualization" tabindex="-1"></iframe>
     {% include threadpilot_wordmark_thread.svg %}
   </div>
 
@@ -134,7 +134,7 @@ threads ???, ???</code></pre>
   </div>
 
   <div class="threadpilot-fold-cell threadpilot-fold-word threadpilot-fold-word-pilot threadpilot-fold-bottom-side">
-    <iframe src="/assets/threadpilot-visual/index.html?scene=04" title="Threadpilot animated visualization" tabindex="-1"></iframe>
+    <iframe data-src="/assets/threadpilot-visual/index.html?scene=04" title="Threadpilot animated visualization" tabindex="-1"></iframe>
     {% include threadpilot_wordmark_pilot.svg %}
   </div>
 </div>
@@ -364,6 +364,7 @@ threads ???, ???</code></pre>
   <div class="threadpilot-wide">
       {% include threadpilot_pricing_comparison.html heading="Stop guessing. Start tuning." %}
   </div>
+  <script src="/assets/js/threadpilot_frames.js" defer></script>
   <script src="/assets/js/threadpilot_music.js" defer></script>
   <script src="/assets/js/threadpilot_scenarios.js" defer></script>
   <script src="/assets/js/threadpilot_headings.js" defer></script>

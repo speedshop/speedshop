@@ -6,7 +6,11 @@ Copied from `~/src/tries/2026-09-14-threadpilot-visual/production` at commit
 The Threadpilot page embeds `index.html` in four iframes, one per THREAD and
 PILOT box, to isolate the player's document selectors, styles, and lifecycle
 from the site's charts and PJAX. Each frame picks its video with `?scene=01`
-through `?scene=04`, defaulting to scene 01.
+through `?scene=04`, defaulting to scene 01. `?scene=all` plays
+`scenes/threadpilot-scene-all.mp4`, the full multi-scene video, which the
+single mobile wordmark box uses. `assets/js/threadpilot_frames.js` sets each
+frame's `src` from `data-src` (or `data-mobile-src` on phones) only when its
+box is displayed, so hidden boxes never load a player.
 The parent page supplies the wordmarks, the music, and a fixed mute/unmute icon
 in the viewport's top-right corner. `assets/js/threadpilot_music.js` binds that
 single control to the page's one audio element, so every embedded player shares
@@ -44,7 +48,8 @@ Renderer source, shaders, atlas, license, built JavaScript, and selected video
 and audio are all copied into this directory and committed. Nothing loads from
 the original project. `scenes/threadpilot-scene-01.mp4` through `04.mp4` are
 160 × 90, 24 fps H.264 scenes with no audio, encoded with the original two-pass
-19 kbps recipe. `dist/music.m4a` is the selected production music, copied
+19 kbps recipe. `scenes/threadpilot-scene-all.mp4` is the original project's
+69-second `production/dist/video.mp4`, copied byte-for-byte, in the same format. `dist/music.m4a` is the selected production music, copied
 byte-for-byte. The music is 142 seconds of stereo AAC-LC
 at 44.1 kHz and approximately 96 kbps (1.73 MB). Its MP4 metadata already precedes
 the audio data for progressive playback. Keep this encode rather than lowering
