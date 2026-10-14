@@ -3,12 +3,14 @@
   if (!sections.length) return;
 
   let measurements = {};
+  let samplingInterval;
   try {
     const response = await fetch("/assets/data/threadpilot_scenarios.json");
     if (!response.ok) throw new Error(`Benchmark data: HTTP ${response.status}`);
     const dataset = await response.json();
     if (dataset.validation) throw new Error("Short validation runs are not performance comparisons");
     measurements = dataset.scenarios;
+    if (dataset.schemaVersion === 2 && dataset.samplingHz > 0) samplingInterval = 1 / dataset.samplingHz;
   } catch (error) {
     console.warn("Measured benchmark data unavailable; showing labeled estimates.", error);
   }
@@ -141,7 +143,7 @@
     write("[data-adaptive-label]", `Threadpilot · ${data.measured.adaptive ? "measured" : "estimated"}`);
     write("[data-baseline-label]", `Fixed · ${baseline} ${baseline === 1 ? "thread" : "threads"} · ${data.measured.fixed ? "measured" : "estimated"}`);
     write("[data-throughput-heading]", `${measured ? "Measured" : "Estimated"} throughput`);
-    write("[data-latency-heading]", `${measured ? "Measured" : "Estimated"} ${kind === "high" ? "request queueing" : "processing p99"}${measured && kind === "high" ? " (median)" : ""}`);
+    write("[data-latency-heading]", measured ? `Measured ${kind === "high" ? "request queueing (whole-run median)" : "processing (whole-run p99)"}` : `Estimated ${kind === "high" ? "request queueing" : "processing p99"}`);
     write("[data-latency-label]", data.scatterLatency ? kind === "high" ? "Request queueing" : "Processing latency" : kind === "high" ? `Request queueing${measured ? " (median)" : ""}` : "Processing p99");
     write("[data-latency-axis]", `Milliseconds${data.scatterLatency ? " · individual observations" : measured ? " · 10-second windows" : ""} · lower is better`);
     write("[data-thread-axis]", kind === "changing" ? data.measured.adaptive ? "Threadpilot's workload phases" : "Following the workload" : "Finding a smaller or larger pool");
@@ -238,7 +240,7 @@
     const key = canvas.dataset.chart;
     const tuned = data.adaptive[key];
     const fixed = data.fixed[key];
-    const peak = Math.max(1, ...tuned.map((point) => point[1]), ...fixed.map((point) => point[1])) * 1.15;
+    const peak = [tuned, fixed].reduce((max, series) => series.reduce((max, [, value]) => Math.max(max, value), max), 1) * 1.15;
     const max = key === "threads" ? Math.ceil(peak / 15) * 15 : peak;
     ctx.font = `${Math.round(10 * dpr)}px ui-monospace, monospace`;
     const left = Math.max(Math.round(48 * dpr), Math.ceil(ctx.measureText(format(max)).width + 12 * dpr));
@@ -288,13 +290,18 @@
         }
       }
     }
-    for (const [series, color, dashed] of [[tuned, "#55ffff", false], [fixed, "#ff55ff", true]]) {
+    for (const [name, series, color, dashed] of [["adaptive", tuned, "#55ffff", false], ["fixed", fixed, "#ff55ff", true]]) {
       if (key === "latency" && data.scatterLatency) {
         ctx.fillStyle = color;
         for (const [second, value] of series) ctx.fillRect(Math.round(x(second)), Math.round(y(value)), 1, 1);
       } else {
-        for (let index = 1; index < series.length; index += 1) {
-          line(ctx, x(series[index - 1][0]), y(series[index - 1][1]), x(series[index][0]), y(series[index][1]), color, dashed);
+        ctx.fillStyle = color;
+        for (let index = 0; index < series.length; index += 1) {
+          if (!index || (data.measured[name] && samplingInterval && series[index][0] - series[index - 1][0] > samplingInterval * 2)) {
+            ctx.fillRect(Math.round(x(series[index][0])), Math.round(y(series[index][1])), 1, 1);
+          } else {
+            line(ctx, x(series[index - 1][0]), y(series[index - 1][1]), x(series[index][0]), y(series[index][1]), color, dashed);
+          }
         }
       }
     }
