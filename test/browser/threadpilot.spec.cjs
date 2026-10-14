@@ -14,7 +14,7 @@ test.describe("Threadpilot typography", () => {
         await page.goto("/threadpilot.html");
         await page.evaluate(() => document.fonts.ready);
         await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-        const selector = ".threadpilot-page h2, .threadpilot-page h3, .threadpilot-page h4";
+        const selector = ".threadpilot-fold-pitch h2, .threadpilot-page h2, .threadpilot-page h3, .threadpilot-page h4";
         const boxes = () => page.locator(selector).evaluateAll(headings => headings.map(heading => heading.getBoundingClientRect().toJSON()));
         const before = await boxes();
         await page.unroute("**/threadpilot_headings.js");
@@ -39,7 +39,7 @@ test.describe("Threadpilot typography", () => {
           return ink > 0;
         }));
         await expect.poll(checkPixels).toBe(true);
-        const selected = await page.locator(".threadpilot-page h3").first().evaluate(heading => {
+        const selected = await page.locator(".threadpilot-fold-pitch h2").evaluate(heading => {
           const range = document.createRange();
           range.selectNodeContents(heading);
           const selection = window.getSelection();
@@ -49,7 +49,7 @@ test.describe("Threadpilot typography", () => {
           selection.removeAllRanges();
           return result;
         });
-        expect(selected).toEqual({ text: "Nobody understands the GVL", color: "rgb(255, 85, 255)" });
+        expect(selected).toEqual({ text: "Stop guessing your thread count", color: "rgb(255, 85, 255)" });
         await page.setViewportSize({ width: viewport.width + 20, height: viewport.height });
         await expect.poll(checkPixels).toBe(true);
       }

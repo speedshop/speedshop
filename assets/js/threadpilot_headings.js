@@ -1,5 +1,5 @@
 (() => {
-  const headings = [...document.querySelectorAll(".threadpilot-page h2, .threadpilot-page h3, .threadpilot-page h4")];
+  const headings = [...document.querySelectorAll(".threadpilot-fold-pitch h2, .threadpilot-page h2, .threadpilot-page h3, .threadpilot-page h4")];
   const states = new Map();
 
   function render(heading, entry) {

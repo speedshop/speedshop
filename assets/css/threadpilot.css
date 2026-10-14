@@ -739,11 +739,11 @@ body.threadpilot {
   }
 }
 
-.threadpilot-page .threadpilot-positioned-heading {
+.threadpilot .threadpilot-positioned-heading {
   position: relative;
 }
 
-.threadpilot-page .threadpilot-raster-heading {
+.threadpilot .threadpilot-raster-heading {
   color: transparent;
 }
 
@@ -753,7 +753,7 @@ body.threadpilot {
   image-rendering: pixelated;
 }
 
-.threadpilot-page .threadpilot-raster-heading::selection {
+.threadpilot .threadpilot-raster-heading::selection {
   color: transparent;
 }
 
