@@ -1,2 +1,3 @@
 url: "https://localhost:4000" # the base hostname & protocol for your site
 vertical_debug: true
+skip_pandoc: true
