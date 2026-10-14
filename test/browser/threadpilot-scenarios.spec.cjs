@@ -10,6 +10,7 @@ test.describe('Threadpilot interactive illustrations', () => {
   test('synchronizes every baseline selector and redraws every comparison', async ({ page }) => {
     await page.goto('/threadpilot.html');
     await expect(page.locator('[data-scenario]')).toHaveCount(3);
+    await expect(page.locator('[data-scenario="high"] [data-throughput-claim]')).toHaveText('2.0x');
     for (const [index, count] of [1, 3, 5, 10, 25].entries()) {
       const source = page.locator(`[data-scenario="${scenarios[index % 3]}"]`);
       await select(source, 'baseline', count);
@@ -41,9 +42,9 @@ test.describe('Threadpilot interactive illustrations', () => {
     await page.goto('/threadpilot.html');
     const low = page.locator('[data-scenario="low"]');
     await select(low, 'baseline', 25);
-    await expect(low.locator('[data-throughput-claim]')).toHaveText('Similar throughput');
+    await expect(low.locator('[data-throughput-claim]')).toHaveText('1.0x');
     await expect(low.locator('[data-latency-claim]')).toContainText('lower');
-    await expect(low.locator('[data-capacity-claim]')).toHaveText('Similar capacity');
+    await expect(low.locator('[data-capacity-claim]')).toHaveText('Similar resources');
     for (const kind of scenarios) {
       const section = page.locator(`[data-scenario="${kind}"]`);
       for (const count of [1, 3, 5, 10, 25]) {
@@ -51,7 +52,7 @@ test.describe('Threadpilot interactive illustrations', () => {
         for (const ratio of kind === 'low' ? [10, 20, 30] : [70, 80, 90]) {
           await select(section, 'workload', `${ratio}%`);
           await expect(section.locator('.threadpilot-scenario-result')).not.toContainText(/NaN|Infinity|undefined/);
-          await expect(section.locator('[data-throughput-claim]')).not.toBeEmpty();
+          await expect(section.locator('[data-throughput-claim]')).toHaveText(/^\d+\.\dx$/);
           await expect(section.locator('[data-latency-claim]')).not.toBeEmpty();
         }
       }
@@ -63,6 +64,8 @@ test.describe('Threadpilot interactive illustrations', () => {
     for (const kind of scenarios) {
       const section = page.locator(`[data-scenario="${kind}"]`);
       await expect(section.locator('.threadpilot-scenario-metrics')).toContainText('Estimated throughput');
+      await expect(section.locator('.threadpilot-scenario-metrics')).toContainText('Server resources');
+      await expect(section.locator('[data-capacity-detail]')).toHaveText(`${kind === 'high' ? 'Puma' : 'Sidekiq'} process count for same load`);
       await expect(section.locator('.threadpilot-scenario-explainer')).toHaveText('ADD EXPLAINER HERE');
       await expect(section).not.toContainText('Changes all three illustrations.');
       await expect(section).not.toContainText('Changes only this illustration.');

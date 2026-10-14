@@ -86,11 +86,11 @@
     };
   }
 
-  function comparison(adaptive, fixed, lower, noun) {
-    if (lower && fixed < 1) return adaptive < 1 ? `Similar ${noun}` : `${format(adaptive - fixed)} ms higher`;
-    const difference = (lower ? 1 - adaptive / fixed : adaptive / fixed - 1) * 100;
+  function latencyComparison(adaptive, fixed, noun) {
+    if (fixed < 1) return adaptive < 1 ? `Similar ${noun}` : `${format(adaptive - fixed)} ms higher`;
+    const difference = (1 - adaptive / fixed) * 100;
     if (Math.abs(difference) < 1) return `Similar ${noun}`;
-    return `${format(Math.abs(difference))}% ${difference > 0 ? (lower ? "lower" : "more") : (lower ? "higher" : "less")}`;
+    return `${format(Math.abs(difference))}% ${difference > 0 ? "lower" : "higher"}`;
   }
 
   function update(section) {
@@ -107,12 +107,12 @@
     const capacity = (1 - data.throughput.fixed / data.throughput.adaptive) * 100;
     const units = kind === "high" ? "requests/s" : "jobs/s";
     write("[data-baseline-label]", `Fixed · ${baseline} ${baseline === 1 ? "thread" : "threads"}`);
-    write("[data-throughput-claim]", comparison(data.throughput.adaptive, data.throughput.fixed, false, "throughput"));
+    write("[data-throughput-claim]", `${(data.throughput.adaptive / data.throughput.fixed).toFixed(1)}x`);
     write("[data-throughput-detail]", `${format(data.throughput.adaptive)} vs ${format(data.throughput.fixed)} ${units}`);
-    write("[data-latency-claim]", comparison(data.latency.adaptive, data.latency.fixed, true, kind === "high" ? "queueing" : "latency"));
+    write("[data-latency-claim]", latencyComparison(data.latency.adaptive, data.latency.fixed, kind === "high" ? "queueing" : "latency"));
     write("[data-latency-detail]", `${format(data.latency.adaptive)} vs ${format(data.latency.fixed)} ms`);
-    write("[data-capacity-claim]", Math.abs(capacity) < 1 ? "Similar capacity" : `${format(Math.abs(capacity))}% ${capacity > 0 ? "less" : "more"}`);
-    write("[data-capacity-detail]", "Estimated process capacity for the same volume");
+    write("[data-capacity-claim]", Math.abs(capacity) < 1 ? "Similar resources" : `${format(Math.abs(capacity))}% ${capacity > 0 ? "less" : "more"}`);
+    write("[data-capacity-detail]", `${kind === "high" ? "Puma" : "Sidekiq"} process count for same load`);
 
     let insight;
     if (kind === "changing") {
