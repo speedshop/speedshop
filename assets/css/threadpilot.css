@@ -485,16 +485,62 @@ body.threadpilot {
   50% { background: #000; color: var(--lamp); }
 }
 
+.threadpilot-fold-intro {
+  padding: 4rem 6% 0;
+  font-size: 1.6rem;
+  line-height: 1.8;
+}
+
 .threadpilot .threadpilot-page {
-  max-width: 108rem;
-  padding: 4rem 6% 8rem;
+  width: calc(100% * 3 / 3.5);
+  margin: 0 auto;
+  padding: 4rem 0 8rem;
   font-size: 1.6rem;
   line-height: 1.8;
   overflow-wrap: break-word;
 }
 
-.threadpilot-page > .row {
+.threadpilot-split,
+.threadpilot-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   margin-bottom: 5rem;
+}
+
+.threadpilot-split > *,
+.threadpilot-pair > * {
+  min-width: 0;
+  padding-inline: 6%;
+}
+
+.threadpilot-split > * > :first-child,
+.threadpilot-pair > * > :first-child {
+  margin-top: 0;
+}
+
+.threadpilot-split-flip > :first-child {
+  grid-area: 1 / 2;
+}
+
+.threadpilot-split-flip > :nth-child(2) {
+  grid-area: 1 / 1;
+}
+
+.threadpilot .threadpilot-pair-heading {
+  grid-column: 1 / -1;
+  padding-inline: 3%;
+}
+
+.threadpilot-wide {
+  margin-bottom: 5rem;
+  padding-inline: 3%;
+}
+
+.threadpilot-center {
+  width: 50%;
+  margin: 0 auto 5rem;
+  padding-inline: 3%;
 }
 .threadpilot .sales-testimonials {
   background: transparent;
@@ -760,9 +806,6 @@ body.threadpilot {
 @media (max-width: 639px) {
   .threadpilot .threadpilot-page {
     font-size: 1.4rem;
-  }
-  .threadpilot-page > .row {
-    margin-bottom: 3rem;
   }
   .threadpilot .threadpilot-pricing-card-aside {
     align-items: stretch;

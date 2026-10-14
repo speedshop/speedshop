@@ -361,10 +361,6 @@ header {
   text-align: center;
 }
 
-.threadpilot-product-row {
-  margin-top: var(--rhythm-main);
-}
-
 .threadpilot-feature-row {
   gap: 1rem;
   margin-bottom: 1rem;
@@ -408,18 +404,10 @@ header {
   margin: calc(var(--rhythm-main) * 2) 0;
 }
 
-.threadpilot-feature-row + .threadpilot-pricing-section {
-  margin-top: calc((var(--rhythm-main) * 2) - 1rem);
-}
-
 @media screen and (max-width: 639px) {
   .threadpilot-feature-row {
     gap: var(--rhythm-main);
     margin-bottom: var(--rhythm-main);
-  }
-
-  .threadpilot-feature-row + .threadpilot-pricing-section {
-    margin-top: calc(var(--rhythm-main) * 2);
   }
 }
 

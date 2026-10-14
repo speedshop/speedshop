@@ -113,232 +113,23 @@ stylesheet: /assets/css/threadpilot.css
     {% include threadpilot_wordmark_thread.svg %}
   </div>
 
-  <div class="container container-narrow threadpilot-page">
-    <div class="row">
-      <div class="column">
-        <p>
-          For the last 10 years or so, every Rubyist has had this problem:
-        </p>
+  <div class="threadpilot-fold-intro">
+    <p>
+      For the last 10 years or so, every Rubyist has had this problem:
+    </p>
 
-        <pre class="highlight"><code># config/sidekiq.yml
+    <pre class="highlight"><code># config/sidekiq.yml
 :concurrency: ???</code></pre>
 
-        <pre class="highlight"><code># config/puma.rb
+    <pre class="highlight"><code># config/puma.rb
 threads ???, ???</code></pre>
 
-        <p>
-          <b>What number do you put here?!</b> How many threads is the right number? Most people will have this set to an env variable, like <code>RAILS_MAX_THREADS</code>, and they might not even be able to tell you what it's set to.
-        </p>
-        <p>
-          Are you even sure you know what number you're running today? How did you pick it? . You probably Googled for 5 minutes or let Claude pick, or maybe you just shipped the defaults. Nothing broke, you moved on. But you're a curious engineer: <b>what gains did you leave on the table?</b>
-        </p>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="column">
-        <h3>Nobody understands the GVL</h3>
-        <p>
-          The problem is that picking the right number of threads in a threadpool is very hard. Getting this answer correct requires extensive knowledge of the Global VM Lock (GVL), and in-depth observability in production which gives you a sense of your workload's I/O characteristics.
-        </p>
-        <p>
-          Maybe you read a Github issue that was a hundred comments long and realized that not even some of the most experienced Rails developers in the world could agree on a single "best" number. Maybe you accidentally crashed your Sidekiq process because your database pool wasn't set to the same number as your concurrency configuration. There's a nagging sense that this all ought to be easier.
-        </p>
-        <p>
-          Even Mike Perham (the author of Sidekiq) and Rails core members like byroot have changed their minds on the "right" number over the years. The defaults for Puma and Sidekiq have changed over the years - why? Who can stay on top of all of this?
-        </p>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="column">
-        <h3>Too few threads? You're wasting money.</h3>
-        <p>When a request waits on the database or an upstream API, another thread can do useful work. Too few threads leave that opportunity unused. Threadpilot can add concurrency instead of leaving requests waiting for a free thread.</p>
-        <p>You don't need to know your exact I/O percentage to explore this. Pick the thread count you run today, then change the workload. The same baseline follows you through all three illustrations.</p>
-        {% include threadpilot_scenario.html kind="high" title="Too few threads" %}
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="column">
-        <h3>Too many threads? More isn't always better.</h3>
-        <p>When Ruby CPU work dominates, extra threads compete for the same GVL. A larger pool can add processing latency without adding throughput. Threadpilot can shrink the pool while keeping useful work moving.</p>
-        {% include threadpilot_scenario.html kind="low" title="Too many threads" %}
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="column">
-        <h3>Your workload changes. A static number doesn't.</h3>
-        <p>Maybe you picked the right number today. What happens tomorrow, when a batch of CPU-heavy jobs is followed by jobs waiting on HTTP requests?</p>
-        <p>A fixed pool has to live with that tradeoff. Threadpilot follows the workload. Compare small and large pools below: a throughput tie can still come with a processing-latency difference.</p>
-        {% include threadpilot_scenario.html kind="changing" title="Changing workloads" %}
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="column">
-        <h3>Reduce your server fleet, without toil</h3>
-        <p>
-          With dynamic, adaptive concurrency, you can process high-IO and high-CPU workloads in the same process without adjusting your server count at all. CPU utilization chugs along at around 80%, your queue latencies stay low, and you didn't have to do anything. Your autoscaler never kicks in because each process dynamically adjusts to fit the workload without incurring additional latency or unnecessary costs.
-        </p>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="column">
-        <h3>It wasn't possible until now</h3>
-        <p>Changing runtime concurrency is actually a fairly complicated technical problem.</p>
-        <p>The instrumentation required to get this right didn't exist until Ruby 3.2. Now, thanks to Ruby contributors, we can actually observe when threads queue for the GVL, which provides the critical backpressure required for auto-tuning to work.</p>
-        <p>Puma and Sidekiq also didn't support the idea of changing thread counts at runtime. Now, after our contributions to Puma, that project now supports it. We also figured out how to make it work for Sidekiq.</p>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="column">
-        <h3>I got sick of doing the same thing for 10 years straight</h3>
-        <p>
-          <img alt="Pixel art of Nate Berkopec" style="float: left; margin-right: 1em; image-rendering: pixelated; height: 128px; width: auto;" src="/assets/img/nate.png" {{ "/assets/img/nate.png" | image_dimensions }}>
-          Hi, I'm Nate Berkopec 👋. I've been consulting on Ruby and Rails application performance for 10 years now. I wrote three books about it, and maintained Puma for nearly as long. I've encountered this question - "what's the right number of threads?" - on an almost daily basis for this entire decade.
-        </p>
-        <p>And unfortunately, all we could do was say "it depends" and write thousands of words no one would read about the intricacies of the GVL, or how we couldn't observe what was going on so we couldn't optimize it. It wasn't a satisfying answer.</p>
-        <p>I'm ready to move on. I want this to Just Work for everyone running multi-threaded Ruby applications in production.</p>
-        <p style="clear: left;">
-          <img alt="Pixel art of Yuki Nishijima" style="float: left; margin-right: 1em; image-rendering: pixelated; height: 128px; width: auto;" src="/assets/img/yuki.png" {{ "/assets/img/yuki.png" | image_dimensions }}>
-          Hi, I'm Yuki Nishijima 👋. I'm a Ruby core member and I wrote most of the code for this project. I also am sick and tired of tuning Puma and Sidekiq. Let's never do that again!
-        </p>
-      </div>
-    </div>
-
-    <div class="row threadpilot-product-row">
-      <div class="column">
-        <h3>Threadpilot: automatic thread tuning for Puma and Sidekiq</h3>
-        <p>So, Yuki and I built this Rubygem. You install it, change a half-dozen lines of config, and then watch all of your Puma and Sidekiq processes get more efficient.</p>
-        <p>Threadpilot adjusts concurrency at run-time based on your workload's actual demands. In a Ruby runtime with a Global VM Lock (GVL) such as MRI/C Ruby, this means that Threadpilot leads to:</p>
-        <ul>
-          <li>Improved throughput. I/O-heavy workloads (even when transient or temporary) will be given more threads, leading to more work being done in parallel.</li>
-          <li>Reduced latency. When workloads are CPU bottlenecked, Threadpilot detects GVL contention (queueing for the GVL) and reduces thread counts, leading to lower latency, particularly in the ~p95+ range.</li>
-        </ul>
-        <p>Threadpilot uses the gvl_timing gem (a wrapper around the Ruby 3.2+ public GVL API) to collect GVL timing data and measure I/O wait ratios.</p>
-      </div>
-    </div>
-
-    <div class="sales-testimonials">
-      <div class="row">
-        <div class="column">
-          <p>[TESTIMONIAL 1: Named person, title, company, specific measurable result.]</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="column">
-          <p>[TESTIMONIAL 2: Named person, title, company, specific measurable result.]</p>
-        </div>
-        <div class="column">
-          <p>[TESTIMONIAL 3: Named person, title, company, specific measurable result.]</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="row threadpilot-feature-row">
-      <div class="column card threadpilot-feature-card">
-        <h4>Automatic tuning for Puma</h4>
-        <p>Never set <code>threads 5, 5</code> ever again. High-IO and high-CPU workloads will instead get the optimal number based on their actual performance at runtime.</p>
-      </div>
-      <div class="column card threadpilot-feature-card">
-        <h4>Automatic tuning for Sidekiq</h4>
-        <p>Sidekiq workloads in particular can vary significantly in their IO characteristics. PDF generation, CSV and JSON parsing can all need low thread counts as they bottleneck on CPU, but HTTP request to 3rd parties may want 25 thread or more. </p>
-      </div>
-    </div>
-    <div class="row threadpilot-feature-row">
-      <div class="column card threadpilot-feature-card">
-        <h4>Evaluated daily in synthetic benchmarks</h4>
-        <p>Speedshop tests the Threadpilot implentation daily against a wide variety of synthetic benchmark scenarios so that our own algorithm performs optimally in all possible situations and workloads.</p>
-      </div>
-      <div class="column card threadpilot-feature-card">
-        <h4>Works with Sidekiq Enterprise</h4>
-        <p>Sidekiq Enterprise's thread limits are supported and respected by Threadpilot. We won't cause you to violate your licensed number of threads.</p>
-      </div>
-    </div>
-
-    {% include threadpilot_pricing_comparison.html heading="Install Threadpilot Now" %}
-
-    <div class="row">
-      <div class="column">
-        <h3>I can tune my threads manually!</h3>
-        <p>Any single number that you put in your <code>config.rb</code> encodes an assumption about your workload. It's saying: "this number will be good for most of my workload, forever, and may it never change!" In the real world, IO and CPU bottlenecks change through the course of a day, even over seconds. Only Threadpilot can dynamically react to what your workload is doing.</p>
-        <h3>Claude can build this, using this page as a prompt!</h3>
-        <p>That's a good idea, which is why we're doing it ourselves. We benchmark, daily, against a vibe-coded Claude prompt which attempts to recreate what we've done. On the days when it actually passes the benchmark suite (not always guaranteed), it performs worse than our artisanally hand-crafted human code. I guess we still have some things we can beat the robots at, huh?</p>
-        <h3>Multi-threading isn't worth the risks</h3>
-        <p>If you have a lot of money, that's probably true. A lot of big shops - Gusto, Github, Shopify - generally run single threaded in production. But for them, server costs are a rounding error. For you - wouldn't you rather save 50% or more on your cloud compute bills by turbocharging your web and background job processes to put out 2x the throughput for the same CPU and memory?</p>
-        <h3>My scale is too small for this to be worth it</h3>
-        <p>Threadpilot is $199, once, for any repository. We think Threadpilot will save most applications about 10% on their server bills over time. If you think you're going to spend more than $2000 on compute costs on your application this year, we think it's worth it.</p>
-      </div>
-    </div>
-
-    {% include threadpilot_pricing_comparison.html heading="Pricing" %}
-
-    <div class="row">
-      <div class="column threadpilot-centered">
-        <h3>Guarantee</h3>
-        <p>If you're not seeing the benefit once you deploy Threadpilot and want your money back, we'll refund you immediately. No deadline, no questions.</p>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="column">
-        <h3>FAQ</h3>
-        <h4>What version of Ruby do I need?</h4>
-        <p>Theadpilot supports CRuby 3.2 and above. This is because we use the new GVL instrumentation APIs added in that version.</p>
-
-        <h4>Will Threadpilot increase my memory usage or cause malloc arena fragmentation?</h4>
-        <p>Potentially! Increasing thread counts will increase memory usage. We recommend running with jemalloc as your allocator, which mitigates a lot of the memory usage that comes with threading. But Threadpilot is designed to optimize the tradeoff between memory and throughput - it picks only the minimum number of threads necessary to get ~95% of the maximum possible throughput, meaning your thread count is never unnecessarily high.</p>
-
-        <h4>Do I need to set my ActiveRecord connection pool size to match the max thread count?</h4>
-        <p>Yes. We cover this extensively in our setup docs. Briefly: we recommend turning off ActiveRecord's connection pool maximum and using an external database connection pooler like PgBouncer, as higher threadcounts may lead to higher database connection count needs.</p>
-
-        <h4>Is it safe to use in production? What if it picks a bad thread count?</h4>
-        <p>Threadpilot has been extensively tested in production by the companies you see on this page, which process billions of requests per day. It's battle-tested and hardened against all kinds of weird production scenarios.</p>
-
-        <h4>Does Threadpilot work on shared hosting platforms like Heroku, Render, or Fly?</h4>
-        <p>Yes. GVL behavior is mostly independent of the underlying implementation, so even in a Docker container with 0.25 cpu allocated, we'll still work correctly.</p>
-
-        <h4>My workload is mostly CPU-bound. Will Threadpilot still help?</h4>
-        <p>Unless your workload is 100% CPU bound all the time (i.e. your code only runs Ruby and never performs IO of any kind, even logging) then Threadpilot will choose a better thread count than just single-threading. The exact answer depends on the workload - exactly what we wrote Threadpilot to fix.</p>
-
-        <h4>Does Threadpilot work with Sidekiq Enterprise? What about capsules?</h4>
-        <p>Threadpilot respects your Sidekiq Enterprise licensed thread-count. It works for any number of capsules in a process.</p>
-
-        <h4>Can I use Threadpilot across multiple applications on the same license?</h4>
-        <p>You can use Threadpilot on the regular license once per repository (you buy it once for running Sidekiq and Puma in the same monorepo, not twice). If you have multiple repositories (i.e. multiple Gemfiles), you can buy more licenses or buy the Unlimited License.</p>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="column">
-        <h3>Threadpilot is for you if...</h3>
-        <ul>
-          <li>You run Puma or Sidekiq in production on CRuby and want better throughput without adding servers.</li>
-          <li>You've ever Googled "how many Puma threads should I use" and gotten five different answers.</li>
-          <li>Your workload mix changes throughout the day and a static thread count is always wrong for something.</li>
-          <li>You're tired of p99 latency spikes that you suspect are GVL-related but can't prove.</li>
-          <li>You'd rather spend your time building features than tuning infrastructure config.</li>
-        </ul>
-
-        <h3>Threadpilot is NOT for you if...</h3>
-        <ul>
-          <li>You enjoy manually tuning Puma configs at 3am.</li>
-          <li>You're running JRuby or TruffleRuby (no GVL, so no need for this).</li>
-          <li>You've already solved concurrency by running single-threaded Puma workers and are happy with your server bill.</li>
-        </ul>
-      </div>
-    </div>
-
-    {% include threadpilot_pricing_comparison.html heading="Stop guessing. Start tuning." %}
-    <script src="/assets/js/threadpilot_music.js" defer></script>
-    <script src="/assets/js/threadpilot_scenarios.js" defer></script>
-    <script src="/assets/js/threadpilot_headings.js" defer></script>
-    <script src="/assets/js/threadpilot_tune.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.1/dist/embed.global.js" defer data-auto-init></script>
+    <p>
+      <b>What number do you put here?!</b> How many threads is the right number? Most people will have this set to an env variable, like <code>RAILS_MAX_THREADS</code>, and they might not even be able to tell you what it's set to.
+    </p>
+    <p>
+      Are you even sure you know what number you're running today? How did you pick it? . You probably Googled for 5 minutes or let Claude pick, or maybe you just shipped the defaults. Nothing broke, you moved on. But you're a curious engineer: <b>what gains did you leave on the table?</b>
+    </p>
   </div>
 
   <div class="threadpilot-fold-cell threadpilot-fold-word threadpilot-fold-word-pilot threadpilot-fold-bottom-side">
@@ -347,3 +138,234 @@ threads ???, ???</code></pre>
   </div>
 </div>
 
+<div class="threadpilot-page">
+  <section class="threadpilot-split">
+    <div>
+      <h3>Nobody understands the GVL</h3>
+      <p>
+        The problem is that picking the right number of threads in a threadpool is very hard. Getting this answer correct requires extensive knowledge of the Global VM Lock (GVL), and in-depth observability in production which gives you a sense of your workload's I/O characteristics.
+      </p>
+      <p>
+        Maybe you read a Github issue that was a hundred comments long and realized that not even some of the most experienced Rails developers in the world could agree on a single "best" number. Maybe you accidentally crashed your Sidekiq process because your database pool wasn't set to the same number as your concurrency configuration. There's a nagging sense that this all ought to be easier.
+      </p>
+      <p>
+        Even Mike Perham (the author of Sidekiq) and Rails core members like byroot have changed their minds on the "right" number over the years. The defaults for Puma and Sidekiq have changed over the years - why? Who can stay on top of all of this?
+      </p>
+    </div>
+  </section>
+
+  <section class="threadpilot-split threadpilot-split-flip">
+    <div>
+      <h3>Too few threads? You're wasting money.</h3>
+      <p>When a request waits on the database or an upstream API, another thread can do useful work. Too few threads leave that opportunity unused. Threadpilot can add concurrency instead of leaving requests waiting for a free thread.</p>
+      <p>You don't need to know your exact I/O percentage to explore this. Pick the thread count you run today, then change the workload. The same baseline follows you through all three illustrations.</p>
+    </div>
+    <div>
+      {% include threadpilot_scenario.html kind="high" title="Too few threads" %}
+    </div>
+  </section>
+
+  <section class="threadpilot-split">
+    <div>
+      <h3>Too many threads? More isn't always better.</h3>
+      <p>When Ruby CPU work dominates, extra threads compete for the same GVL. A larger pool can add processing latency without adding throughput. Threadpilot can shrink the pool while keeping useful work moving.</p>
+    </div>
+    <div>
+      {% include threadpilot_scenario.html kind="low" title="Too many threads" %}
+    </div>
+  </section>
+
+  <section class="threadpilot-split threadpilot-split-flip">
+    <div>
+      <h3>Your workload changes. A static number doesn't.</h3>
+      <p>Maybe you picked the right number today. What happens tomorrow, when a batch of CPU-heavy jobs is followed by jobs waiting on HTTP requests?</p>
+      <p>A fixed pool has to live with that tradeoff. Threadpilot follows the workload. Compare small and large pools below: a throughput tie can still come with a processing-latency difference.</p>
+    </div>
+    <div>
+      {% include threadpilot_scenario.html kind="changing" title="Changing workloads" %}
+    </div>
+  </section>
+
+  <section class="threadpilot-split">
+    <div>
+      <h3>Reduce your server fleet, without toil</h3>
+      <p>
+        With dynamic, adaptive concurrency, you can process high-IO and high-CPU workloads in the same process without adjusting your server count at all. CPU utilization chugs along at around 80%, your queue latencies stay low, and you didn't have to do anything. Your autoscaler never kicks in because each process dynamically adjusts to fit the workload without incurring additional latency or unnecessary costs.
+      </p>
+    </div>
+  </section>
+
+  <section class="threadpilot-split threadpilot-split-flip">
+    <div>
+      <h3>It wasn't possible until now</h3>
+      <p>Changing runtime concurrency is actually a fairly complicated technical problem.</p>
+      <p>The instrumentation required to get this right didn't exist until Ruby 3.2. Now, thanks to Ruby contributors, we can actually observe when threads queue for the GVL, which provides the critical backpressure required for auto-tuning to work.</p>
+      <p>Puma and Sidekiq also didn't support the idea of changing thread counts at runtime. Now, after our contributions to Puma, that project now supports it. We also figured out how to make it work for Sidekiq.</p>
+    </div>
+  </section>
+
+  <section class="threadpilot-split">
+    <div>
+      <h3>I got sick of doing the same thing for 10 years straight</h3>
+      <p>
+        <img alt="Pixel art of Nate Berkopec" style="float: left; margin-right: 1em; image-rendering: pixelated; height: 128px; width: auto;" src="/assets/img/nate.png" {{ "/assets/img/nate.png" | image_dimensions }}>
+        Hi, I'm Nate Berkopec 👋. I've been consulting on Ruby and Rails application performance for 10 years now. I wrote three books about it, and maintained Puma for nearly as long. I've encountered this question - "what's the right number of threads?" - on an almost daily basis for this entire decade.
+      </p>
+      <p>And unfortunately, all we could do was say "it depends" and write thousands of words no one would read about the intricacies of the GVL, or how we couldn't observe what was going on so we couldn't optimize it. It wasn't a satisfying answer.</p>
+      <p>I'm ready to move on. I want this to Just Work for everyone running multi-threaded Ruby applications in production.</p>
+      <p style="clear: left;">
+        <img alt="Pixel art of Yuki Nishijima" style="float: left; margin-right: 1em; image-rendering: pixelated; height: 128px; width: auto;" src="/assets/img/yuki.png" {{ "/assets/img/yuki.png" | image_dimensions }}>
+        Hi, I'm Yuki Nishijima 👋. I'm a Ruby core member and I wrote most of the code for this project. I also am sick and tired of tuning Puma and Sidekiq. Let's never do that again!
+      </p>
+    </div>
+  </section>
+
+  <section class="threadpilot-split threadpilot-split-flip">
+    <div>
+      <h3>Threadpilot: automatic thread tuning for Puma and Sidekiq</h3>
+      <p>So, Yuki and I built this Rubygem. You install it, change a half-dozen lines of config, and then watch all of your Puma and Sidekiq processes get more efficient.</p>
+      <p>Threadpilot adjusts concurrency at run-time based on your workload's actual demands. In a Ruby runtime with a Global VM Lock (GVL) such as MRI/C Ruby, this means that Threadpilot leads to:</p>
+      <ul>
+        <li>Improved throughput. I/O-heavy workloads (even when transient or temporary) will be given more threads, leading to more work being done in parallel.</li>
+        <li>Reduced latency. When workloads are CPU bottlenecked, Threadpilot detects GVL contention (queueing for the GVL) and reduces thread counts, leading to lower latency, particularly in the ~p95+ range.</li>
+      </ul>
+      <p>Threadpilot uses the gvl_timing gem (a wrapper around the Ruby 3.2+ public GVL API) to collect GVL timing data and measure I/O wait ratios.</p>
+    </div>
+  </section>
+
+  <div class="threadpilot-wide">
+  <div class="sales-testimonials">
+    <div class="row">
+      <div class="column">
+        <p>[TESTIMONIAL 1: Named person, title, company, specific measurable result.]</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="column">
+        <p>[TESTIMONIAL 2: Named person, title, company, specific measurable result.]</p>
+      </div>
+      <div class="column">
+        <p>[TESTIMONIAL 3: Named person, title, company, specific measurable result.]</p>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="threadpilot-wide">
+  <div class="row threadpilot-feature-row">
+    <div class="column card threadpilot-feature-card">
+      <h4>Automatic tuning for Puma</h4>
+      <p>Never set <code>threads 5, 5</code> ever again. High-IO and high-CPU workloads will instead get the optimal number based on their actual performance at runtime.</p>
+    </div>
+    <div class="column card threadpilot-feature-card">
+      <h4>Automatic tuning for Sidekiq</h4>
+      <p>Sidekiq workloads in particular can vary significantly in their IO characteristics. PDF generation, CSV and JSON parsing can all need low thread counts as they bottleneck on CPU, but HTTP request to 3rd parties may want 25 thread or more. </p>
+    </div>
+  </div>
+  <div class="row threadpilot-feature-row">
+    <div class="column card threadpilot-feature-card">
+      <h4>Evaluated daily in synthetic benchmarks</h4>
+      <p>Speedshop tests the Threadpilot implentation daily against a wide variety of synthetic benchmark scenarios so that our own algorithm performs optimally in all possible situations and workloads.</p>
+    </div>
+    <div class="column card threadpilot-feature-card">
+      <h4>Works with Sidekiq Enterprise</h4>
+      <p>Sidekiq Enterprise's thread limits are supported and respected by Threadpilot. We won't cause you to violate your licensed number of threads.</p>
+    </div>
+  </div>
+  </div>
+
+  <div class="threadpilot-wide">
+      {% include threadpilot_pricing_comparison.html heading="Install Threadpilot Now" %}
+  </div>
+
+  <section class="threadpilot-pair">
+    <div>
+      <h3>I can tune my threads manually!</h3>
+      <p>Any single number that you put in your <code>config.rb</code> encodes an assumption about your workload. It's saying: "this number will be good for most of my workload, forever, and may it never change!" In the real world, IO and CPU bottlenecks change through the course of a day, even over seconds. Only Threadpilot can dynamically react to what your workload is doing.</p>
+    </div>
+    <div>
+      <h3>Claude can build this, using this page as a prompt!</h3>
+      <p>That's a good idea, which is why we're doing it ourselves. We benchmark, daily, against a vibe-coded Claude prompt which attempts to recreate what we've done. On the days when it actually passes the benchmark suite (not always guaranteed), it performs worse than our artisanally hand-crafted human code. I guess we still have some things we can beat the robots at, huh?</p>
+    </div>
+    <div>
+      <h3>Multi-threading isn't worth the risks</h3>
+      <p>If you have a lot of money, that's probably true. A lot of big shops - Gusto, Github, Shopify - generally run single threaded in production. But for them, server costs are a rounding error. For you - wouldn't you rather save 50% or more on your cloud compute bills by turbocharging your web and background job processes to put out 2x the throughput for the same CPU and memory?</p>
+    </div>
+    <div>
+      <h3>My scale is too small for this to be worth it</h3>
+      <p>Threadpilot is $199, once, for any repository. We think Threadpilot will save most applications about 10% on their server bills over time. If you think you're going to spend more than $2000 on compute costs on your application this year, we think it's worth it.</p>
+    </div>
+  </section>
+
+  <div class="threadpilot-wide">
+      {% include threadpilot_pricing_comparison.html heading="Pricing" %}
+  </div>
+
+  <div class="threadpilot-wide threadpilot-centered">
+    <h3>Guarantee</h3>
+    <p>If you're not seeing the benefit once you deploy Threadpilot and want your money back, we'll refund you immediately. No deadline, no questions.</p>
+  </div>
+
+  <section class="threadpilot-pair">
+    <h3 class="threadpilot-pair-heading">FAQ</h3>
+    <div>
+      <h4>What version of Ruby do I need?</h4>
+      <p>Theadpilot supports CRuby 3.2 and above. This is because we use the new GVL instrumentation APIs added in that version.</p>
+    </div>
+    <div>
+      <h4>Will Threadpilot increase my memory usage or cause malloc arena fragmentation?</h4>
+      <p>Potentially! Increasing thread counts will increase memory usage. We recommend running with jemalloc as your allocator, which mitigates a lot of the memory usage that comes with threading. But Threadpilot is designed to optimize the tradeoff between memory and throughput - it picks only the minimum number of threads necessary to get ~95% of the maximum possible throughput, meaning your thread count is never unnecessarily high.</p>
+    </div>
+    <div>
+      <h4>Do I need to set my ActiveRecord connection pool size to match the max thread count?</h4>
+      <p>Yes. We cover this extensively in our setup docs. Briefly: we recommend turning off ActiveRecord's connection pool maximum and using an external database connection pooler like PgBouncer, as higher threadcounts may lead to higher database connection count needs.</p>
+    </div>
+    <div>
+      <h4>Is it safe to use in production? What if it picks a bad thread count?</h4>
+      <p>Threadpilot has been extensively tested in production by the companies you see on this page, which process billions of requests per day. It's battle-tested and hardened against all kinds of weird production scenarios.</p>
+    </div>
+    <div>
+      <h4>Does Threadpilot work on shared hosting platforms like Heroku, Render, or Fly?</h4>
+      <p>Yes. GVL behavior is mostly independent of the underlying implementation, so even in a Docker container with 0.25 cpu allocated, we'll still work correctly.</p>
+    </div>
+    <div>
+      <h4>My workload is mostly CPU-bound. Will Threadpilot still help?</h4>
+      <p>Unless your workload is 100% CPU bound all the time (i.e. your code only runs Ruby and never performs IO of any kind, even logging) then Threadpilot will choose a better thread count than just single-threading. The exact answer depends on the workload - exactly what we wrote Threadpilot to fix.</p>
+    </div>
+    <div>
+      <h4>Does Threadpilot work with Sidekiq Enterprise? What about capsules?</h4>
+      <p>Threadpilot respects your Sidekiq Enterprise licensed thread-count. It works for any number of capsules in a process.</p>
+    </div>
+    <div>
+      <h4>Can I use Threadpilot across multiple applications on the same license?</h4>
+      <p>You can use Threadpilot on the regular license once per repository (you buy it once for running Sidekiq and Puma in the same monorepo, not twice). If you have multiple repositories (i.e. multiple Gemfiles), you can buy more licenses or buy the Unlimited License.</p>
+    </div>
+  </section>
+
+  <section class="threadpilot-center">
+    <h3>Threadpilot is for you if...</h3>
+    <ul>
+      <li>You run Puma or Sidekiq in production on CRuby and want better throughput without adding servers.</li>
+      <li>You've ever Googled "how many Puma threads should I use" and gotten five different answers.</li>
+      <li>Your workload mix changes throughout the day and a static thread count is always wrong for something.</li>
+      <li>You're tired of p99 latency spikes that you suspect are GVL-related but can't prove.</li>
+      <li>You'd rather spend your time building features than tuning infrastructure config.</li>
+    </ul>
+
+    <h3>Threadpilot is NOT for you if...</h3>
+    <ul>
+      <li>You enjoy manually tuning Puma configs at 3am.</li>
+      <li>You're running JRuby or TruffleRuby (no GVL, so no need for this).</li>
+      <li>You've already solved concurrency by running single-threaded Puma workers and are happy with your server bill.</li>
+    </ul>
+  </section>
+
+  <div class="threadpilot-wide">
+      {% include threadpilot_pricing_comparison.html heading="Stop guessing. Start tuning." %}
+  </div>
+  <script src="/assets/js/threadpilot_music.js" defer></script>
+  <script src="/assets/js/threadpilot_scenarios.js" defer></script>
+  <script src="/assets/js/threadpilot_headings.js" defer></script>
+  <script src="/assets/js/threadpilot_tune.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.1/dist/embed.global.js" defer data-auto-init></script>
+</div>
