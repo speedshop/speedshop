@@ -16,5 +16,5 @@ void main() {
   vec2 position = origin + clamp(fract(cell), 0., 1.) / 16.;
   vec4 bit = texture(atlas, position);
   float mask = (bit.a > 0. && dot(bit.rgb, vec3(0.299, 0.587, 0.114)) > 0.5) ? 1. : 0.;
-  color = mix(vec4(8./255., 12./255., 9./255., 1.), texelFetch(inks, gridCell, 0), mask);
+  color = mix(vec4(0., 0., 0., 1.), texelFetch(inks, gridCell, 0), mask);
 }

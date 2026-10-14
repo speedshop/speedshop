@@ -6,8 +6,10 @@ test.use({ launchOptions: { args: ["--enable-unsafe-swiftshader"] } });
 for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
   test(`Threadpilot visualization plays at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport);
+    const musicRequests = [];
     const stillRequests = [];
     page.on("request", request => {
+      if (request.url().endsWith("/dist/music.m4a")) musicRequests.push(request);
       if (request.url().endsWith("/still.jpg")) stillRequests.push(request);
     });
     await page.goto("/threadpilot.html");
@@ -18,6 +20,8 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     await expect(frame.getByRole("button")).toHaveCount(0);
     await expect(frame.getByRole("status")).toHaveCount(0);
     await expect(frame.locator("audio")).toHaveJSProperty("paused", true);
+    await expect(frame.locator("audio")).not.toHaveAttribute("src");
+    expect(musicRequests).toHaveLength(0);
     expect(stillRequests).toHaveLength(0);
     const toggle = page.getByRole("button", { name: "Unmute music", exact: true });
     const before = await toggle.boundingBox();
@@ -25,6 +29,10 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     expect(before.y).toBeCloseTo(12, 0);
     await toggle.click();
     await expect(frame.locator("audio")).toHaveJSProperty("paused", false);
+    expect(musicRequests.length).toBeGreaterThan(0);
+    expect(musicRequests[0].resourceType()).toBe("media");
+    expect(musicRequests[0].headers().range).toMatch(/^bytes=/);
+    await expect.poll(() => frame.locator("audio").evaluate(audio => audio.currentTime)).toBeGreaterThan(0);
     await expect(page.locator("#threadpilot-audio-toggle")).toHaveAttribute("data-muted", "false");
     await page.getByRole("button", { name: "Mute music", exact: true }).click();
     await expect(frame.locator("audio")).toHaveJSProperty("paused", true);

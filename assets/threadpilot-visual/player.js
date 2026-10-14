@@ -33,11 +33,22 @@ function startLoop() {
   if (frameRequest || failed) return;
   stopped = false;lastTime = 0;frameRequest = requestAnimationFrame(draw);
 }
-function resize() {
+function resize(entries) {
   if (!renderer || failed) return;
-  const bounds = canvas.getBoundingClientRect();
-  renderer.resize(bounds.width, bounds.height);
+  const entry = entries?.[0];
+  const bounds = entry?.contentRect || canvas.getBoundingClientRect();
+  const deviceSize = entry?.devicePixelContentBoxSize?.[0];
+  const expectedWidth = Math.round(bounds.width * window.devicePixelRatio);
+  const expectedHeight = Math.round(bounds.height * window.devicePixelRatio);
+  const width = Math.abs(deviceSize?.inlineSize - expectedWidth) <= 1 ? deviceSize.inlineSize : expectedWidth;
+  const height = Math.abs(deviceSize?.blockSize - expectedHeight) <= 1 ? deviceSize.blockSize : expectedHeight;
+  renderer.resize(width, height, bounds.width, bounds.height);
   if (stopped && (stillImage || video.readyState >= 2)) renderer.draw(stillImage || video, 0);
+}
+function observeSize() {
+  const observer = new ResizeObserver(resize);
+  try { observer.observe(canvas, { box: 'device-pixel-content-box' }); }
+  catch { observer.observe(canvas); }
 }
 async function loadSource(startTime) {
   const response = await fetch(video.currentSrc || video.src);
@@ -61,13 +72,13 @@ async function start() {
     stillImage.currentTime = 22.492708333333333;
     [renderer] = await Promise.all([createRenderer(canvas), stillImage.decode()]);
     resize();
-    new ResizeObserver(resize).observe(document.querySelector('#stage'));
+    observeSize();
     canvas.setAttribute('aria-label', 'Static ASCII artwork');
     canvas.dataset.ready = 'true';
     return;
   }
   [renderer] = await Promise.all([createRenderer(canvas), loadSource(5.607)]);resize();
-  new ResizeObserver(resize).observe(document.querySelector('#stage'));
+  observeSize();
   canvas.dataset.ready = 'true';
   renderer.draw(video, 0);
   try { await video.play();startLoop(); }
@@ -79,7 +90,12 @@ async function start() {
 if (audioToggle) {
   const controls = new AbortController();
   audioToggle.addEventListener('click', async () => {
-    try { if (music.paused) await music.play();else music.pause(); }
+    try {
+      if (music.paused) {
+        if (!music.hasAttribute('src')) music.src = music.dataset.src;
+        await music.play();
+      } else music.pause();
+    }
     catch (error) { report(error); }
   }, { signal: controls.signal });
   function updateAudioControl() {

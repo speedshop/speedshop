@@ -391,7 +391,7 @@ header {
 }
 
 .threadpilot-chart-note {
-  color: #666;
+  color: #fff;
 }
 
 .threadpilot-chart {
@@ -402,20 +402,12 @@ header {
 }
 
 .threadpilot-chart-caption {
-  color: #666;
+  color: #fff;
   font-size: 1.6rem;
   height: calc(var(--rhythm-main) * 2);
   line-height: var(--rhythm-main);
   margin-top: 0;
   overflow: hidden;
-}
-
-.threadpilot-chart-static {
-  color: #e45858;
-}
-
-.threadpilot-chart-adaptive {
-  color: #3b82f6;
 }
 
 .card {

@@ -38,7 +38,7 @@ export async function createRenderer(canvas, settings = {}) {
   const sample = document.createElement('canvas');
   const context = sample.getContext('2d');
   if (!context) throw new Error('Canvas 2D is required.');
-  let config = initialConfig, cols, rows, size, tick = 0, accumulator = 0, rebuild = true, destroyed = false;
+  let config = initialConfig, cols, rows, size, cssWidth, cssHeight, tick = 0, accumulator = 0, rebuild = true, destroyed = false;
   function program(fragment, vertexSource = vertex) {
     const handle = gl.createProgram();
     for (const [type, source] of [[gl.VERTEX_SHADER, vertexSource], [gl.FRAGMENT_SHADER, fragment]]) {
@@ -82,10 +82,12 @@ export async function createRenderer(canvas, settings = {}) {
   shift.uniform('u_wordGlyphs', 'uniform2fv', Array.from('threadpilotspeedshop', character => [character.charCodeAt(0) / 255, 0]).flat());
   output.use();for (const [index, name] of ['glyphs','inks','atlas'].entries()) output.uniform(name, 'uniform1i', index);
 
-  function resize(width, height) {
+  function resize(width, height, layoutWidth = width, layoutHeight = height) {
     if (destroyed) throw new Error('Renderer is destroyed.');
-    canvas.width = Math.max(1, Math.round(width));canvas.height = Math.max(1, Math.round(height));size = config.size;
-    cols = Math.max(1, Math.floor(canvas.width / size));rows = Math.max(1, Math.floor(canvas.height / size));
+    canvas.width = Math.max(1, Math.round(width));canvas.height = Math.max(1, Math.round(height));
+    cssWidth = Math.max(1, layoutWidth);cssHeight = Math.max(1, layoutHeight);
+    size = Math.max(1, Math.round(config.size * canvas.width / cssWidth));
+    cols = Math.max(1, Math.floor(cssWidth / config.size));rows = Math.max(1, Math.floor(cssHeight / config.size));
     const aspect = cols / rows;sample.width = Math.max(1, Math.round(640 * Math.min(aspect, 1)));sample.height = Math.max(1, Math.round(640 / Math.max(aspect, 1)));
     for (const buffer of buffers) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, buffer.framebuffer);
@@ -102,7 +104,8 @@ export async function createRenderer(canvas, settings = {}) {
     if (destroyed) throw new Error('Renderer is destroyed.');
     const candidate = validated(changes, config);
     rebuild ||= ['size','exposure','contrast','palette','words'].some(key => candidate[key] !== config[key]);
-    config = candidate;if (size !== config.size) resize(canvas.width, canvas.height);
+    const sizeChanged = candidate.size !== config.size;
+    config = candidate;if (sizeChanged) resize(canvas.width, canvas.height, cssWidth, cssHeight);
   }
   function draw(media, dt = 1 / 30) {
     if (destroyed) throw new Error('Renderer is destroyed.');
@@ -120,7 +123,7 @@ export async function createRenderer(canvas, settings = {}) {
     shift.uniform('u_size', 'uniform2f', cols, rows);shift.uniform('u_tick', 'uniform1f', ++tick);
     shift.uniform('u_refresh', 'uniform1f', 1 - Math.pow(1 - config.refresh / 100, dt * 30));shift.uniform('u_steps', 'uniform1i', steps);
     shift.uniform('u_palette', 'uniform1i', palettes.indexOf(config.palette));shift.uniform('u_rebuild', 'uniform1i', rebuild);shift.uniform('u_words', 'uniform1f', config.words / 100);gl.drawArrays(gl.TRIANGLES, 0, 6);
-    [previous, next] = [next, previous];rebuild = false;gl.bindFramebuffer(gl.FRAMEBUFFER, null);gl.clearColor(8/255,12/255,9/255,1);gl.clear(gl.COLOR_BUFFER_BIT);
+    [previous, next] = [next, previous];rebuild = false;gl.bindFramebuffer(gl.FRAMEBUFFER, null);gl.clearColor(0,0,0,1);gl.clear(gl.COLOR_BUFFER_BIT);
     const x = Math.floor((canvas.width - cols * size) / 2), y = Math.floor((canvas.height - rows * size) / 2);gl.viewport(x, y, cols * size, rows * size);
     [...previous.attachments, atlas].forEach(bind);output.use();output.uniform('grid', 'uniform2f', cols, rows);output.uniform('pixels', 'uniform2f', cols * size, rows * size);output.uniform('offset', 'uniform2f', x, y);gl.drawArrays(gl.TRIANGLES, 0, 6);
   }

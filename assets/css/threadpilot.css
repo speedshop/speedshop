@@ -6,20 +6,12 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: "Redaction 70";
-  src: url("/assets/fonts/redaction/Redaction70-Wordmark-Subset.woff2") format("woff2");
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-}
-
 body.threadpilot {
   --tp-black: #000;
   --tp-white: #fff;
   --tp-cyan: #55ffff;
   --tp-magenta: #ff55ff;
-  --tp-border: #333;
+  --tp-border: #fff;
   background: var(--tp-black);
   color: var(--tp-white);
   color-scheme: dark;
@@ -73,7 +65,7 @@ body.threadpilot {
 
 .threadpilot-topbar {
   padding: 1.4rem 2rem;
-  border-bottom: 1px solid var(--tp-border);
+  border-bottom: 1px dotted var(--tp-border);
   text-align: center;
   font-size: 1.3rem;
   line-height: 1.5;
@@ -90,6 +82,7 @@ body.threadpilot {
   display: block;
   width: 9rem;
   height: auto;
+  shape-rendering: crispEdges;
 }
 
 .threadpilot .threadpilot-hero {
@@ -101,8 +94,16 @@ body.threadpilot {
   margin: 0;
   padding: 3rem;
   overflow: hidden;
-  border-bottom: 1px solid var(--tp-border);
-  background: #080b08;
+  border-bottom: 0;
+  background: #000;
+}
+
+.threadpilot-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  border-bottom: 1px dotted var(--tp-border);
+  pointer-events: none;
 }
 
 #threadpilot-audio-toggle {
@@ -116,16 +117,16 @@ body.threadpilot {
   height: 44px;
   margin: 0;
   padding: 10px;
-  border: 1px solid #98a59b;
-  border-radius: 2px;
-  background: #080c09;
-  color: #ffffee;
+  border: 1px dotted #fff;
+  border-radius: 0;
+  background: #000;
+  color: #fff;
   cursor: pointer;
 }
 
 #threadpilot-audio-toggle:hover,
 #threadpilot-audio-toggle:focus-visible {
-  border-color: #ffffee;
+  border-color: #fff;
 }
 
 #threadpilot-audio-toggle svg {
@@ -150,12 +151,17 @@ body.threadpilot {
 .threadpilot .threadpilot-hero h1 {
   pointer-events: none;
   margin: 0;
-  font-family: "Redaction 70", Georgia, serif;
-  font-style: italic;
   font-size: clamp(5rem, 13.5vw, 21rem);
-  line-height: 0.95;
-  letter-spacing: -0.055em;
+  line-height: 0;
+  letter-spacing: 0;
   text-align: center;
+}
+
+.threadpilot-hero h1 svg {
+  display: block;
+  width: 3.8em;
+  height: 1.9em;
+  overflow: visible;
 }
 
 .threadpilot .threadpilot-page {
@@ -212,7 +218,7 @@ body.threadpilot {
 }
 .threadpilot .threadpilot-intro-row {
   margin-bottom: 1.5rem;
-  color: #bbb;
+  color: #fff;
   font-size: 1.3rem;
 }
 .threadpilot-intro-row p {
@@ -227,7 +233,7 @@ body.threadpilot {
   width: 100%;
   margin: 0 0 3.5rem;
   padding: 0 0 2rem;
-  border-bottom: 1px solid var(--tp-border);
+  border-bottom: 1px dotted var(--tp-border);
 }
 .threadpilot-used-by-row p {
   flex: 0 0 auto;
@@ -242,8 +248,6 @@ body.threadpilot {
 .threadpilot-client-logos img {
   display: block;
   max-height: 2.8rem;
-  filter: brightness(0) invert(1);
-  opacity: 0.72;
 }
 .threadpilot-client-logo-aviary {
   width: 9rem;
@@ -256,13 +260,14 @@ body.threadpilot {
 }
 .threadpilot .sales-testimonials {
   background: transparent;
-  border-block: 1px solid var(--tp-border);
+  border-block: 1px dotted var(--tp-border);
   padding: 4rem 0;
   margin: 5rem 0;
 }
 .threadpilot .card {
-  background: #080808;
+  background: #000;
   border-color: var(--tp-border);
+  border-style: dotted;
   box-shadow: none;
 }
 .threadpilot .threadpilot-feature-card {
@@ -299,9 +304,10 @@ body.threadpilot {
 }
 .threadpilot pre,
 .threadpilot code {
-  background: #111;
+  background: #000;
   color: var(--tp-cyan);
   border-color: var(--tp-border);
+  border-style: dotted;
   font-family: inherit;
 }
 .threadpilot pre {
@@ -309,7 +315,7 @@ body.threadpilot {
 }
 .threadpilot .threadpilot-chart-note,
 .threadpilot .threadpilot-chart-caption {
-  color: #bbb;
+  color: #fff;
 }
 .threadpilot .threadpilot-chart-caption {
   height: auto;
@@ -320,6 +326,24 @@ body.threadpilot {
 }
 .threadpilot .threadpilot-chart-adaptive {
   color: var(--tp-cyan);
+}
+
+.threadpilot-page .threadpilot-positioned-heading {
+  position: relative;
+}
+
+.threadpilot-page .threadpilot-raster-heading {
+  color: transparent;
+}
+
+.threadpilot-heading-canvas {
+  position: absolute;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
+.threadpilot-page .threadpilot-raster-heading::selection {
+  color: transparent;
 }
 
 @media (max-width: 800px) {

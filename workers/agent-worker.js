@@ -73,13 +73,13 @@ function isStaticAsset(pathname) {
   );
 }
 
-async function fetchFromOrigin(pathname, env) {
+async function fetchFromOrigin(pathname, env, request) {
   // In local dev, fetch from the static file server
   // In production, fetch from the same origin (Cloudflare routes to S3)
   const originUrl = env?.ORIGIN_URL || SITE_URL;
   const url = originUrl + pathname;
 
-  return fetch(url, {
+  return fetch(request ? new Request(url, request) : url, {
     cf: {
       // Bypass cache to go directly to origin
       cacheTtl: 0,
@@ -95,7 +95,7 @@ export default {
 
     // Skip content negotiation for static assets and already-markdown files
     if (isStaticAsset(pathname)) {
-      const response = await fetchFromOrigin(pathname, env);
+      const response = await fetchFromOrigin(pathname, env, request);
       return new Response(response.body, {
         status: response.status,
         statusText: response.statusText,

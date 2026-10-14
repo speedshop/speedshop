@@ -14,6 +14,66 @@ if (benchmark && canvas instanceof HTMLCanvasElement) {
   let animationStart;
   let animationFrame;
 
+  function drawLabel(ctx, text, x, y) {
+    const raster = document.createElement("canvas");
+    const ink = raster.getContext("2d");
+    ink.font = ctx.font;
+    ink.textAlign = ctx.textAlign;
+    ink.textBaseline = ctx.textBaseline;
+    const metrics = ink.measureText(String(text));
+    const left = Math.floor(-metrics.actualBoundingBoxLeft) - 1;
+    const top = Math.floor(-metrics.actualBoundingBoxAscent) - 1;
+    raster.width = Math.max(
+      1, Math.ceil(metrics.actualBoundingBoxRight) - left + 1,
+    );
+    raster.height = Math.max(
+      1, Math.ceil(metrics.actualBoundingBoxDescent) - top + 1,
+    );
+    ink.font = ctx.font;
+    ink.textAlign = ctx.textAlign;
+    ink.textBaseline = ctx.textBaseline;
+    ink.fillText(String(text), -left, -top);
+    const pixels = ink.getImageData(0, 0, raster.width, raster.height).data;
+    for (let row = 0; row < raster.height; row += 1) {
+      for (let column = 0; column < raster.width; column += 1) {
+        if (pixels[(row * raster.width + column) * 4 + 3] >= 128) {
+          ctx.fillRect(
+            Math.round(x) + left + column, Math.round(y) + top + row, 1, 1,
+          );
+        }
+      }
+    }
+  }
+
+  function sizeCanvas(entry) {
+    const dpr = window.devicePixelRatio || 1;
+    const bounds = canvas.getBoundingClientRect();
+    const box = entry?.devicePixelContentBoxSize?.[0];
+    const content = entry?.contentRect || bounds;
+    const width = Math.max(1, Math.round(content.width * dpr));
+    const height = Math.max(1, Math.round(content.height * dpr));
+    const validBox = box &&
+      Math.abs(box.inlineSize - width) <= 1 &&
+      Math.abs(box.blockSize - height) <= 1;
+    canvas.width = validBox ? box.inlineSize : width;
+    canvas.height = validBox ? box.blockSize : height;
+    canvas.style.width = `${canvas.width / dpr}px`;
+    canvas.style.height = `${canvas.height / dpr}px`;
+    alignCanvas();
+  }
+
+  function alignCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.transform = "none";
+    const snapped = canvas.getBoundingClientRect();
+    const x = snapped.left + window.scrollX;
+    const y = snapped.top + window.scrollY;
+    const offsetX = Math.round(x * dpr) / dpr - x;
+    const offsetY = Math.round(y * dpr) / dpr - y;
+    canvas.style.transformOrigin = "0 0";
+    canvas.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${canvas.width / dpr / snapped.width}, ${canvas.height / dpr / snapped.height})`;
+  }
+
   function drawPixel(x, y, color) {
     context.fillStyle = color;
     context.fillRect(Math.round(x), Math.round(y), 1, 1);
@@ -21,16 +81,9 @@ if (benchmark && canvas instanceof HTMLCanvasElement) {
 
   function draw(progressValue) {
     const devicePixelRatio = window.devicePixelRatio || 1;
-    const bounds = canvas.getBoundingClientRect();
-    const width = Math.max(1, Math.round(bounds.width * devicePixelRatio));
-    const height = Math.max(1, Math.round(bounds.height * devicePixelRatio));
-
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
-    } else {
-      context.clearRect(0, 0, width, height);
-    }
+    const width = canvas.width;
+    const height = canvas.height;
+    context.clearRect(0, 0, width, height);
 
     context.imageSmoothingEnabled = false;
     const styles = getComputedStyle(document.body);
@@ -45,25 +98,21 @@ if (benchmark && canvas instanceof HTMLCanvasElement) {
 
     for (const ratio of [0.25, 0.5, 0.75]) {
       const y = Math.round(top + plotHeight * ratio);
-      for (
-        let x = left;
-        x <= right;
-        x += Math.max(3, Math.round(4 * devicePixelRatio))
-      ) {
-        drawPixel(x, y, "#242424");
+      for (let x = left; x <= right; x += 6) {
+        drawPixel(x, y, "#fff");
       }
     }
 
-    context.fillStyle = "#777";
+    context.fillStyle = "#fff";
     context.fillRect(left, top, 1, plotHeight + 1);
     context.fillRect(left, bottom, plotWidth + 1, 1);
 
-    context.fillStyle = "#bbbbbb";
+    context.fillStyle = "#fff";
     context.font = `${Math.round(10 * devicePixelRatio)}px ui-monospace, monospace`;
     context.textBaseline = "top";
-    context.fillText("Throughput", left, 0);
+    drawLabel(context, "Throughput", left, 0);
     context.textAlign = "right";
-    context.fillText("Time", right, bottom + Math.round(10 * devicePixelRatio));
+    drawLabel(context, "Time", right, bottom + Math.round(10 * devicePixelRatio));
     context.textAlign = "left";
 
     const visibleWidth = Math.max(0, Math.floor(plotWidth * progressValue));
@@ -106,6 +155,8 @@ if (benchmark && canvas instanceof HTMLCanvasElement) {
     }
   }
 
+  sizeCanvas();
+
   if (reduceMotion) {
     benchmark.dataset.renderState = "complete";
     draw(1);
@@ -124,5 +175,24 @@ if (benchmark && canvas instanceof HTMLCanvasElement) {
     observer.observe(benchmark);
   }
 
-  new ResizeObserver(resize).observe(canvas);
+  const canvasObserver = new ResizeObserver((entries) => {
+    sizeCanvas(entries[0]);
+    resize();
+  });
+  canvasObserver.observe(canvas);
+  new ResizeObserver(() => requestAnimationFrame(alignCanvas)).observe(document.body);
+  document.fonts.ready.then(() => {
+    requestAnimationFrame(() => {
+      sizeCanvas();
+      resize();
+    });
+  });
+  let containerWidth;
+  new ResizeObserver((entries) => {
+    const width = entries[0].contentRect.width;
+    if (width === containerWidth) return;
+    containerWidth = width;
+    canvas.style.width = "";
+    canvas.style.height = "";
+  }).observe(benchmark);
 }

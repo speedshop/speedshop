@@ -9,16 +9,45 @@ stylesheet: /assets/css/threadpilot.css
 
 <div class="threadpilot-topbar">a <a href="/" aria-label="Speedshop">{% include speedshop_wordmark.svg %}</a> skunkworks product</div>
 <button id="threadpilot-audio-toggle" type="button" aria-label="Unmute music" title="Unmute music" data-muted="true">
-  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M11 5 6 9H3v6h3l5 4Z" />
-    <path class="sound-on" d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14" />
-    <path class="sound-off" d="m16 9 6 6m0-6-6 6" />
+  <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" shape-rendering="crispEdges">
+    <rect x="3" y="9" width="3" height="6"/>
+    <rect x="6" y="8" width="2" height="8"/>
+    <rect x="8" y="6" width="2" height="12"/>
+    <rect x="10" y="5" width="2" height="14"/>
+    <g class="sound-on">
+      <rect x="15" y="8" width="2" height="8"/>
+      <rect x="19" y="5" width="2" height="14"/>
+    </g>
+    <g class="sound-off">
+      <rect x="15" y="8" width="2" height="2"/>
+      <rect x="17" y="10" width="2" height="4"/>
+      <rect x="19" y="14" width="2" height="2"/>
+      <rect x="19" y="8" width="2" height="2"/>
+      <rect x="15" y="14" width="2" height="2"/>
+    </g>
   </svg>
 </button>
 <header class="threadpilot-hero">
   <iframe class="threadpilot-hero-visual" src="/assets/threadpilot-visual/index.html" title="Threadpilot animated visualization and music control" allow="autoplay"></iframe>
-  <h1>THREAD<br>PILOT</h1>
+  <h1 aria-label="Threadpilot">{% include threadpilot_wordmark.svg %}</h1>
 </header>
+<script>
+  (() => {
+    const topbar = document.querySelector(".threadpilot-topbar");
+    const hero = document.querySelector(".threadpilot-hero");
+    function snapHero() {
+      const density = window.devicePixelRatio || 1;
+      topbar.style.height = "";
+      topbar.style.height = `${Math.round(topbar.getBoundingClientRect().height * density) / density}px`;
+      hero.style.height = "";
+      const cell = Math.round(8 * density);
+      hero.style.height = `${Math.round(hero.getBoundingClientRect().height * density / cell) * cell / density}px`;
+    }
+    snapHero();
+    window.addEventListener("load", snapHero);
+    window.addEventListener("resize", snapHero);
+  })();
+</script>
 
 <div class="container container-narrow threadpilot-page">
   <section class="threadpilot-lead">
@@ -300,16 +329,62 @@ threads ???, ???</code></pre>
 
     var DPR = window.devicePixelRatio || 1;
 
-    function setupCanvas(id) {
+    function setupCanvas(id, entry) {
       var c = document.getElementById(id);
+      DPR = window.devicePixelRatio || 1;
       var rect = c.getBoundingClientRect();
-      var w = Math.round(rect.width * DPR);
-      var h = Math.round(rect.height * DPR);
+      var box = entry && entry.devicePixelContentBoxSize && entry.devicePixelContentBoxSize[0];
+      var content = entry ? entry.contentRect : rect;
+      var w = Math.max(1, Math.round(content.width * DPR));
+      var h = Math.max(1, Math.round(content.height * DPR));
+      if (box && Math.abs(box.inlineSize - w) <= 1 && Math.abs(box.blockSize - h) <= 1) {
+        w = box.inlineSize;
+        h = box.blockSize;
+      }
       c.width = w;
       c.height = h;
+      c.style.width = w / DPR + 'px';
+      c.style.height = h / DPR + 'px';
+      alignCanvas(c);
       var ctx = c.getContext('2d');
       ctx.imageSmoothingEnabled = false;
       return { ctx: ctx, w: w, h: h };
+    }
+
+    function alignCanvas(c) {
+      c.style.transform = 'none';
+      var snapped = c.getBoundingClientRect();
+      var x = snapped.left + window.scrollX;
+      var y = snapped.top + window.scrollY;
+      var offsetX = Math.round(x * DPR) / DPR - x;
+      var offsetY = Math.round(y * DPR) / DPR - y;
+      c.style.transformOrigin = '0 0';
+      c.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + c.width / DPR / snapped.width + ', ' + c.height / DPR / snapped.height + ')';
+    }
+
+    function drawLabel(ctx, text, x, y) {
+      var raster = document.createElement("canvas");
+      var ink = raster.getContext("2d");
+      ink.font = ctx.font;
+      ink.textAlign = ctx.textAlign;
+      ink.textBaseline = ctx.textBaseline;
+      var metrics = ink.measureText(String(text));
+      var left = Math.floor(-metrics.actualBoundingBoxLeft) - 1;
+      var top = Math.floor(-metrics.actualBoundingBoxAscent) - 1;
+      raster.width = Math.max(1, Math.ceil(metrics.actualBoundingBoxRight) - left + 1);
+      raster.height = Math.max(1, Math.ceil(metrics.actualBoundingBoxDescent) - top + 1);
+      ink.font = ctx.font;
+      ink.textAlign = ctx.textAlign;
+      ink.textBaseline = ctx.textBaseline;
+      ink.fillText(String(text), -left, -top);
+      var pixels = ink.getImageData(0, 0, raster.width, raster.height).data;
+      for (var row = 0; row < raster.height; row += 1) {
+        for (var column = 0; column < raster.width; column += 1) {
+          if (pixels[(row * raster.width + column) * 4 + 3] >= 128) {
+            ctx.fillRect(Math.round(x) + left + column, Math.round(y) + top + row, 1, 1);
+          }
+        }
+      }
     }
 
     // Draw a single device pixel at (x, y)
@@ -346,19 +421,19 @@ threads ???, ???</code></pre>
     // Draw axes (single-pixel lines)
     function drawAxes(ctx, w, h, pad, yMin, yMax, yTicks, xLabel) {
       // Y axis
-      line(ctx, pad, pad, pad, h - pad, '#999999');
+      line(ctx, pad, pad, pad, h - pad, '#fff');
       // X axis
-      line(ctx, pad, h - pad, w - pad, h - pad, '#999999');
+      line(ctx, pad, h - pad, w - pad, h - pad, '#fff');
       // Y tick marks and labels
-      ctx.fillStyle = '#999999';
+      ctx.fillStyle = '#fff';
       var fontSize = Math.max(9, Math.round(10 * DPR));
       ctx.font = fontSize + 'px monospace';
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
       for (var t = 0; t < yTicks.length; t++) {
         var y = mapY(yTicks[t], yMin, yMax, h, pad);
-        line(ctx, pad - 3, y, pad, y, '#999999');
-        ctx.fillText(yTicks[t], pad - 5, y);
+        line(ctx, pad - 3, y, pad, y, '#fff');
+        drawLabel(ctx, yTicks[t], pad - 5, y);
       }
       // X axis labels
       ctx.textAlign = 'center';
@@ -366,8 +441,8 @@ threads ???, ???</code></pre>
       var xLabels = ['0m', '15m', '30m', '45m', '60m'];
       for (var i = 0; i < xLabels.length; i++) {
         var x = mapX(i * (3600 / 4) , 3600, w, pad);
-        line(ctx, x, h - pad, x, h - pad + 3, '#999999');
-        ctx.fillText(xLabels[i], x, h - pad + 5);
+        line(ctx, x, h - pad, x, h - pad + 3, '#fff');
+        drawLabel(ctx, xLabels[i], x, h - pad + 5);
       }
     }
 
@@ -441,18 +516,18 @@ threads ???, ???</code></pre>
 
     var PAD_RATIO = 0.18;
 
-    function drawChart(id, staticData, tpData, yMin, yMax, yTicks) {
-      var s = setupCanvas(id);
+    function drawChart(id, staticData, tpData, yMin, yMax, yTicks, entry) {
+      var s = setupCanvas(id, entry);
       var pad = Math.round(s.w * PAD_RATIO * 0.3);
       // Background
-      s.ctx.fillStyle = '#080808';
+      s.ctx.fillStyle = '#000';
       s.ctx.fillRect(0, 0, s.w, s.h);
 
       // Gridlines
       for (var t = 0; t < yTicks.length; t++) {
         var y = mapY(yTicks[t], yMin, yMax, s.h, pad);
-        for (var x = pad + 2; x < s.w - pad; x += 3) {
-          px(s.ctx, x, y, '#303030');
+        for (var x = pad + 2; x < s.w - pad; x += 6) {
+          px(s.ctx, x, y, '#fff');
         }
       }
 
@@ -463,19 +538,33 @@ threads ???, ???</code></pre>
       plotSeries(s.ctx, tpData, s.w, s.h, pad, yMin, yMax, '#55ffff');
     }
 
-    function render() {
-      drawChart('chart-threads', staticThreads, tpThreads, 0, 28, [0, 5, 10, 15, 20, 25]);
-      drawChart('chart-latency', staticLatency, tpLatency, 0, 250, [0, 50, 100, 150, 200, 250]);
-      drawChart('chart-throughput', staticThroughput, tpThroughput, 100, 700, [100, 200, 300, 400, 500, 600, 700]);
+    function observeChart(id, staticData, tpData, yMin, yMax, yTicks) {
+      var c = document.getElementById(id);
+      drawChart(id, staticData, tpData, yMin, yMax, yTicks);
+      new ResizeObserver(function(entries) {
+        drawChart(id, staticData, tpData, yMin, yMax, yTicks, entries[0]);
+      }).observe(c);
+      new ResizeObserver(function() {
+        requestAnimationFrame(function() { alignCanvas(c); });
+      }).observe(document.body);
+      document.fonts.ready.then(function() {
+        requestAnimationFrame(function() {
+          drawChart(id, staticData, tpData, yMin, yMax, yTicks);
+        });
+      });
+      var containerWidth;
+      new ResizeObserver(function(entries) {
+        var width = entries[0].contentRect.width;
+        if (width === containerWidth) return;
+        containerWidth = width;
+        c.style.width = '';
+        c.style.height = '';
+      }).observe(c.parentElement);
     }
 
-    // Render on load and resize
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', render);
-    } else {
-      render();
-    }
-    window.addEventListener('resize', render);
+    observeChart('chart-threads', staticThreads, tpThreads, 0, 28, [0, 5, 10, 15, 20, 25]);
+    observeChart('chart-latency', staticLatency, tpLatency, 0, 250, [0, 50, 100, 150, 200, 250]);
+    observeChart('chart-throughput', staticThroughput, tpThroughput, 100, 700, [100, 200, 300, 400, 500, 600, 700]);
   })();
   </script>
 
@@ -539,6 +628,7 @@ threads ???, ???</code></pre>
 
   {% include threadpilot_pricing_comparison.html heading="Stop guessing. Start tuning." %}
   <script src="/assets/js/threadpilot_benchmark.js" defer></script>
+  <script src="/assets/js/threadpilot_headings.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.1/dist/embed.global.js" defer data-auto-init></script>
 
 </div>

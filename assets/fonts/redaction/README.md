@@ -1,14 +1,11 @@
 # Threadpilot Redaction fonts
 
-`Redaction70-Wordmark-Subset.woff2` contains only the uppercase glyphs used by the `THREAD PILOT` hero wordmark. It was generated from the approved italic font at fleet base `6fb1b9d4d5060a2f250ee1b81d096b3eed728777` with FontTools 4.62.0 and Brotli 1.2.0:
+The hero uses `_includes/threadpilot_wordmark.svg`, generated from the OFL italic wordmark subset. Glyph advances and GPOS kerning are preserved, with -0.055em tracking, 0.95em line spacing, and the original font's baseline. No italic font is loaded by the page. Regenerate the outlines from the archived subset:
 
 ```sh
-git show 6fb1b9d4d5060a2f250ee1b81d096b3eed728777:assets/fonts/redaction/Redaction70-Italic.woff2 > /tmp/Redaction70-Italic.woff2
-pyftsubset /tmp/Redaction70-Italic.woff2 \
-  --text='THREADPILOT' \
-  --flavor=woff2 \
-  --layout-features='*' \
-  --output-file=Redaction70-Wordmark-Subset.woff2
+git show 35f0ad0cd4a30f3ec4e5a2ac8d14da988c2a05b7:assets/fonts/redaction/Redaction70-Wordmark-Subset.woff2 > tmp/threadpilot-wordmark-source.woff2
+uv run --with fonttools --with brotli python _scripts/build_threadpilot_wordmark.py tmp/threadpilot-wordmark-source.woff2
+rm tmp/threadpilot-wordmark-source.woff2
 ```
 
 `Redaction35-ASCII-Subset.woff2` contains the printable ASCII characters available in Redaction 35 Regular (U+0020–U+007E). The original font has no `<` or `>` glyphs. This subset covers all current Threadpilot headings and allows ordinary ASCII copy edits without regeneration. Non-ASCII heading characters require expanding the subset or will fall back to Georgia.
