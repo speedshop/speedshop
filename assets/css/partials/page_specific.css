@@ -381,35 +381,6 @@ header {
   width: 100%;
 }
 
-.threadpilot-chart-row {
-  margin-bottom: var(--rhythm-main);
-}
-
-.threadpilot-chart-heading,
-.threadpilot-chart-note {
-  text-align: center;
-}
-
-.threadpilot-chart-note {
-  color: #fff;
-}
-
-.threadpilot-chart {
-  display: block;
-  height: calc(var(--rhythm-main) * 6);
-  image-rendering: pixelated;
-  width: 100%;
-}
-
-.threadpilot-chart-caption {
-  color: #fff;
-  font-size: 1.6rem;
-  height: calc(var(--rhythm-main) * 2);
-  line-height: var(--rhythm-main);
-  margin-top: 0;
-  overflow: hidden;
-}
-
 .card {
   box-shadow: #ccc 2px 2px 10px 0px;
   border: 1px solid #bbb;

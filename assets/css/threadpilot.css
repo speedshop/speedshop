@@ -313,19 +313,216 @@ body.threadpilot {
 .threadpilot pre {
   border-left: 2px solid var(--tp-magenta);
 }
-.threadpilot .threadpilot-chart-note,
-.threadpilot .threadpilot-chart-caption {
-  color: #fff;
-}
-.threadpilot .threadpilot-chart-caption {
-  height: auto;
-  overflow: visible;
-}
 .threadpilot .threadpilot-chart-static {
   color: var(--tp-magenta);
 }
 .threadpilot .threadpilot-chart-adaptive {
   color: var(--tp-cyan);
+}
+
+.threadpilot-scenario {
+  margin: 3rem 0 0;
+  padding: 2rem 0;
+  border-block: 1px dotted var(--tp-border);
+  scroll-margin-top: 2rem;
+}
+
+.threadpilot .threadpilot-scenario-disclosure {
+  margin: 0 0 2rem;
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.threadpilot-scenario-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem 3rem;
+}
+
+.threadpilot-scenario fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.threadpilot-scenario legend {
+  margin-bottom: 1rem;
+  padding: 0;
+  font-size: 1.4rem;
+  line-height: 1.6;
+}
+
+.threadpilot-options {
+  display: flex;
+  gap: 0;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.threadpilot-options label {
+  position: relative;
+  margin: 0;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.threadpilot-options input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+
+.threadpilot-options span {
+  display: grid;
+  place-items: center;
+  min-width: 4.4rem;
+  min-height: 4.4rem;
+  padding: 0.4rem 1.2rem;
+  border: 1px solid var(--tp-white);
+  font-size: 1.5rem;
+  line-height: 1.4;
+}
+
+.threadpilot-options label + label span {
+  border-left: 0;
+}
+
+.threadpilot-options input:checked + span {
+  background: var(--tp-white);
+  color: var(--tp-black);
+}
+
+.threadpilot-baseline-control input:checked + span {
+  background: var(--tp-magenta);
+  border-color: var(--tp-magenta);
+}
+
+.threadpilot-options input:focus-visible + span {
+  outline: 2px solid var(--tp-cyan);
+  outline-offset: 4px;
+  z-index: 1;
+}
+
+.threadpilot .threadpilot-control-hint {
+  margin: 0.8rem 0 0;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.threadpilot .threadpilot-scenario-insight {
+  margin: 2.4rem 0;
+  min-height: 3.6em;
+}
+
+.threadpilot-scenario-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+  margin: 0 0 2.4rem;
+}
+
+.threadpilot-scenario-metrics dt {
+  font-size: 1.2rem;
+}
+
+.threadpilot-scenario-metrics dd {
+  margin: 0.4rem 0;
+  color: var(--tp-cyan);
+  font-size: clamp(1.6rem, 2.2vw, 2.4rem);
+  line-height: 1.4;
+}
+
+.threadpilot-scenario-metrics small {
+  display: block;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.threadpilot-scenario-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 2.4rem;
+  margin-bottom: 1.6rem;
+  font-size: 1.2rem;
+}
+
+.threadpilot-scenario-charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+}
+
+.threadpilot-scenario-charts figure {
+  min-width: 0;
+  margin: 0;
+}
+
+.threadpilot-scenario-charts figure:first-child {
+  grid-column: 1 / -1;
+}
+
+.threadpilot-scenario-charts figcaption {
+  margin-bottom: 0.8rem;
+  font-size: 1.3rem;
+  line-height: 1.6;
+}
+
+.threadpilot-scenario-charts figcaption span {
+  display: block;
+  font-size: 1.1rem;
+}
+
+.threadpilot-scenario-chart {
+  display: block;
+  width: 100%;
+  height: 20rem;
+  image-rendering: pixelated;
+}
+
+.threadpilot .threadpilot-scenario-method,
+.threadpilot-scenario-reference {
+  margin: 2rem 0 0;
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.threadpilot-scenario-reference summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--tp-cyan);
+}
+
+.threadpilot-scenario-reference summary:focus-visible {
+  outline: 2px solid var(--tp-magenta);
+  outline-offset: 4px;
+}
+
+.threadpilot-scenario-reference p {
+  margin: 1rem 0;
+}
+
+@media (max-width: 640px) {
+  .threadpilot-scenario-controls,
+  .threadpilot-scenario-charts {
+    grid-template-columns: 1fr;
+  }
+
+  .threadpilot-scenario-metrics {
+    grid-template-columns: 1fr;
+    gap: 1.6rem;
+  }
+
+  .threadpilot-scenario-metrics > div {
+    padding-left: 1.2rem;
+    border-left: 1px solid var(--tp-cyan);
+  }
+
+  .threadpilot-scenario-metrics dd {
+    font-size: 2rem;
+  }
 }
 
 .threadpilot-page .threadpilot-positioned-heading {

@@ -60,6 +60,7 @@ stylesheet: /assets/css/threadpilot.css
       <figcaption id="threadpilot-benchmark-description">
         <span class="threadpilot-chart-adaptive">Threadpilot</span>
         <span class="threadpilot-chart-static">Static concurrency</span>
+        <span>Conceptual illustration</span>
       </figcaption>
     </figure>
   </section>
@@ -116,56 +117,26 @@ threads ???, ???</code></pre>
   <div class="row">
     <div class="column">
       <h3>Too few threads? You're wasting money.</h3>
-
-      <p>
-        More threads allow CRuby processes to do more waiting in parallel. If your workload spends any significant portion of it's time waiting on I/O, you'll easily be able to save a lot on memory usage by using more threads per process.
-      </p>
-
-      <p>
-        For a workload which spends 25% of it's time waiting on I/O, a Sidekiq process with 5 threads will perform X% more jobs per second than a single-threaded Solid Queue process in <code>fork</code> mode.
-      </p>
-
-      INSERT BENCHMARK RESULT HERE
-
-      <p>
-        The reason for this is quite simple: when the job waits on I/O, Sidekiq can pick up a different job and work on it while it waits for the I/O to finish. It's multi-tasking!
-      </p>
-
-      INSERT GANTT CHART SHOWING 5 THREADS SHARING GVL, DOING IO HERE
-
-      <p>
-        A Sidekiq process with 5 threads will use slightly more memory than a single-threaded Solid Queue process. However, in terms of <b>job throughput per GB of memory</b>, it does much better:
-      </p>
-
-      INSERT BENCHMARK RESULT: GIVEN ONE CPU CORE, SIDEKIQ W 5 THREADS VS SINGLE THREADED, MEMORY USAGE, JOBS/SEC AT 25% IO, WHAT IS JOB/SEC/GB?
-
-      <p>
-        This effect can become extremely pronounced when I/O dominates the workload. Imagine a workload of jobs which talk to upstream AI chat completion APIs over HTTP. This could easily be a 95% I/O job: wait for 19 seconds, then run Ruby for 1 second after you get a response. In that case, our Sidekiq process really gets crazy:
-      </p>
-
-      INSERT BENCHMARK RESULT
-
-      <p>
-        <b>If you shoot too low with your thread numbers, you are wasting money</b>. You are buying extra memory you don't need. I don't like wasting money, do you?
-      </p>
+      <p>When a request waits on the database or an upstream API, another thread can do useful work. Too few threads leave that opportunity unused. Threadpilot can add concurrency instead of leaving requests waiting for a free thread.</p>
+      <p>You don't need to know your exact I/O percentage to explore this. Pick the thread count you run today, then change the workload. The same baseline follows you through all three illustrations.</p>
+      {% include threadpilot_scenario.html kind="high" title="Too few threads" %}
     </div>
   </div>
 
   <div class="row">
     <div class="column">
-      <h3>Too many threads? Your app is slow, fragile and memory-bloated.</h3>
-
-
+      <h3>Too many threads? More isn't always better.</h3>
+      <p>When Ruby CPU work dominates, extra threads compete for the same GVL. A larger pool can add processing latency without adding throughput. Threadpilot can shrink the pool while keeping useful work moving.</p>
+      {% include threadpilot_scenario.html kind="low" title="Too many threads" %}
     </div>
   </div>
 
   <div class="row">
     <div class="column">
-      <h3>A single, static number can be 10x slower than the right one.</h3>
-      <p>If you choose a thread count that's too high, you'll end up with higher memory usage, higher database connection counts, and higher tail latencies at the p95 and up. With thread counts that are too high for the workload, you consume too many resources for the throughput you get in return, and you'll even make your app slower to boot.</p>
-      <p>But, if you choose a number that's too low, you leave throughput on the table. Particularly for workloads where the % of time spent waiting on I/O is extremely high (90% or more), you might be able to process 10x as many transactions per second with the correct setting.</p>
-      <p>The optimal number of threads varies from moment to moment as the workload and resource constraints change. If your only option is to set a static number before deploying the application, your workload will eventually shift and you're de-optimized again. It's futile to use static config to solve a dynamic problem.</p>
-      <p>So: you can either light money on fire by buying more servers than you need to, or risk swapping as your memory doubles and tail latencies jump hundreds of milliseconds. Great.</p>
+      <h3>Your workload changes. A static number doesn't.</h3>
+      <p>Maybe you picked the right number today. What happens tomorrow, when a batch of CPU-heavy jobs is followed by jobs waiting on HTTP requests?</p>
+      <p>A fixed pool has to live with that tradeoff. Threadpilot follows the workload. Compare small and large pools below: a throughput tie can still come with a processing-latency difference.</p>
+      {% include threadpilot_scenario.html kind="changing" title="Changing workloads" %}
     </div>
   </div>
 
@@ -268,306 +239,6 @@ threads ???, ???</code></pre>
     </div>
   </div>
 
-  <div class="sales-testimonials">
-    <div class="row">
-      <div class="column">
-        <h3 class="threadpilot-chart-heading">Benchmark: Mixed Puma Workload Over 60 Minutes</h3>
-        <p class="threadpilot-chart-note">
-          Synthetic benchmark: alternating CPU-heavy and IO-heavy request phases. 8-core VM, PostgreSQL, Redis, 4 Puma workers.
-        </p>
-      </div>
-    </div>
-    <div class="row threadpilot-chart-row">
-      <div class="column">
-        <div style="position:relative;">
-          <canvas id="chart-threads" class="threadpilot-chart"></canvas>
-          <div class="threadpilot-chart-caption">
-            <strong>Thread count over time</strong> —
-            <span class="threadpilot-chart-static">Static (5 threads)</span> vs
-            <span class="threadpilot-chart-adaptive">Threadpilot (adaptive)</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row threadpilot-chart-row">
-      <div class="column">
-        <div style="position:relative;">
-          <canvas id="chart-latency" class="threadpilot-chart"></canvas>
-          <div class="threadpilot-chart-caption">
-            <strong>p99 latency (ms)</strong> —
-            <span class="threadpilot-chart-static">Static</span> vs
-            <span class="threadpilot-chart-adaptive">Threadpilot</span>.
-            Lower is better.
-          </div>
-        </div>
-      </div>
-      <div class="column">
-        <div style="position:relative;">
-          <canvas id="chart-throughput" class="threadpilot-chart"></canvas>
-          <div class="threadpilot-chart-caption">
-            <strong>Throughput (req/s)</strong> —
-            <span class="threadpilot-chart-static">Static</span> vs
-            <span class="threadpilot-chart-adaptive">Threadpilot</span>.
-            Higher is better.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-  (function() {
-    // Seeded PRNG for reproducible "data"
-    function mulberry32(a) {
-      return function() {
-        a |= 0; a = a + 0x6D2B79F5 | 0;
-        var t = Math.imul(a ^ a >>> 15, 1 | a);
-        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-        return ((t ^ t >>> 14) >>> 0) / 4294967296;
-      }
-    }
-
-    var DPR = window.devicePixelRatio || 1;
-
-    function setupCanvas(id, entry) {
-      var c = document.getElementById(id);
-      DPR = window.devicePixelRatio || 1;
-      var rect = c.getBoundingClientRect();
-      var box = entry && entry.devicePixelContentBoxSize && entry.devicePixelContentBoxSize[0];
-      var content = entry ? entry.contentRect : rect;
-      var w = Math.max(1, Math.round(content.width * DPR));
-      var h = Math.max(1, Math.round(content.height * DPR));
-      if (box && Math.abs(box.inlineSize - w) <= 1 && Math.abs(box.blockSize - h) <= 1) {
-        w = box.inlineSize;
-        h = box.blockSize;
-      }
-      c.width = w;
-      c.height = h;
-      c.style.width = w / DPR + 'px';
-      c.style.height = h / DPR + 'px';
-      alignCanvas(c);
-      var ctx = c.getContext('2d');
-      ctx.imageSmoothingEnabled = false;
-      return { ctx: ctx, w: w, h: h };
-    }
-
-    function alignCanvas(c) {
-      c.style.transform = 'none';
-      var snapped = c.getBoundingClientRect();
-      var x = snapped.left + window.scrollX;
-      var y = snapped.top + window.scrollY;
-      var offsetX = Math.round(x * DPR) / DPR - x;
-      var offsetY = Math.round(y * DPR) / DPR - y;
-      c.style.transformOrigin = '0 0';
-      c.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + c.width / DPR / snapped.width + ', ' + c.height / DPR / snapped.height + ')';
-    }
-
-    function drawLabel(ctx, text, x, y) {
-      var raster = document.createElement("canvas");
-      var ink = raster.getContext("2d");
-      ink.font = ctx.font;
-      ink.textAlign = ctx.textAlign;
-      ink.textBaseline = ctx.textBaseline;
-      var metrics = ink.measureText(String(text));
-      var left = Math.floor(-metrics.actualBoundingBoxLeft) - 1;
-      var top = Math.floor(-metrics.actualBoundingBoxAscent) - 1;
-      raster.width = Math.max(1, Math.ceil(metrics.actualBoundingBoxRight) - left + 1);
-      raster.height = Math.max(1, Math.ceil(metrics.actualBoundingBoxDescent) - top + 1);
-      ink.font = ctx.font;
-      ink.textAlign = ctx.textAlign;
-      ink.textBaseline = ctx.textBaseline;
-      ink.fillText(String(text), -left, -top);
-      var pixels = ink.getImageData(0, 0, raster.width, raster.height).data;
-      for (var row = 0; row < raster.height; row += 1) {
-        for (var column = 0; column < raster.width; column += 1) {
-          if (pixels[(row * raster.width + column) * 4 + 3] >= 128) {
-            ctx.fillRect(Math.round(x) + left + column, Math.round(y) + top + row, 1, 1);
-          }
-        }
-      }
-    }
-
-    // Draw a single device pixel at (x, y)
-    function px(ctx, x, y, color) {
-      ctx.fillStyle = color;
-      ctx.fillRect(x, y, 1, 1);
-    }
-
-    // Draw a line of single pixels using Bresenham's
-    function line(ctx, x0, y0, x1, y1, color) {
-      x0 = Math.round(x0); y0 = Math.round(y0);
-      x1 = Math.round(x1); y1 = Math.round(y1);
-      var dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-      var dy = -Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-      var err = dx + dy, e2;
-      while (true) {
-        px(ctx, x0, y0, color);
-        if (x0 === x1 && y0 === y1) break;
-        e2 = 2 * err;
-        if (e2 >= dy) { err += dy; x0 += sx; }
-        if (e2 <= dx) { err += dx; y0 += sy; }
-      }
-    }
-
-    // Map value to pixel coordinate
-    function mapY(val, min, max, h, pad) {
-      return Math.round(pad + (1 - (val - min) / (max - min)) * (h - pad * 2));
-    }
-
-    function mapX(i, n, w, pad) {
-      return Math.round(pad + (i / (n - 1)) * (w - pad * 2));
-    }
-
-    // Draw axes (single-pixel lines)
-    function drawAxes(ctx, w, h, pad, yMin, yMax, yTicks, xLabel) {
-      // Y axis
-      line(ctx, pad, pad, pad, h - pad, '#fff');
-      // X axis
-      line(ctx, pad, h - pad, w - pad, h - pad, '#fff');
-      // Y tick marks and labels
-      ctx.fillStyle = '#fff';
-      var fontSize = Math.max(9, Math.round(10 * DPR));
-      ctx.font = fontSize + 'px monospace';
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      for (var t = 0; t < yTicks.length; t++) {
-        var y = mapY(yTicks[t], yMin, yMax, h, pad);
-        line(ctx, pad - 3, y, pad, y, '#fff');
-        drawLabel(ctx, yTicks[t], pad - 5, y);
-      }
-      // X axis labels
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      var xLabels = ['0m', '15m', '30m', '45m', '60m'];
-      for (var i = 0; i < xLabels.length; i++) {
-        var x = mapX(i * (3600 / 4) , 3600, w, pad);
-        line(ctx, x, h - pad, x, h - pad + 3, '#fff');
-        drawLabel(ctx, xLabels[i], x, h - pad + 5);
-      }
-    }
-
-    // Plot a data series as individual device pixels
-    function plotSeries(ctx, data, w, h, pad, yMin, yMax, color) {
-      for (var i = 0; i < data.length; i++) {
-        var x = mapX(i, data.length, w, pad);
-        var y = mapY(data[i], yMin, yMax, h, pad);
-        px(ctx, x, y, color);
-      }
-    }
-
-    // Connect data with single-pixel Bresenham lines
-    function plotLine(ctx, data, w, h, pad, yMin, yMax, color) {
-      for (var i = 1; i < data.length; i++) {
-        var x0 = mapX(i - 1, data.length, w, pad);
-        var y0 = mapY(data[i - 1], yMin, yMax, h, pad);
-        var x1 = mapX(i, data.length, w, pad);
-        var y1 = mapY(data[i], yMin, yMax, h, pad);
-        line(ctx, x0, y0, x1, y1, color);
-      }
-    }
-
-    // Generate data: 3600 points (1 per second over 60 min)
-    var N = 3600;
-    var rng = mulberry32(42);
-
-    // Workload phases: alternate CPU-heavy and IO-heavy
-    function ioRatio(t) {
-      // Smooth transitions between phases
-      var phase = Math.sin(t / 600 * Math.PI) * 0.5 + 0.5; // 0=CPU, 1=IO
-      // Add some mid-frequency variation
-      phase += Math.sin(t / 120 * Math.PI) * 0.15;
-      return Math.max(0.1, Math.min(0.95, phase));
-    }
-
-    // Threadpilot thread count: adapts to IO ratio
-    var tpThreads = [];
-    var staticThreads = [];
-    var tpLatency = [];
-    var staticLatency = [];
-    var tpThroughput = [];
-    var staticThroughput = [];
-
-    var currentThreads = 5;
-    for (var i = 0; i < N; i++) {
-      var io = ioRatio(i);
-      var noise = (rng() - 0.5) * 0.6;
-
-      // Threadpilot: smoothly tracks optimal = ceil(1 / (1 - io))
-      var optimal = Math.min(25, Math.max(1, Math.ceil(1 / (1.001 - io))));
-      // Exponential moving average with jitter
-      currentThreads += (optimal - currentThreads) * 0.02 + noise * 0.3;
-      currentThreads = Math.max(1, Math.min(25, currentThreads));
-      tpThreads.push(currentThreads);
-      staticThreads.push(5);
-
-      // Latency model: CPU-bound phases with too many threads = GVL contention
-      var staticContention = Math.max(0, 5 - optimal) * 18;
-      var tpContention = Math.max(0, currentThreads - optimal) * 3;
-      var baseLatency = 40 + (1 - io) * 60; // CPU work component
-      staticLatency.push(baseLatency + staticContention + rng() * 25);
-      tpLatency.push(baseLatency + tpContention + rng() * 15);
-
-      // Throughput model: IO-bound phases benefit from more threads
-      var staticTP = 200 + Math.min(5, optimal) / optimal * io * 400;
-      var tpTP = 200 + Math.min(currentThreads, optimal) / Math.max(1, optimal) * io * 400;
-      staticThroughput.push(staticTP + rng() * 30);
-      tpThroughput.push(tpTP + rng() * 20);
-    }
-
-    var PAD_RATIO = 0.18;
-
-    function drawChart(id, staticData, tpData, yMin, yMax, yTicks, entry) {
-      var s = setupCanvas(id, entry);
-      var pad = Math.round(s.w * PAD_RATIO * 0.3);
-      // Background
-      s.ctx.fillStyle = '#000';
-      s.ctx.fillRect(0, 0, s.w, s.h);
-
-      // Gridlines
-      for (var t = 0; t < yTicks.length; t++) {
-        var y = mapY(yTicks[t], yMin, yMax, s.h, pad);
-        for (var x = pad + 2; x < s.w - pad; x += 6) {
-          px(s.ctx, x, y, '#fff');
-        }
-      }
-
-      drawAxes(s.ctx, s.w, s.h, pad, yMin, yMax, yTicks);
-
-      // Plot both series as individual data points (every point = 1 device pixel)
-      plotSeries(s.ctx, staticData, s.w, s.h, pad, yMin, yMax, '#ff55ff');
-      plotSeries(s.ctx, tpData, s.w, s.h, pad, yMin, yMax, '#55ffff');
-    }
-
-    function observeChart(id, staticData, tpData, yMin, yMax, yTicks) {
-      var c = document.getElementById(id);
-      drawChart(id, staticData, tpData, yMin, yMax, yTicks);
-      new ResizeObserver(function(entries) {
-        drawChart(id, staticData, tpData, yMin, yMax, yTicks, entries[0]);
-      }).observe(c);
-      new ResizeObserver(function() {
-        requestAnimationFrame(function() { alignCanvas(c); });
-      }).observe(document.body);
-      document.fonts.ready.then(function() {
-        requestAnimationFrame(function() {
-          drawChart(id, staticData, tpData, yMin, yMax, yTicks);
-        });
-      });
-      var containerWidth;
-      new ResizeObserver(function(entries) {
-        var width = entries[0].contentRect.width;
-        if (width === containerWidth) return;
-        containerWidth = width;
-        c.style.width = '';
-        c.style.height = '';
-      }).observe(c.parentElement);
-    }
-
-    observeChart('chart-threads', staticThreads, tpThreads, 0, 28, [0, 5, 10, 15, 20, 25]);
-    observeChart('chart-latency', staticLatency, tpLatency, 0, 250, [0, 50, 100, 150, 200, 250]);
-    observeChart('chart-throughput', staticThroughput, tpThroughput, 100, 700, [100, 200, 300, 400, 500, 600, 700]);
-  })();
-  </script>
-
   {% include threadpilot_pricing_comparison.html heading="Pricing" %}
 
   <div class="row">
@@ -628,6 +299,7 @@ threads ???, ???</code></pre>
 
   {% include threadpilot_pricing_comparison.html heading="Stop guessing. Start tuning." %}
   <script src="/assets/js/threadpilot_benchmark.js" defer></script>
+  <script src="/assets/js/threadpilot_scenarios.js" defer></script>
   <script src="/assets/js/threadpilot_headings.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.1/dist/embed.global.js" defer data-auto-init></script>
 
