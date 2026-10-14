@@ -7,8 +7,11 @@ class MarkdownTest < Minitest::Test
   BLOG = "/blog/the-complete-guide-to-rails-caching"
   ALIASES = {
     "/" => %w[/index.md /.md /index.html.md],
-    "/retainer.html" => %w[/retainer.md /retainer.html.md],
-    "#{BLOG}/" => ["#{BLOG}.md", "#{BLOG}/index.md", "#{BLOG}/.md", "#{BLOG}/index.html.md"]
+    "/retainer.html" => %w[/retainer.md /retainer.html.md /retainer/index.md /retainer/index.html.md /retainer/.md],
+    "#{BLOG}/" => ["#{BLOG}.md", "#{BLOG}/index.md", "#{BLOG}/.md", "#{BLOG}/index.html.md", "/2015/07/15/the-complete-guide-to-rails-caching.md", "/2015/07/15/the-complete-guide-to-rails-caching.html.md"],
+    "/archives/tune.html" => %w[/tune.md /tune.html.md /tune/index.md /tune/index.html.md /tune/.md],
+    "/archives/rails-performance-workshop.html" => %w[/rails-performance-workshop.md /rails-performance-workshop.html.md /rails-performance-workshop/index.md /rails-performance-workshop/index.html.md /rails-performance-workshop/.md],
+    "/archives/vertical_debug.html" => %w[/vertical_debug.md /vertical_debug.html.md /vertical_debug/index.md /vertical_debug/index.html.md /vertical_debug/.md]
   }.freeze
 
   def request(path, headers = {}, head: false)
