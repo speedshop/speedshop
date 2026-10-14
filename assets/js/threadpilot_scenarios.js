@@ -1,6 +1,16 @@
-(() => {
+(async () => {
   const sections = [...document.querySelectorAll("[data-scenario]")];
   if (!sections.length) return;
+
+  let measurements = {};
+  try {
+    const response = await fetch("/assets/data/threadpilot_scenarios.json");
+    if (!response.ok) throw new Error(`Benchmark data: HTTP ${response.status}`);
+    measurements = (await response.json()).scenarios;
+  } catch (error) {
+    console.warn("Measured benchmark data unavailable; showing labeled estimates.", error);
+  }
+  if (!sections.every((section) => section.isConnected)) return;
 
   let baseline = 5;
   let frame;
@@ -41,7 +51,9 @@
 
   function scenario(kind) {
     const changing = kind === "changing";
-    const duration = changing ? 720 : 120;
+    const recording = measurements[kind]?.io === workloads[kind] ? measurements[kind] : null;
+    const duration = recording ? Math.ceil(recording.runs.adaptive.duration) : changing ? 720 : 120;
+    const ioBands = changing ? recording?.ioBands || [[180, 360], [540, 720]] : [];
     const service = kind === "high" ? 250 : 100;
     const adaptive = { threads: [], throughput: [], latency: [] };
     const fixed = { threads: [], throughput: [], latency: [] };
@@ -50,18 +62,18 @@
     let threads = 5;
 
     for (let second = 0; second <= duration; second += 1) {
-      const io = (changing && Math.floor(Math.min(second, duration - 1) / 180) % 2 === 0 ? 10 : workloads[kind]) / 100;
+      const io = (changing && !ioBands.some(([start, end]) => second >= start && second < end) ? 10 : workloads[kind]) / 100;
       threads += (poolFor(io) - threads) * 0.075;
       const tuned = point(threads, io, service);
       const staticPoint = point(baseline, io, service);
       const variation = 1 + Math.sin(second * 0.37) * 0.012;
       tuned.throughput *= variation;
       staticPoint.throughput *= variation;
-      adaptive.threads.push(threads);
-      fixed.threads.push(baseline);
+      adaptive.threads.push([second, threads]);
+      fixed.threads.push([second, baseline]);
       for (const [series, sample] of [[adaptive, tuned], [fixed, staticPoint]]) {
-        series.throughput.push(sample.throughput);
-        series.latency.push(kind === "high" ? sample.queueing : sample.processing * 2.4);
+        series.throughput.push([second, sample.throughput]);
+        series.latency.push([second, kind === "high" ? sample.queueing : sample.processing * 2.4]);
       }
       adaptiveSamples.push(tuned);
       fixedSamples.push(staticPoint);
@@ -69,10 +81,12 @@
 
     const tunedSummary = changing ? adaptiveSamples : adaptiveSamples.slice(-60);
     const fixedSummary = changing ? fixedSamples : fixedSamples.slice(-60);
-    return {
+    const data = {
       adaptive,
       fixed,
       duration,
+      ioBands,
+      measured: { adaptive: false, fixed: false },
       throughput: {
         adaptive: mean(tunedSummary.map((sample) => sample.throughput)),
         fixed: mean(fixedSummary.map((sample) => sample.throughput)),
@@ -84,6 +98,17 @@
         }
         : { adaptive: tailLatency(tunedSummary), fixed: tailLatency(fixedSummary) },
     };
+    if (recording) {
+      for (const [name, run] of [["adaptive", recording.runs.adaptive], ["fixed", recording.runs[baseline]]]) {
+        if (!run) continue;
+        data[name] = run;
+        data.measured[name] = true;
+        data.throughput[name] = run.summary.throughput;
+        data.latency[name] = run.summary.latency;
+      }
+      data.duration = Math.max(recording.runs.adaptive.duration, recording.runs[baseline]?.duration || duration);
+    }
+    return data;
   }
 
   function latencyComparison(adaptive, fixed, noun) {
@@ -99,6 +124,7 @@
     results.set(section, data);
     section.dataset.baseline = baseline;
     section.dataset.workload = workloads[kind];
+    section.dataset.source = data.measured.fixed ? "measured" : data.measured.adaptive ? "mixed" : "estimated";
     section.querySelectorAll("[data-baseline]").forEach((input) => {
       input.checked = Number(input.value) === baseline;
     });
@@ -106,13 +132,20 @@
     const throughputGain = data.throughput.adaptive / data.throughput.fixed - 1;
     const capacity = (1 - data.throughput.fixed / data.throughput.adaptive) * 100;
     const units = kind === "high" ? "requests/s" : "jobs/s";
-    write("[data-baseline-label]", `Fixed · ${baseline} ${baseline === 1 ? "thread" : "threads"}`);
+    const measured = data.measured.adaptive && data.measured.fixed;
+    write("[data-adaptive-label]", `Threadpilot · ${data.measured.adaptive ? "measured" : "estimated"}`);
+    write("[data-baseline-label]", `Fixed · ${baseline} ${baseline === 1 ? "thread" : "threads"} · ${data.measured.fixed ? "measured" : "estimated"}`);
+    write("[data-throughput-heading]", `${measured ? "Measured" : "Estimated"} throughput`);
+    write("[data-latency-heading]", `${measured ? "Measured" : "Estimated"} ${kind === "high" ? "request queueing" : "processing p99"}${measured && kind === "high" ? " (median)" : ""}`);
+    write("[data-latency-label]", kind === "high" ? `Request queueing${measured ? " (median)" : ""}` : "Processing p99");
+    write("[data-latency-axis]", `Milliseconds${measured ? " · 10-second windows" : ""} · lower is better`);
+    write("[data-thread-axis]", kind === "changing" ? data.measured.adaptive ? "Threadpilot's workload phases" : "Following the workload" : "Finding a smaller or larger pool");
     write("[data-throughput-claim]", `${(data.throughput.adaptive / data.throughput.fixed).toFixed(1)}x`);
     write("[data-throughput-detail]", `${format(data.throughput.adaptive)} vs ${format(data.throughput.fixed)} ${units}`);
     write("[data-latency-claim]", latencyComparison(data.latency.adaptive, data.latency.fixed, kind === "high" ? "queueing" : "latency"));
     write("[data-latency-detail]", `${format(data.latency.adaptive)} vs ${format(data.latency.fixed)} ms`);
     write("[data-capacity-claim]", Math.abs(capacity) < 1 ? "Similar resources" : `${format(Math.abs(capacity))}% ${capacity > 0 ? "less" : "more"}`);
-    write("[data-capacity-detail]", `${kind === "high" ? "Puma" : "Sidekiq"} process count for same load`);
+    write("[data-capacity-detail]", `Estimated ${kind === "high" ? "Puma" : "Sidekiq"} process count for same load`);
 
     let insight;
     if (kind === "changing") {
@@ -200,15 +233,15 @@
     const key = canvas.dataset.chart;
     const tuned = data.adaptive[key];
     const fixed = data.fixed[key];
-    const peak = Math.max(1, ...tuned, ...fixed) * 1.15;
+    const peak = Math.max(1, ...tuned.map((point) => point[1]), ...fixed.map((point) => point[1])) * 1.15;
     const max = key === "threads" ? Math.ceil(peak / 15) * 15 : peak;
-    const left = Math.round(48 * dpr);
+    ctx.font = `${Math.round(10 * dpr)}px ui-monospace, monospace`;
+    const left = Math.max(Math.round(48 * dpr), Math.ceil(ctx.measureText(format(max)).width + 12 * dpr));
     const right = canvas.width - Math.round(16 * dpr);
     const top = Math.round(28 * dpr);
     const bottom = canvas.height - Math.round(28 * dpr);
-    const x = (index) => left + index / (tuned.length - 1) * (right - left);
+    const x = (second) => left + second / data.duration * (right - left);
     const y = (value) => bottom - value / max * (bottom - top);
-    ctx.font = `${Math.round(10 * dpr)}px ui-monospace, monospace`;
     ctx.fillStyle = "#fff";
     ctx.textAlign = "right";
     ctx.textBaseline = "middle";
@@ -223,26 +256,28 @@
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     for (let tick = 0; tick <= 4; tick += 1) {
-      label(ctx, `${data.duration * tick / 240}m`, left + (right - left) * tick / 4, bottom + Math.round(8 * dpr));
+      label(ctx, `${format(data.duration * tick / 240)}m`, left + (right - left) * tick / 4, bottom + Math.round(8 * dpr));
     }
     if (kind === "changing") {
       ctx.textBaseline = "top";
-      for (let phase = 0; phase < 4; phase += 1) {
-        const center = left + (right - left) * (phase + 0.5) / 4;
-        label(ctx, phase % 2 === 0 ? "CPU" : "I/O", center, 0);
-        if (phase) {
-          const column = Math.round(left + (right - left) * phase / 4);
-          for (let row = top; row < bottom; row += 8) ctx.fillRect(column, row, 1, 1);
-        }
+      const end = data.measured.adaptive ? data.adaptive.duration : data.duration;
+      const boundaries = [...new Set([0, ...data.ioBands.flat(), end])].filter((second) => second <= end).sort((a, b) => a - b);
+      for (let phase = 1; phase < boundaries.length; phase += 1) {
+        const center = (boundaries[phase - 1] + boundaries[phase]) / 2;
+        const ioHeavy = data.ioBands.some(([start, stop]) => center >= start && center < stop);
+        if (x(boundaries[phase]) - x(boundaries[phase - 1]) > 26 * dpr) label(ctx, ioHeavy ? "I/O" : "CPU", x(center), 0);
+        const column = Math.round(x(boundaries[phase]));
+        for (let row = top; row < bottom; row += 8) ctx.fillRect(column, row, 1, 1);
       }
     }
     for (const [series, color, dashed] of [[tuned, "#55ffff", false], [fixed, "#ff55ff", true]]) {
       for (let index = 1; index < series.length; index += 1) {
-        line(ctx, x(index - 1), y(series[index - 1]), x(index), y(series[index]), color, dashed);
+        line(ctx, x(series[index - 1][0]), y(series[index - 1][1]), x(series[index][0]), y(series[index][1]), color, dashed);
       }
     }
     const name = key === "threads" ? "thread count" : key === "throughput" ? "throughput" : kind === "high" ? "request queueing" : "processing p99";
-    canvas.setAttribute("aria-label", `Illustrative ${name}: Threadpilot versus ${baseline} fixed threads at ${workloads[kind]}% I/O${kind === "changing" ? ", alternating with 10% I/O" : ""}. Estimates, not measured results.`);
+    const source = data.measured.fixed ? "Measured comparison" : data.measured.adaptive ? "Measured Threadpilot; estimated fixed baseline" : "Estimates, not measured results";
+    canvas.setAttribute("aria-label", `${name}: Threadpilot versus ${baseline} fixed threads at ${workloads[kind]}% I/O${kind === "changing" ? ", alternating with 10% I/O" : ""}. ${source}.${data.measured.fixed && key === "latency" ? ` Ten-second ${kind === "high" ? "median queueing" : "processing p99"} windows.` : ""}`);
     align(canvas);
   }
 

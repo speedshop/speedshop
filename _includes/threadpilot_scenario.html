@@ -1,4 +1,4 @@
-<section class="threadpilot-scenario" id="benchmark-{{ include.kind }}" data-scenario="{{ include.kind }}" aria-label="{{ include.title }} illustration">
+<section class="threadpilot-scenario" id="benchmark-{{ include.kind }}" data-scenario="{{ include.kind }}" aria-label="{{ include.title }} comparison">
   <div class="threadpilot-scenario-controls">
     <fieldset class="threadpilot-baseline-control">
       <legend>Your fixed thread count</legend>
@@ -23,18 +23,18 @@
   <div class="threadpilot-scenario-result" role="status" aria-live="polite" aria-atomic="true">
     <p class="threadpilot-scenario-insight" data-insight></p>
     <dl class="threadpilot-scenario-metrics">
-      <div><dt>Estimated throughput</dt><dd data-throughput-claim></dd><small data-throughput-detail></small></div>
-      <div><dt>{% if include.kind == "high" %}Estimated request queueing{% else %}Estimated processing p99{% endif %}</dt><dd data-latency-claim></dd><small data-latency-detail></small></div>
+      <div><dt data-throughput-heading>Throughput</dt><dd data-throughput-claim></dd><small data-throughput-detail></small></div>
+      <div><dt data-latency-heading>{% if include.kind == "high" %}Request queueing{% else %}Processing p99{% endif %}</dt><dd data-latency-claim></dd><small data-latency-detail></small></div>
       <div><dt>Server resources</dt><dd data-capacity-claim></dd><small data-capacity-detail></small></div>
     </dl>
   </div>
   <div class="threadpilot-scenario-legend">
-    <span class="threadpilot-chart-adaptive">Threadpilot · adaptive</span>
+    <span class="threadpilot-chart-adaptive" data-adaptive-label>Threadpilot · adaptive</span>
     <span class="threadpilot-chart-static" data-baseline-label>Fixed · 5 threads</span>
   </div>
   <div class="threadpilot-scenario-charts">
     <figure>
-      <figcaption>Thread count <span>{% if include.kind == "changing" %}Following the workload{% else %}Finding a smaller or larger pool{% endif %}</span></figcaption>
+      <figcaption>Thread count <span data-thread-axis>{% if include.kind == "changing" %}Following the workload{% else %}Finding a smaller or larger pool{% endif %}</span></figcaption>
       <canvas{% if include.kind == "changing" %} id="chart-threads"{% endif %} class="threadpilot-scenario-chart" data-chart="threads" role="img" aria-label="Illustrative thread counts over time"></canvas>
     </figure>
     <figure>
@@ -42,10 +42,10 @@
       <canvas{% if include.kind == "changing" %} id="chart-throughput"{% endif %} class="threadpilot-scenario-chart" data-chart="throughput" role="img" aria-label="Illustrative throughput over time"></canvas>
     </figure>
     <figure>
-      <figcaption>{% if include.kind == "high" %}Request queueing{% else %}Processing p99{% endif %} <span>Milliseconds · lower is better</span></figcaption>
+      <figcaption><b data-latency-label>{% if include.kind == "high" %}Request queueing{% else %}Processing p99{% endif %}</b> <span data-latency-axis>Milliseconds · lower is better</span></figcaption>
       <canvas{% if include.kind == "changing" %} id="chart-latency"{% endif %} class="threadpilot-scenario-chart" data-chart="latency" role="img" aria-label="Illustrative latency over time"></canvas>
     </figure>
   </div>
   <p class="threadpilot-scenario-explainer">ADD EXPLAINER HERE</p>
-  <noscript><p>Enable JavaScript to explore the illustrative comparisons.</p></noscript>
+  <noscript><p>Enable JavaScript to explore the benchmark comparisons.</p></noscript>
 </section>
