@@ -59,8 +59,21 @@
   fill(11, 52, 5, 2);
   fill(16, 52, 4, 2);
   const hand = document.querySelector(".threadpilot-fold-hand");
-  const path = (set, color) => `<path fill="${color}" d="${[...set].map((p) => { const [x, y] = p.split(","); return `M${x} ${y}h1v1h-1z`; }).join("")}"/>`;
-  hand.innerHTML = path(bones, "#fff") + path(joints, "#aaaaaa");
+  const sideways = matchMedia("(max-width: 639px)");
+  function drawHand() {
+    const turn = sideways.matches;
+    const path = (set, color) => `<path fill="${color}" d="${[...set].map((p) => {
+      const [x, y] = p.split(",").map(Number);
+      return turn ? `M${y} ${23 - x}h1v1h-1z` : `M${x} ${y}h1v1h-1z`;
+    }).join("")}"/>`;
+    const [width, height] = turn ? [54, 24] : [24, 54];
+    hand.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    hand.setAttribute("width", width);
+    hand.setAttribute("height", height);
+    hand.innerHTML = path(bones, "#fff") + path(joints, "#aaaaaa");
+  }
+  drawHand();
+  sideways.addEventListener("change", drawHand);
 
   const pilot = document.querySelector(".threadpilot-fold-pilot");
   const tune = document.querySelector(".threadpilot-fold-tune");
@@ -74,17 +87,23 @@
   let lastFrame = performance.now();
 
   function goal(now) {
+    const turn = sideways.matches;
     const bounds = hand.getBoundingClientRect();
-    const tip = { x: bounds.left - offset.x + (bounds.width * 13) / 24, y: bounds.top - offset.y + bounds.width / 24 };
+    const unit = (turn ? bounds.height : bounds.width) / 24;
+    const tip = turn
+      ? { x: bounds.left - offset.x + unit, y: bounds.top - offset.y + unit * 11 }
+      : { x: bounds.left - offset.x + unit * 13, y: bounds.top - offset.y + unit };
     const button = tune.getBoundingClientRect();
     const center = { x: button.left + button.width / 2, y: button.top + button.height / 2 };
     if (now < pressUntil) return { x: center.x - tip.x, y: center.y - tip.y };
     if (pointer) {
       const overButton = pointer.x >= button.left && pointer.x <= button.right && pointer.y >= button.top && pointer.y <= button.bottom;
-      return { x: (overButton ? center.x : pointer.x) - tip.x, y: pointer.y - tip.y };
+      if (!overButton) return { x: pointer.x - tip.x, y: pointer.y - tip.y };
+      return turn ? { x: pointer.x - tip.x, y: center.y - tip.y } : { x: center.x - tip.x, y: pointer.y - tip.y };
     }
     const t = (now - bounceStart) / 700;
-    return { x: 0, y: t < 1 ? -24 * Math.abs(Math.sin(t * 2 * Math.PI)) * (1 - t) : 0 };
+    const lift = t < 1 ? -24 * Math.abs(Math.sin(t * 2 * Math.PI)) * (1 - t) : 0;
+    return turn ? { x: lift, y: 0 } : { x: 0, y: lift };
   }
 
   const bounce = setInterval(() => {

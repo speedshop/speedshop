@@ -151,6 +151,10 @@ body.threadpilot {
   width: calc(84cqw * 2860 / 3715);
 }
 
+.threadpilot-fold-word-tail {
+  display: none;
+}
+
 .threadpilot-fold-pitch {
   display: flex;
   flex-direction: column;
@@ -804,9 +808,164 @@ body.threadpilot {
 }
 
 @media (max-width: 639px) {
-  .threadpilot .threadpilot-page {
+  .threadpilot-fold {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .threadpilot-fold-cell {
+    container-type: inline-size;
+  }
+
+  .threadpilot-fold-word {
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    height: 15svh;
+    min-height: 11.2rem;
+    padding-bottom: 1.6rem;
+  }
+
+  .threadpilot-fold-word-pilot,
+  .threadpilot-fold-bottom-side {
+    display: none;
+  }
+
+  .threadpilot-fold-word svg {
+    width: calc(88cqw * 3715 / 6520);
+  }
+
+  .threadpilot-fold-word-tail {
+    display: block;
+    margin-left: calc(88cqw * -55 / 6520);
+  }
+
+  .threadpilot-fold-word-tail svg {
+    width: calc(88cqw * 2860 / 6520);
+  }
+
+  .threadpilot-fold-pitch {
+    padding: 2rem 6% 2.4rem;
+  }
+
+  .threadpilot .threadpilot-fold-pitch h2 {
+    font-size: 3.2rem;
+  }
+
+  .threadpilot-fold-pitch p {
     font-size: 1.4rem;
   }
+
+  .threadpilot-fold-sim {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    height: max(30rem, calc(85svh - 17.6rem));
+    gap: 1.2rem;
+    padding: 0 6% 2.4rem;
+  }
+
+  .threadpilot-fold-sim-readout dd {
+    font-size: 1.4rem;
+  }
+
+  .threadpilot-fold-lamps {
+    flex-direction: row;
+    height: min(6.4rem, 8svh);
+  }
+
+  .threadpilot-fold-hazard {
+    flex: none;
+    width: 1.2rem;
+    height: auto;
+  }
+
+  .threadpilot-fold-lamp {
+    padding: 0.2rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+  }
+
+  .threadpilot-fold-lamp-master {
+    font-size: 1rem;
+  }
+
+  .threadpilot-fold-lamp-nominal {
+    margin: 0 0 0 0.6rem;
+  }
+
+  .threadpilot-fold-pilot {
+    flex-direction: row;
+    gap: 2.4rem;
+  }
+
+  .threadpilot-fold-tune {
+    width: 55%;
+    height: min(8rem, 10svh);
+    font-size: 3.2rem;
+  }
+
+  .threadpilot-fold-hand {
+    width: 10.8rem;
+    margin: 0;
+  }
+
+  .threadpilot-fold-creators,
+  .threadpilot-fold-logos,
+  .threadpilot-fold-intro {
+    order: 1;
+  }
+
+  .threadpilot-fold-creators,
+  .threadpilot-fold-logos {
+    gap: 2rem;
+    padding: 4rem 6% 0;
+  }
+
+  .threadpilot-fold-creator-list {
+    gap: 2.4rem;
+  }
+
+  .threadpilot-fold-creator img {
+    width: 12.8rem;
+  }
+
+  .threadpilot-fold-logo-grid {
+    gap: 1.6rem;
+  }
+
+  .threadpilot-fold-logo-grid > * {
+    height: 4.8rem;
+  }
+
+  .threadpilot-fold-intro {
+    font-size: 1.4rem;
+  }
+
+  .threadpilot .threadpilot-page {
+    width: auto;
+    font-size: 1.4rem;
+  }
+
+  .threadpilot-split,
+  .threadpilot-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .threadpilot-split-flip > :first-child,
+  .threadpilot-split-flip > :nth-child(2) {
+    grid-area: auto;
+  }
+
+  .threadpilot .threadpilot-pair-heading,
+  .threadpilot-wide,
+  .threadpilot-center {
+    padding-inline: 6%;
+  }
+
+  .threadpilot-center {
+    width: auto;
+  }
+
   .threadpilot .threadpilot-pricing-card-aside {
     align-items: stretch;
   }
