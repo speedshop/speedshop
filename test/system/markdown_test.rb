@@ -75,7 +75,7 @@ class MarkdownTest < Minitest::Test
   end
 
   def test_native_asset_range_and_conditional_range
-    path = "/assets/threadpilot-visual/dist/music.m4a"
+    path = "/assets/files/TuneWikiEdu.pdf"
     metadata = request(path, {}, head: true)
     assert_equal "200", metadata.code
     assert metadata["etag"]

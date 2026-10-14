@@ -5,7 +5,5 @@
 content_types:
   - pattern: "*.txt"
     content_type: "text/plain; charset=utf-8"
-  - pattern: "*.md"
-    content_type: "text/markdown; charset=utf-8"
   - pattern: "*.ics"
     content_type: "text/calendar; charset=utf-8"
