@@ -564,31 +564,90 @@ body.threadpilot {
 .threadpilot .threadpilot-feature-card:nth-child(2) {
   border-top-color: var(--tp-magenta);
 }
-.threadpilot .threadpilot-pricing-card h3 {
-  font-size: 3.2rem;
-  line-height: 1.2;
-  margin-bottom: 2rem;
+.threadpilot-pricing {
+  margin: 8rem 0;
+  scroll-margin-top: 2rem;
 }
+
+.threadpilot-pricing > h2,
+.threadpilot-pricing > p:first-of-type {
+  max-width: 64rem;
+}
+
+.threadpilot-licenses {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 4rem 0 3rem;
+  border-block: 3px double var(--tp-white);
+}
+
+.threadpilot-license {
+  --license: var(--tp-cyan);
+  --license-face: #00aaaa;
+  --license-shade: #005555;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 3rem 6% 3.6rem 0;
+}
+
+.threadpilot-license + .threadpilot-license {
+  --license: var(--tp-magenta);
+  --license-face: var(--tp-purple);
+  --license-shade: #550055;
+  padding-left: 6%;
+  border-left: 1px solid var(--tp-white);
+}
+
+.threadpilot .threadpilot-license h3 {
+  margin: 0;
+  font-size: 3.2rem;
+}
+
 .threadpilot .threadpilot-price {
-  font-family: inherit;
-  font-weight: normal;
-  font-size: 3.2rem;
-  color: var(--tp-white);
+  margin: 1.6rem 0 0.8rem;
+  color: var(--license);
+  font-size: clamp(5.6rem, 7vw, 8.8rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
 }
-.threadpilot .button {
-  background: var(--tp-cyan);
-  color: var(--tp-black);
-  border: 1px solid var(--tp-cyan);
-  font-family: inherit;
-  font-size: 1.5rem;
-  font-weight: normal;
-  letter-spacing: 0;
+
+.threadpilot-license p:not(.threadpilot-price) {
+  margin-bottom: 2.4rem;
 }
-.threadpilot .button:hover,
-.threadpilot .button:focus {
-  background: var(--tp-magenta);
-  border-color: var(--tp-magenta);
-  color: var(--tp-black);
+
+.threadpilot .threadpilot-buy {
+  margin-top: auto;
+  padding: 1.2rem 2.4rem;
+  background: var(--license-face);
+  box-shadow:
+    inset 3px 3px 0 var(--license),
+    inset -3px -3px 0 var(--license-shade),
+    0 0 0 2px #000,
+    0 0 0 3px var(--license);
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.threadpilot .threadpilot-buy:hover {
+  color: #fff;
+}
+
+.threadpilot .threadpilot-buy:active {
+  box-shadow:
+    inset 3px 3px 0 var(--license-shade),
+    inset -3px -3px 0 var(--license),
+    0 0 0 2px #000,
+    0 0 0 3px var(--license);
+}
+
+.threadpilot-pricing-note {
+  margin-bottom: 0.4rem;
+  color: var(--tp-gray);
+  font-size: 1.4rem;
 }
 .threadpilot pre,
 .threadpilot code {
@@ -987,7 +1046,17 @@ body.threadpilot {
     width: auto;
   }
 
-  .threadpilot .threadpilot-pricing-card-aside {
-    align-items: stretch;
+  .threadpilot-licenses {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .threadpilot-license,
+  .threadpilot-license + .threadpilot-license {
+    padding: 2.4rem 0 3rem;
+  }
+
+  .threadpilot-license + .threadpilot-license {
+    border-left: 0;
+    border-top: 1px solid var(--tp-white);
   }
 }

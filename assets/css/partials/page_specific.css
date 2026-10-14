@@ -387,92 +387,11 @@ header {
   }
 }
 
-.threadpilot-button {
-  border-radius: 0;
-  font-size: 2.2rem;
-  line-height: var(--rhythm-main);
-  min-width: 24rem;
-  padding: calc((var(--rhythm-main) - 0.2rem) / 2) 3rem;
-
-  @media screen and (max-width: 639px) {
-    width: 100%;
-    min-width: 0;
-  }
-}
-
-.threadpilot-pricing-section {
-  margin: calc(var(--rhythm-main) * 2) 0;
-}
-
 @media screen and (max-width: 639px) {
   .threadpilot-feature-row {
     gap: var(--rhythm-main);
     margin-bottom: var(--rhythm-main);
   }
-}
-
-.threadpilot-pricing-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--rhythm-main);
-}
-
-.threadpilot-pricing-card {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--rhythm-main);
-  margin-left: 0 !important;
-  padding: calc(var(--rhythm-main) - 0.1rem) !important;
-
-  @media screen and (max-width: 639px) {
-    flex-direction: column;
-  }
-}
-
-.threadpilot-pricing-card-main {
-  flex: 1;
-}
-
-.threadpilot-pricing-card-aside {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  flex: 0 0 24rem;
-
-  @media screen and (max-width: 639px) {
-    align-items: stretch;
-    flex: none;
-    width: 100%;
-  }
-}
-
-.threadpilot-pricing-card h3 {
-  font-size: 2.4rem;
-  line-height: var(--rhythm-main);
-  margin-bottom: 0;
-}
-
-.threadpilot-price {
-  font-family: 'Helvetica Neue', Inter, Roboto, 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
-  font-size: 4rem;
-  font-weight: 700;
-  line-height: calc(var(--rhythm-main) * 2);
-  margin-bottom: var(--rhythm-main);
-  text-align: right;
-
-  @media screen and (max-width: 639px) {
-    text-align: left;
-  }
-}
-
-.threadpilot-pricing-card ul {
-  margin-bottom: 0;
-  padding-left: 2rem;
-}
-
-.threadpilot-card-button {
-  min-width: 0;
-  width: 100%;
 }
 
 .threadpilot-feature-card {
