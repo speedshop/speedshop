@@ -361,15 +361,6 @@ header {
   text-align: center;
 }
 
-.threadpilot-intro-row {
-  padding-top: var(--rhythm-main);
-}
-
-.threadpilot-used-by-row {
-  margin-bottom: 0;
-  padding-bottom: var(--rhythm-main);
-}
-
 .threadpilot-product-row {
   margin-top: var(--rhythm-main);
 }

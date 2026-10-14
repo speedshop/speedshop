@@ -14,6 +14,7 @@ sitemap: false
 <body>
 <section id="stage" aria-label="Threadpilot processed video"><canvas aria-label="Animated ASCII video"></canvas></section>
 <p role="alert" hidden></p>
-<video src="dist/video.mp4" muted loop playsinline preload="none"></video>
+<video muted loop playsinline preload="none"></video>
+<script>document.querySelector("video").src = `scenes/threadpilot-scene-${new URLSearchParams(location.search).get("scene") || "01"}.mp4`;</script>
 </body>
 </html>

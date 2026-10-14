@@ -13,7 +13,7 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
       if (request.url().endsWith("/still.jpg")) stillRequests.push(request);
     });
     await page.goto("/threadpilot.html");
-    const frame = page.frameLocator(".threadpilot-hero-visual");
+    const frame = page.frameLocator(".threadpilot-fold-word iframe").first();
     const canvas = frame.locator("canvas");
     await expect(canvas).toHaveAttribute("data-ready", "true", { timeout: 20000 });
     await expect.poll(async () => Number(await canvas.getAttribute("data-frames"))).toBeGreaterThan(2);
@@ -52,7 +52,7 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     const requests = [];
     page.on("request", request => requests.push(request.url()));
     await page.goto("/threadpilot.html");
-    const frame = page.frameLocator(".threadpilot-hero-visual");
+    const frame = page.frameLocator(".threadpilot-fold-word iframe").first();
     const canvas = frame.locator("canvas");
     await expect(canvas).toHaveAttribute("data-ready", "true");
     await expect(canvas).toHaveAttribute("aria-label", "Static ASCII artwork");
@@ -60,11 +60,14 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     const pixels = await canvas.evaluate(canvas => canvas.toDataURL());
     await page.waitForTimeout(300);
     expect(await canvas.evaluate(canvas => canvas.toDataURL())).toBe(pixels);
+    const widthBefore = await canvas.evaluate(canvas => canvas.width);
     await page.setViewportSize({ width: viewport.width + 20, height: viewport.height });
-    await expect.poll(() => canvas.evaluate(canvas => canvas.width)).toBe(viewport.width + 20);
+    const frameWidth = async () => Math.round((await page.locator(".threadpilot-fold-word iframe").first().boundingBox()).width);
+    await expect.poll(async () => (await canvas.evaluate(canvas => canvas.width)) === await frameWidth()).toBe(true);
+    expect(await canvas.evaluate(canvas => canvas.width)).toBeGreaterThan(widthBefore);
     await expect(frame.locator("video")).toHaveJSProperty("paused", true);
-    expect(requests.filter(url => url.endsWith("/dist/video.mp4"))).toHaveLength(0);
-    expect(requests.filter(url => url.endsWith("/still.jpg"))).toHaveLength(1);
+    expect(requests.filter(url => url.endsWith(".mp4"))).toHaveLength(0);
+    expect(requests.filter(url => url.endsWith("/still.jpg"))).toHaveLength(4);
     await expect(frame.getByRole("button")).toHaveCount(0);
   });
 }

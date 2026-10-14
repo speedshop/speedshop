@@ -12,6 +12,13 @@ body.threadpilot {
   --tp-cyan: #55ffff;
   --tp-magenta: #ff55ff;
   --tp-border: #fff;
+  --tp-yellow: #ffff55;
+  --tp-red: #ff5555;
+  --tp-green: #55ff55;
+  --tp-purple: #aa00aa;
+  --tp-gray: #aaaaaa;
+  --tp-dim: #555555;
+  --threadpilot-fold-row: calc(100svh / 3);
   background: var(--tp-black);
   color: var(--tp-white);
   color-scheme: dark;
@@ -63,49 +70,6 @@ body.threadpilot {
   outline-offset: 5px;
 }
 
-.threadpilot-topbar {
-  padding: 1.4rem 2rem;
-  border-bottom: 1px dotted var(--tp-border);
-  text-align: center;
-  font-size: 1.3rem;
-  line-height: 1.5;
-}
-
-.threadpilot-topbar a {
-  display: inline-block;
-  color: var(--tp-white);
-  vertical-align: middle;
-  line-height: 0;
-}
-
-.threadpilot-topbar svg {
-  display: block;
-  width: 9rem;
-  height: auto;
-  shape-rendering: crispEdges;
-}
-
-.threadpilot .threadpilot-hero {
-  position: relative;
-  display: grid;
-  place-items: center;
-  isolation: isolate;
-  height: 66.667svh;
-  margin: 0;
-  padding: 3rem;
-  overflow: hidden;
-  border-bottom: 0;
-  background: #000;
-}
-
-.threadpilot-hero::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  border-bottom: 1px dotted var(--tp-border);
-  pointer-events: none;
-}
-
 #threadpilot-audio-toggle {
   position: fixed;
   top: 12px;
@@ -139,124 +103,398 @@ body.threadpilot {
   display: none;
 }
 
-.threadpilot-hero-visual {
+.threadpilot-fold {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr);
+  grid-template-rows: var(--threadpilot-fold-row) var(--threadpilot-fold-row) auto;
+}
+
+.threadpilot-fold-cell {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  container-type: size;
+}
+
+.threadpilot-fold-bottom-side {
+  align-self: start;
+  height: var(--threadpilot-fold-row);
+}
+
+.threadpilot-fold-word {
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+
+.threadpilot-fold-word iframe {
   position: absolute;
   inset: 0;
-  z-index: -2;
+  z-index: -1;
   width: 100%;
   height: 100%;
   border: 0;
 }
 
-.threadpilot .threadpilot-hero h1 {
-  pointer-events: none;
+.threadpilot .threadpilot-fold-word h1 {
   margin: 0;
-  font-size: clamp(5rem, 13.5vw, 21rem);
   line-height: 0;
-  letter-spacing: 0;
-  text-align: center;
 }
 
-.threadpilot-hero h1 svg {
+.threadpilot-fold-word svg {
   display: block;
-  width: 3.8em;
-  height: 1.9em;
+  width: 84cqw;
+  pointer-events: none;
+}
+
+.threadpilot-fold-word-pilot svg {
+  width: calc(84cqw * 2860 / 3715);
+}
+
+.threadpilot-fold-pitch {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 6%;
+}
+
+.threadpilot .threadpilot-fold-pitch h2 {
+  margin: 0 0 0.35em;
+  font-size: min(9.2cqw, 25cqh);
+  line-height: 1;
+}
+
+.threadpilot-fold-pitch p {
+  margin: 0;
+  font-size: min(3.3cqw, 8.5cqh);
+  line-height: 1.35;
+}
+
+.threadpilot-fold-inline-wordmark {
+  display: inline-flex;
+  vertical-align: -0.05em;
+}
+
+.threadpilot-fold-inline-wordmark svg {
+  display: block;
+  height: 0.8em;
+  width: calc(0.8em * 3715 / 700);
+}
+
+.threadpilot-fold-inline-wordmark svg + svg {
+  width: calc(0.8em * 2860 / 700);
+  margin-left: calc(0.8em * -55 / 700);
+}
+
+.threadpilot-fold-label {
+  margin: 0;
+  color: var(--tp-gray);
+  font-size: 1.2rem;
+  letter-spacing: 0.15em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.threadpilot-fold-creators {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2.4rem;
+  padding: 0 10%;
+}
+
+.threadpilot-fold-creator-list {
+  display: flex;
+  gap: 3.2rem;
+}
+
+.threadpilot-fold-creator {
+  flex: none;
+  margin: 0;
+}
+
+.threadpilot-fold-creator img {
+  display: block;
+  width: min(32cqw, 48cqh);
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.threadpilot-fold-creator figcaption {
+  margin-top: 1.2rem;
+  font-size: 1.4rem;
+  line-height: 1.4;
+}
+
+.threadpilot-fold-skunkworks {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.threadpilot-fold-skunkworks a {
+  color: var(--tp-white);
+  line-height: 0;
+}
+
+.threadpilot-fold-skunkworks svg {
+  display: block;
+  width: 9rem;
+  height: auto;
+  shape-rendering: crispEdges;
+}
+
+.threadpilot-fold-creator b {
+  display: block;
+  font-weight: normal;
+  color: var(--tp-cyan);
+}
+
+.threadpilot-fold-logos {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2.4rem;
+  padding: 0 10%;
+}
+
+.threadpilot-fold-logo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5cqh 5cqw;
+}
+
+.threadpilot-fold-logo-grid > * {
+  display: grid;
+  place-items: center;
+  height: 11cqh;
+}
+
+.threadpilot-fold-logo-grid img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.threadpilot-fold-logo-placeholder {
+  border: 1px dotted var(--tp-dim);
+  color: var(--tp-dim);
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+}
+
+.threadpilot-fold-sim {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 19% 23%;
+  gap: 1.6rem;
+  padding: 2.4rem 1.6rem;
+  font-size: 1.1rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.threadpilot-fold-sim-window {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  border: 3px double var(--tp-cyan);
+  background: #000;
+}
+
+.threadpilot-fold-sim-window::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(transparent 0 2px, rgb(0 0 0 / 0.35) 2px 3px);
+  pointer-events: none;
+}
+
+.threadpilot-fold-sim-plot {
+  position: relative;
+  min-height: 0;
+  margin: 0.6rem 0.6rem 0;
+  border-left: 1px solid var(--tp-gray);
+  border-bottom: 1px solid var(--tp-gray);
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgb(85 255 255 / 0.18) calc(10% - 1px) 10%),
+    repeating-linear-gradient(transparent 0 calc(20% - 1px), rgb(85 255 255 / 0.18) calc(20% - 1px) 20%);
+}
+
+.threadpilot-fold-sim-plot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   overflow: visible;
+}
+
+.threadpilot-fold-sim-plot polyline {
+  fill: none;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  shape-rendering: crispEdges;
+}
+
+.threadpilot-fold-sim-plot .redline {
+  position: absolute;
+  inset: 12% 0 auto;
+  border-top: 1px dashed var(--tp-red);
+  color: var(--tp-red);
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.threadpilot-fold-sim-readout {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.6rem;
+}
+
+.threadpilot-fold-sim-readout div {
+  border-top: 2px solid currentColor;
+  padding-top: 0.3rem;
+}
+
+.threadpilot-fold-sim-readout dt {
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+}
+
+.threadpilot-fold-sim-readout dd {
+  margin: 0;
+  color: #fff;
+  font-size: 1.6rem;
+  white-space: nowrap;
+}
+
+.threadpilot-fold-p99 { color: var(--tp-magenta); stroke: var(--tp-magenta); }
+.threadpilot-fold-mem { color: var(--tp-yellow); stroke: var(--tp-yellow); }
+.threadpilot-fold-rps { color: var(--tp-cyan); stroke: var(--tp-cyan); }
+.threadpilot-fold-thr { color: #fff; stroke: #fff; }
+
+.threadpilot-fold-lamps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.threadpilot-fold-hazard {
+  height: 1.2rem;
+  background: repeating-linear-gradient(-45deg, var(--tp-yellow) 0 6px, #000 6px 12px);
+}
+
+.threadpilot-fold-lamp {
+  --lamp: var(--tp-yellow);
+  --lamp-off: #aa5500;
+  display: grid;
+  place-items: center;
+  flex: 1;
+  padding: 0.4rem;
+  border: 2px solid var(--lamp);
+  outline: 1px solid var(--lamp);
+  outline-offset: -5px;
+  background: #000;
+  color: var(--lamp);
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-align: center;
+  animation: threadpilot-fold-lamp 0.9s steps(1) infinite;
+}
+
+.threadpilot-fold-lamp-master {
+  --lamp: var(--tp-red);
+  --lamp-off: #aa0000;
+  flex: 1.6;
+  font-size: 1.3rem;
+}
+
+.threadpilot-fold-lamp:nth-child(3) { animation-delay: -0.2s; }
+.threadpilot-fold-lamp:nth-child(4) { animation-delay: -0.6s; }
+.threadpilot-fold-lamp:nth-child(5) { animation-delay: -0.35s; }
+
+.threadpilot-fold-lamp-nominal {
+  --lamp: var(--tp-green);
+  --lamp-off: #00aa00;
+  flex: 1.3;
+  margin-top: 0.6rem;
+  box-shadow: 0 0 1.6rem rgb(85 255 85 / 0.45);
+}
+
+.threadpilot-fold-lamp[data-off] {
+  --lamp: var(--lamp-off);
+  border-color: var(--tp-dim);
+  outline-style: dashed;
+  box-shadow: none;
+  animation: none;
+}
+
+.threadpilot-fold-pilot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 0;
+}
+
+.threadpilot-fold-tune {
+  flex: none;
+  width: 100%;
+  height: 36cqh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--tp-purple);
+  box-shadow:
+    inset 4px 4px 0 var(--tp-magenta),
+    inset -4px -4px 0 #550055,
+    0 0 0 2px #000,
+    0 0 0 4px var(--tp-magenta);
+  color: #fff;
+  font-family: "Redaction 35", Georgia, serif;
+  font-size: min(5.5cqw, 10cqh);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.threadpilot-fold-tune:active,
+.threadpilot-fold-tune[aria-pressed="true"] {
+  box-shadow:
+    inset 4px 4px 0 #550055,
+    inset -4px -4px 0 var(--tp-magenta),
+    0 0 0 2px #000,
+    0 0 0 4px var(--tp-magenta);
+}
+
+.threadpilot-fold-hand {
+  display: block;
+  flex: none;
+  width: min(70%, 36cqh);
+  height: auto;
+  margin-top: 1rem;
+  pointer-events: none;
+  shape-rendering: crispEdges;
+}
+
+@keyframes threadpilot-fold-lamp {
+  0% { background: var(--lamp); color: #000; }
+  50% { background: #000; color: var(--lamp); }
 }
 
 .threadpilot .threadpilot-page {
   max-width: 108rem;
-  padding: 0 clamp(2rem, 5vw, 6rem) 8rem;
+  padding: 4rem 6% 8rem;
   font-size: 1.6rem;
   line-height: 1.8;
   overflow-wrap: break-word;
 }
 
-.threadpilot-lead {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  align-items: start;
-  gap: clamp(3rem, 6vw, 7rem);
-  padding: 4.5rem 0 2.5rem;
-  text-align: left;
-}
-
-.threadpilot-lead h2 {
-  margin: 0 0 1.6rem;
-  font-size: clamp(3.6rem, 4.5vw, 5.6rem);
-}
-
-.threadpilot-lead-copy p {
-  margin-bottom: 0;
-}
-
-.threadpilot-benchmark {
-  --benchmark-axis-offset: 48px;
-  margin: 0;
-  min-width: 0;
-}
-
-.threadpilot-benchmark-canvas {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 480 / 286;
-  image-rendering: pixelated;
-}
-
-.threadpilot-benchmark figcaption {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem 2rem;
-  padding-left: var(--benchmark-axis-offset);
-  font-size: 1.2rem;
-  line-height: 1.6;
-}
-
 .threadpilot-page > .row {
   margin-bottom: 5rem;
-}
-.threadpilot .threadpilot-intro-row {
-  margin-bottom: 1.5rem;
-  color: #fff;
-  font-size: 1.3rem;
-}
-.threadpilot-intro-row p {
-  margin-bottom: 0;
-}
-.threadpilot .threadpilot-used-by-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 2.4rem;
-  width: 100%;
-  margin: 0 0 3.5rem;
-  padding: 0 0 2rem;
-  border-bottom: 1px dotted var(--tp-border);
-}
-.threadpilot-used-by-row p {
-  flex: 0 0 auto;
-  margin: 0;
-}
-.threadpilot-client-logos {
-  display: flex;
-  align-items: center;
-  gap: 2.4rem;
-  min-width: 0;
-}
-.threadpilot-client-logos img {
-  display: block;
-  max-height: 2.8rem;
-}
-.threadpilot-client-logo-aviary {
-  width: 9rem;
-}
-.threadpilot-client-logo-adquick {
-  width: 11.5rem;
-}
-.threadpilot-client-logo-atob {
-  width: 7.5rem;
 }
 .threadpilot .sales-testimonials {
   background: transparent;
@@ -519,42 +757,12 @@ body.threadpilot {
   color: transparent;
 }
 
-@media (max-width: 800px) {
-  .threadpilot-lead {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2.5rem;
-    padding-top: 3.5rem;
-  }
-}
-
 @media (max-width: 639px) {
-  .threadpilot .threadpilot-hero {
-    padding: 1rem;
-  }
   .threadpilot .threadpilot-page {
     font-size: 1.4rem;
   }
   .threadpilot-page > .row {
     margin-bottom: 3rem;
-  }
-  .threadpilot .threadpilot-intro-row {
-    margin-bottom: 1.2rem;
-  }
-  .threadpilot .threadpilot-used-by-row {
-    gap: 1.4rem;
-    margin-bottom: 2.5rem;
-  }
-  .threadpilot-client-logos {
-    gap: 0.8rem;
-  }
-  .threadpilot-client-logo-aviary {
-    width: 7rem;
-  }
-  .threadpilot-client-logo-adquick {
-    width: 9rem;
-  }
-  .threadpilot-client-logo-atob {
-    width: 6rem;
   }
   .threadpilot .threadpilot-pricing-card-aside {
     align-items: stretch;

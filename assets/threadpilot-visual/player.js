@@ -3,7 +3,7 @@ import { createRenderer } from './renderer.js';
 const canvas = document.querySelector('canvas');
 const video = document.querySelector('video');
 const errorMessage = document.querySelector('[role=alert]');
-const settings = canvas.dataset.size ? { size: Number(canvas.dataset.size) } : {};
+const settings = { size: 4 };
 let renderer, frameRequest, mediaURL, stillImage;
 let stopped = true, failed = false, lastTime = 0;
 

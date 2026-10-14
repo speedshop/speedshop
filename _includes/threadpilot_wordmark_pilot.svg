@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2860 700" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor">
-  <g transform="translate(0 700) scale(1 -1)">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -700 2860 700" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor">
+  <g transform="scale(1 -1)">
     <path transform="translate(0 0)" d="M280 350H210V140H140V70H210V0H0V70H70V210H140V350H210V560H280V630H210V700H630V630H700V420H630V350H490V420H560V630H350V490H280Z"/>
     <path transform="translate(575 0)" d="M210 280V0H0V70H70V210H140V350H210V560H280V630H210V700H420V630H350V490H280V280Z"/>
     <path transform="translate(870 0)" d="M490 0H0V70H70V210H140V420H210V560H280V630H210V700H420V630H350V490H280V350H210V140H140V70H490ZM630 210H560V280H630ZM560 140V70H490V140Z"/>

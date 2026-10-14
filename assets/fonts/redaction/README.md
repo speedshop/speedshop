@@ -1,6 +1,6 @@
 # Threadpilot Redaction fonts
 
-The hero uses `_includes/threadpilot_wordmark.svg`, generated from the OFL italic wordmark subset. Glyph advances and GPOS kerning are preserved, with -0.055em tracking, 0.95em line spacing, and the original font's baseline. No italic font is loaded by the page. Regenerate the outlines from the archived subset:
+The page uses `_includes/threadpilot_wordmark_thread.svg` and `_includes/threadpilot_wordmark_pilot.svg`, generated from the OFL italic wordmark subset. Glyph advances and GPOS kerning are preserved, with -0.055em tracking. Each view box is cropped to its word's outline bounds. No italic font is loaded by the page. Regenerate the outlines from the archived subset:
 
 ```sh
 git show 35f0ad0cd4a30f3ec4e5a2ac8d14da988c2a05b7:assets/fonts/redaction/Redaction70-Wordmark-Subset.woff2 > tmp/threadpilot-wordmark-source.woff2
