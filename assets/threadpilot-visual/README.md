@@ -21,12 +21,14 @@ Playback uses the native audio element's progressive buffering, not a full-file
 fetch or blob. The agent worker forwards asset requests, including `Range` and
 `If-Range`, so S3 can return partial content. Browsers control how far ahead to
 buffer and may eventually download the entire track.
-Reduced motion loads `still.jpg`, the original single-video hero's frame at
-22.492708 seconds (frame-selection candidate 07), instead of loading a scene. The 160 × 90 JPEG
+Reduced motion loads one still per scene instead of loading a video:
+`still-01.jpg` through `still-04.jpg` are frames from the scene videos at 1, 10,
+10.5, and 4 seconds, and `still-all.jpg` is the full video's frame at 22.492708
+seconds (frame-selection candidate 07). Each 160 × 90 JPEG
 runs through the normal ASCII renderer in the browser, drawing once at dt=0 and
 redrawing only on resize. The frame timestamp also fixes the noise preprocessing
-phase. Desktop and mobile use the same source image, rendered at their actual
-canvas dimensions. Normal-motion clients never request the JPEG.
+phase. Each still renders at its frame's actual canvas dimensions.
+Normal-motion clients never request the JPEGs.
 
 The display background and renderer clear color are opaque black. The production
 CGA palette uses only black, white, cyan (#55ffff), and magenta (#ff55ff).

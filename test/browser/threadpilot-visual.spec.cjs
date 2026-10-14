@@ -10,7 +10,7 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     const stillRequests = [];
     page.on("request", request => {
       if (request.url().endsWith("/dist/music.m4a")) musicRequests.push(request);
-      if (request.url().endsWith("/still.jpg")) stillRequests.push(request);
+      if (/\/still-\w+\.jpg$/.test(request.url())) stillRequests.push(request);
     });
     await page.goto("/threadpilot.html");
     const frame = page.frameLocator(".threadpilot-fold-word iframe").first();
@@ -67,7 +67,8 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     expect(await canvas.evaluate(canvas => canvas.width)).toBeGreaterThan(widthBefore);
     await expect(frame.locator("video")).toHaveJSProperty("paused", true);
     expect(requests.filter(url => url.endsWith(".mp4"))).toHaveLength(0);
-    expect(requests.filter(url => url.endsWith("/still.jpg"))).toHaveLength(viewport.width < 640 ? 1 : 4);
+    const stills = requests.filter(url => /\/still-\w+\.jpg$/.test(url)).map(url => url.split("/").pop()).sort();
+    expect(stills).toEqual(viewport.width < 640 ? ["still-all.jpg"] : ["still-01.jpg", "still-02.jpg", "still-03.jpg", "still-04.jpg"]);
     await expect(frame.getByRole("button")).toHaveCount(0);
   });
 }

@@ -64,11 +64,13 @@ async function loadSource(startTime) {
     video.currentTime = Math.min(startTime, Math.max(0, video.duration - 1));
   });
 }
+const scene = new URLSearchParams(location.search).get('scene') || '01';
+const stillTimes = { '01': 1, '02': 10, '03': 10.5, '04': 4, all: 22.492708333333333 };
 async function start() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     stillImage = new Image();
-    stillImage.src = 'still.jpg';
-    stillImage.currentTime = 22.492708333333333;
+    stillImage.src = `still-${scene}.jpg`;
+    stillImage.currentTime = stillTimes[scene];
     [renderer] = await Promise.all([createRenderer(canvas, settings), stillImage.decode()]);
     resize();
     observeSize();
