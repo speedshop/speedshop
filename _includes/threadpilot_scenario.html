@@ -1,5 +1,4 @@
 <section class="threadpilot-scenario" id="benchmark-{{ include.kind }}" data-scenario="{{ include.kind }}" aria-label="{{ include.title }} illustration">
-  <p class="threadpilot-scenario-disclosure">Interactive illustration · estimated data, not a measured benchmark</p>
   <div class="threadpilot-scenario-controls">
     <fieldset class="threadpilot-baseline-control">
       <legend>Your fixed thread count</legend>
@@ -9,7 +8,6 @@
           <label><input type="radio" name="baseline-{{ include.kind }}" value="{{ count }}" data-baseline{% if count == "5" %} checked{% endif %}><span>{{ count }}</span></label>
         {% endfor %}
       </div>
-      <p class="threadpilot-control-hint">Changes all three illustrations.</p>
     </fieldset>
     <fieldset class="threadpilot-workload-control">
       <legend>{% if include.kind == "changing" %}I/O in the I/O-heavy phases{% else %}Time spent waiting on I/O{% endif %}</legend>
@@ -19,14 +17,14 @@
           <label><input type="radio" name="workload-{{ include.kind }}" value="{{ ratio }}" data-workload{% if include.kind == "low" and ratio == "10" %} checked{% elsif include.kind != "low" and ratio == "90" %} checked{% endif %}><span>{{ ratio }}%</span></label>
         {% endfor %}
       </div>
-      <p class="threadpilot-control-hint">{% if include.kind == "changing" %}CPU-heavy phases stay at 10% I/O.{% else %}Changes only this illustration.{% endif %}</p>
+      {% if include.kind == "changing" %}<p class="threadpilot-control-hint">CPU-heavy phases stay at 10% I/O.</p>{% endif %}
     </fieldset>
   </div>
   <div class="threadpilot-scenario-result" role="status" aria-live="polite" aria-atomic="true">
     <p class="threadpilot-scenario-insight" data-insight></p>
     <dl class="threadpilot-scenario-metrics">
-      <div><dt>Throughput</dt><dd data-throughput-claim></dd><small data-throughput-detail></small></div>
-      <div><dt>{% if include.kind == "high" %}Request queueing{% else %}Processing p99{% endif %}</dt><dd data-latency-claim></dd><small data-latency-detail></small></div>
+      <div><dt>Estimated throughput</dt><dd data-throughput-claim></dd><small data-throughput-detail></small></div>
+      <div><dt>{% if include.kind == "high" %}Estimated request queueing{% else %}Estimated processing p99{% endif %}</dt><dd data-latency-claim></dd><small data-latency-detail></small></div>
       <div><dt>Modeled capacity</dt><dd data-capacity-claim></dd><small data-capacity-detail></small></div>
     </dl>
   </div>
@@ -48,17 +46,6 @@
       <canvas{% if include.kind == "changing" %} id="chart-latency"{% endif %} class="threadpilot-scenario-chart" data-chart="latency" role="img" aria-label="Illustrative latency over time"></canvas>
     </figure>
   </div>
-  <p class="threadpilot-scenario-method">{% if include.kind == "changing" %}Illustrated over 12 minutes: CPU-heavy, I/O-heavy, CPU-heavy, I/O-heavy. {% else %}Illustrated over 2 minutes at a fixed workload; claims use the settled last minute. {% endif %}{% if include.kind == "changing" %}Claims include all phases and transitions. {% endif %}One CRuby process, up to 25 threads. Capacity estimate = 1 − fixed throughput ÷ adaptive throughput, for the same volume and equal cost per process. It is not a cloud-bill prediction or a measurement of servers needed to meet a p99 target.</p>
-  <details class="threadpilot-scenario-reference">
-    <summary>What have we measured so far?</summary>
-    {% if include.kind == "low" %}
-      <p>In the published 10%-I/O Sidekiq run, median job-processing latency was 174 ms with Threadpilot versus 406 ms with five fixed threads; throughput was 0.5% lower. That is a median result, not the p99 plotted in this illustration. <a href="https://threadpilotbench.speedshop.co/sidekiq_low_ios/">Read the measured run</a>.</p>
-    {% elsif include.kind == "high" %}
-      <p>In the published 90%-I/O Puma run, reported request queueing was 245 ms with Threadpilot, 84% lower than a three-thread baseline. The startup ceiling was raised to 25. <a href="https://threadpilotbench.speedshop.co/puma_high_ios/">Read the measured run</a>.</p>
-    {% else %}
-      <p>In the published alternating Sidekiq workload, Threadpilot delivered 7.1% higher throughput and 21% lower median job-processing latency than five fixed threads. These longer illustrated phases are not a replay of that run. <a href="https://threadpilotbench.speedshop.co/sidekiq_step_ratios/">Read the measured run</a>.</p>
-    {% endif %}
-    <p>References are from October 2, 2026. Every plotted curve and changing claim above is illustrative. Additional measured baselines will replace the estimates.</p>
-  </details>
-  <noscript><p>Enable JavaScript to compare the thread counts and workload estimates. The measured references above remain available without it.</p></noscript>
+  <p class="threadpilot-scenario-explainer">ADD EXPLAINER HERE</p>
+  <noscript><p>Enable JavaScript to explore the illustrative comparisons.</p></noscript>
 </section>

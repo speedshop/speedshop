@@ -327,12 +327,6 @@ body.threadpilot {
   scroll-margin-top: 2rem;
 }
 
-.threadpilot .threadpilot-scenario-disclosure {
-  margin: 0 0 2rem;
-  font-size: 1.2rem;
-  line-height: 1.6;
-}
-
 .threadpilot-scenario-controls {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -482,26 +476,8 @@ body.threadpilot {
   image-rendering: pixelated;
 }
 
-.threadpilot .threadpilot-scenario-method,
-.threadpilot-scenario-reference {
+.threadpilot .threadpilot-scenario-explainer {
   margin: 2rem 0 0;
-  font-size: 1.1rem;
-  line-height: 1.7;
-}
-
-.threadpilot-scenario-reference summary {
-  width: fit-content;
-  cursor: pointer;
-  color: var(--tp-cyan);
-}
-
-.threadpilot-scenario-reference summary:focus-visible {
-  outline: 2px solid var(--tp-magenta);
-  outline-offset: 4px;
-}
-
-.threadpilot-scenario-reference p {
-  margin: 1rem 0;
 }
 
 @media (max-width: 640px) {

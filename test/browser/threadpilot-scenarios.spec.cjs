@@ -58,15 +58,15 @@ test.describe('Threadpilot interactive illustrations', () => {
     }
   });
 
-  test('labels estimates and keeps measured references separate', async ({ page }) => {
+  test('uses concise estimate labels and explainer placeholders', async ({ page }) => {
     await page.goto('/threadpilot.html');
     for (const kind of scenarios) {
       const section = page.locator(`[data-scenario="${kind}"]`);
-      await expect(section.locator('.threadpilot-scenario-disclosure')).toContainText('not a measured benchmark');
-      await expect(section.locator('.threadpilot-scenario-method')).toContainText('not a cloud-bill prediction');
-      await section.getByText('What have we measured so far?', { exact: true }).click();
-      await expect(section.locator('.threadpilot-scenario-reference')).toContainText('Every plotted curve and changing claim above is illustrative');
-      await expect(section.getByRole('link', { name: 'Read the measured run' })).toBeVisible();
+      await expect(section.locator('.threadpilot-scenario-metrics')).toContainText('Estimated throughput');
+      await expect(section.locator('.threadpilot-scenario-explainer')).toHaveText('ADD EXPLAINER HERE');
+      await expect(section).not.toContainText('Changes all three illustrations.');
+      await expect(section).not.toContainText('Changes only this illustration.');
+      await expect(section).not.toContainText('What have we measured so far?');
     }
   });
 
