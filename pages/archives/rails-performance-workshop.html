@@ -1,0 +1,352 @@
+---
+layout: null
+permalink: /archives/rails-performance-workshop.html
+sitemap: false
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archived: Rails Performance Workshop — Speedshop</title>
+</head>
+<body>
+<aside><p><strong>Historical archive.</strong> This retired page is preserved for older Markdown links. Offers and examples below may be outdated. See the <a href="https://www.speedshop.co/">current Speedshop website</a> for current information.</p></aside>
+
+<div class="fancy-ruby" style="padding-top:4rem">
+<div class="container container-narrow">
+<div class="row" style="margin-bottom:6rem">
+<div class="column column-20">
+<p><img
+src="data:image/svg+xml;base64,PHN2ZyB2aWV3Ym94PSIwIDAgMTE0Mi4wNTAxIDE4OC4yNTg5IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0xNi42NCA3Ny42Yy40IDI4LjM4IDQ3LjYyIDMwLjIgNDguMDMgNDYuMjIgMCA2LjktNS40NyAxMC43NC0xMi4xNiAxMC43NC0zLjYgMC02LS40LTkuMy0xLjIyIDMuNy0xNi40LTkuMy0yNy43Ni0yMy45LTI3Ljc2LTguOSAwLTE2IDMuNjUtMTguNCAxMS43NS01LjcgMjAuODcgMTggMzMuMjQgNTguMSAzMy4yNCAzMi43IDAgNTIuNy0xMS41NSA1Ny0yOS40IDguMS0zNS4wNS01My43LTM2LjA2LTUzLjktNTUuMS0uMi02LjEgNS4xLTkuMzMgMTEuNi05LjMzIDIgMCA0LjMuNCA2LjUgMS00LjEgMTMuMiA4LjEgMjIuOSAyMy4zIDIyLjkgMTMuOCAwIDIxLjMtNi44OCAyMS4xLTE2LjQtLjYtMTMuNTgtMjAuNDQtMjMuNS01NC41LTIzLjUtMzUuMjQgMC01My43IDE1LjItNTMuMyAzNi44N3oiIC8+PHBhdGggZD0ibTE3OS40IDEzMy4xNGMtMi4yMyAwLTQuMjYtLjgtNS44OC0yLjQzbDE2LTUyLjhjNC4yNi02LjUgOC43Mi03LjcgMTAuMzQtNy43IDUuMDcgMCA4LjMgMi45LjIgMzEuOC03LjkgMjgtMTQuOCAzMS4yLTIwLjY3IDMxLjJ6bS04LjEtOTAuNThjLTE2LjIyIDAtMzUuMjcgNS4yNi0zNi45IDExLjc1LTEuODIgNi43IDkuNTMgNS45IDYuNSAxNS40bC0yOS42IDk3LjFjLTMuNDQgMTIuMi0xMC43NCA5LjUtMTIuMzYgMTUuNC0xLjIgMy41IDEuODMgNi4xIDguOTIgNi4xaDQ2LjRjOC41MiAwIDEyLjE2LTEuNCAxMy4xOC00LjggMS42Mi01LjQtOC43Mi01LTUuMDctMTZsNi41LTIxLjdjNy4wOCA0LjEgMTYgNS45IDI0LjMgNS45IDI3Ljk3IDAgNTIuNy0xNi42IDYxLjItNTEuMyA4LjUtMzQuNC00LjA1LTU4LjUtMzAuOC01OC41LTEwLjc0IDAtMjEuNDggNS41LTMxIDE3LjctMS4yMi0xMC42LTkuMzMtMTYuOS0yMS4yNy0xNi45em0xNTMuMjcgMTUuOGMxLjgzIDAgMy4wNCAxLjgzIDMuMjQgNS42OC4zIDEyLjE2LTUuNiAyNy4xNS0xOS40IDI1LjMzIDQuMy0yMC44OCAxMi4yLTMxIDE2LjItMzF6bS02MiAzMy40NGMtOC4xIDM5LjUyIDE2LjggNTguNTYgNDkuNjQgNTguNTYgMzIuNSAwIDQ3LjctMjAuNjcgNDcuNS0zMy42NCAwLTIuMDItLjgtMi42My0yLjItMi42My00LjIgMC0xNi40IDYuNC0yOC4zIDYuNC0xMi41IDAtMjIuMy00LjEtMjIuMS0xOS4xIDIzLjkgMy40IDYxLjggMS4yIDY3LjUtMjMuNyAzLjktMTcuMy01LTM2LjMtNDgtMzYuMy0zMS40IDAtNTYuOSAxNi02My44IDUwLjJ6bTE3NS42LTMzLjQ0YzEuODIgMCAzLjAzIDEuODMgMy4yNCA1LjY4LjIgMTIuMTYtNS42IDI3LjE1LTE5LjQgMjUuMzMgNC4zLTIwLjg4IDEyLjItMzEgMTYuMi0zMXptLTYyIDMzLjQ0Yy04LjEgMzkuNTIgMTYuOCA1OC41NiA0OS42MyA1OC41NiAzMi40MyAwIDQ3LjYzLTIwLjY3IDQ3LjQyLTMzLjY0IDAtMi4wMi0uOC0yLjYzLTIuMjMtMi42My00LjMgMC0xNi41IDYuNC0yOC40IDYuNC0xMi42IDAtMjIuMy00LjEtMjIuMS0xOS4xIDIzLjkgMy40IDYxLjggMS4yIDY3LjUtMjMuNyAzLjgtMTcuMy01LjEtMzYuMy00OC4xLTM2LjMtMzEuNCAwLTU3IDE2LTYzLjkgNTAuMnptMjUwLjk3LTY2LjQ3YzQuMjYtMTMuOTgtLjQtMjUuMzMtMjEuNDgtMjUuMzMtMTYuMiAwLTM1LjI2IDUuMjctMzYuODggMTEuNTUtMS42MiA2LjcgOS43MyA1Ljg4IDYuNyAxNS42bC02LjkgMjIuN2MtNi4yOC01LjA3LTE0LTguMS0yNi4xNC04LjEtMzMuNDQgMC01NS43MyAzNS42Ni01NS4xMiA3Mi41NC40IDIxLjggMTYuODIgMzYgMzQuODUgMzYgMTAuMzQgMCAyMC4wNi00LjUgMjcuNTYtMTQgMy42NSA4LjMgMTQuNCAxNCAyNy45NyAxNCAxNy44MyAwIDMxLjgtMTMuMiAzMS42LTI0LjEgMC0yLjMtLjgtNC43LTIuMjItNC43LTEuNjIgMC0yLjYzIDQuMi02LjQ4IDQuMi0yLjIzIDAtMy40NS0yLTIuNDQtNS4zbDI4Ljk4LTk1LjN6bS03OC42MiA4OS41N2MtMi4wMyA2LjUtNC4yNiA5LjEyLTcuOSA5LjEyLTUuMDcgMC03LjMtMy44NS03LjMtMTEuMTUtLjQtMTkuNjUgMTEuMzUtNTIuMDggMjMuOS01Mi4wOCAyLjg1IDAgNS4wOCAxIDcuMSAyLjhsLTE1LjggNTEuMnptODQuNDYtMzcuM2MuNCAyOC4zOCA0Ny42MiAzMC4yIDQ4LjAyIDQ2LjIyIDAgNi45LTUuNDcgMTAuNzQtMTIuMTYgMTAuNzQtMy42NCAwLTYuMDctLjQtOS4zMi0xLjIyIDMuNjUtMTYuNC05LjMyLTI3Ljc2LTIzLjktMjcuNzYtOC45MyAwLTE2LjAyIDMuNjUtMTguNDUgMTEuNzUtNS42NyAyMC44OCAxOC4wNCAzMy4yNCA1OC4xNiAzMy4yNCAzMi42MyAwIDUyLjctMTEuNTUgNTYuOTQtMjkuNCA4LjEtMzUuMDUtNTMuNy0zNi4wNi01My45LTU1LjEtLjItNi4xIDUuMDctOS4zMyAxMS41NS05LjMzIDIuMDMgMCA0LjI2LjQgNi40OCAxLTQuMDUgMTMuMiA4LjEgMjIuOSAyMy4zIDIyLjkgMTMuOCAwIDIxLjMtNi44OCAyMS4wOC0xNi40LS42LTEzLjU4LTIwLjQ2LTIzLjUtNTQuNS0yMy41LTM1LjI3IDAtNTMuNyAxNS4yLTUzLjMgMzYuODd6bTEzMi43Mi02Ni4wNWMtMS42NCA2LjcgOS43IDUuNjcgNi42NyAxNS42bC0zMC44IDEwMS4xM2MtMy42NSAxMi4xNS0xMC45NCA5LjUyLTEyLjc3IDE1LjItMSAzLjY0IDIuMDMgNi4yOCA5LjMzIDYuMjhoNDYuMmM4LjcgMCAxMi4xNi0xLjYzIDEzLjM3LTUuMDcgMS40Mi01LjMtOC45LTQuNy01LjQ3LTE2LjFsMTIuNzctNDEuMDl2LjRjMy42NS0xMS41MiA5LjkzLTE1IDE0LjE4LTE1IDQuMDYgMCA3LjUgMy4yOCA0Ljg3IDkuOTZsLTExLjE1IDI5LjE3Yy0yLjQzIDYuMy0zLjY0IDEyLjE2LTMuNjQgMTYuODIuMiAxMy43NyAxMS41NSAyMi43IDI5LjM4IDIyLjcgMjIuOSAwIDM0LjY1LTEyLjk4IDM0LjQ1LTI0LjEzIDAtMi4yMi0uOS00LjQ1LTIuMy00LjQ1cy0yLjcgNC4zLTYuNSA0LjNjLTIuMiAwLTMuNS0yLjItMi4yLTUuNDVsMTIuNC0zOS45NGM2LjktMjIuMy00LjktMzkuMy0yNS42LTM5LjMtMTIuNCAwLTI0LjUgMy42NS0zNS45IDE4LjQ1bDExLTM1LjYzYzQuMi0xNC0uNC0yNS4zNS0yMS41LTI1LjM1LTE2LjIgMC0zNS4zIDUuMjctMzYuOSAxMS41NXptMTE1LjU0IDg0LjljLTYuOSAyOS44IDYuNyA1NS4xMyA1My41IDU1LjEzIDM2LjA3IDAgNjUuNDYtMjEuNDggNzMuMzYtNTUuMTIgNi43LTI4LjE3LTUuODgtNTMuOS01Mi4wOC01My45LTM2LjA3IDAtNjcuMDggMjEuODgtNzQuNzggNTMuOXptNzIuOTYuMmMtOS45MyAzMi4yMy0xNS40IDM3LjctMjAuMjcgMzcuMy01LjA2IDAtOS4xMi0zLjY1IDEuMjItMzcuMSA5LjUyLTMwLjYgMTUuNC0zNi4yNiAyMC4yNi0zNi4yNiA1LjEgMCA5IDQuMi0xLjIgMzZ6IiAvPjxwYXRoIGQ9Im0xMDY0LjQzIDEzMy4xNGMtMi4yMyAwLTQuMjUtLjgtNS44Ny0yLjQzbDE2LTUyLjhjNC4yNi02LjUgOC43Mi03LjcgMTAuMzQtNy43IDUuMDcgMCA4LjMgMi45LjIgMzEuOC03LjkgMjgtMTQuOCAzMS4yLTIwLjY3IDMxLjJ6bS04LjEtOTAuNThjLTE2LjIgMC0zNS4yNiA1LjI2LTM2Ljg4IDExLjc1LTEuODMgNi43IDkuNTIgNS45IDYuNDggMTUuNGwtMjkuNiA5Ny4xYy0zLjQzIDEyLjItMTAuNzMgOS41LTEyLjM1IDE1LjQtMS4yIDMuNSAxLjgzIDYuMSA4LjkyIDYuMWg0Ni40YzguNTIgMCAxMi4xNi0xLjQgMTMuMTgtNC44IDEuNjItNS40LTguNzItNS01LjA3LTE2bDYuNS0yMS43YzcuMSA0LjEgMTYgNS45IDI0LjMgNS45IDI4IDAgNTIuNy0xNi42IDYxLjItNTEuMyA4LjYtMzQuNC00LTU4LjUtMzAuOC01OC41LTEwLjcgMC0yMS40IDUuNS0zMSAxNy43LTEuMi0xMC41LTkuMy0xNi44LTIxLjItMTYuOHoiIC8+PC9zdmc+" /></p>
+</div>
+</div>
+<div class="row">
+<div class="column" style="text-align: center">
+<h1 id="the-rails-performance-workshop">The Rails Performance
+Workshop</h1>
+<p>Got a slow Rails app? Not anymore. Join the hundreds that have taken
+this four-week bootcamp and made their Rails applications fast and
+scalable.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="container container-narrow">
+<div class="row">
+<div class="column">
+<h3 id="rails-apps-dont-have-to-be-slow">Rails Apps Don't Have To Be
+Slow</h3>
+<p>How did your Rails app get so slow? It didn't start that way. Your
+app started as a lean, mean web machine. Customers are complaining. The
+Redis server is on fire, and the database ran out of memory last
+week.</p>
+<p>Or maybe you're worried about the future. Things are OK now, but what
+happens when that big client you signed turns on their service? Are you
+prepared for the traffic they're going to send your way, or are your
+servers going to crumble?</p>
+<p>Do you wish you had more money and time to spend on other parts of
+your application? Does looking at your New Relic dashboard or your AWS
+bill give you the chills?</p>
+</div>
+</div>
+<div class="sales-testimonials">
+<div class="row">
+<div class="column">
+<p>"Nate quickly helped us identify key bottlenecks in our application's
+infrastructure, as well as lay out a roadmap of future improvements to
+keep us scaling well past our engagement. His Rails Performance Workshop
+set our engineering team up with the knowledge and tools to move from
+reacting to performance problems to proactively preventing them with
+Rails best practices and a profiling-based, data-driven mindset."<br />
+- Joe Burns, TeePublic</p>
+</div>
+</div>
+</div>
+<div class="row">
+<div class="column">
+<h3 id="a-step-by-step-performance-training-and-sprint">A Step-By-Step
+Performance Training and Sprint</h3>
+<p>Let's introduce the <strong>Rails Performance Workshop</strong>. The
+workshop is a training program and guided roadmap for faster Rails apps
+that's been used by more than a hundred organizations.</p>
+<p>The Rails Performance Workshop is <strong>a combination of training
+and a performance improvement plan</strong>. Using the Workshop, your
+team will improve your Rails app's performance as you learn the concepts
+taught within.</p>
+<p>The Rails Performance Workshop is a combination of video, hands-on
+exercises, specific instructions and a guided plan for improving your
+own app, and a community of experienced Rails practicioners. Over about
+4 weeks, you'll go from A to Z on how to make a Rails application faster
+for your customers and cost less to scale.</p>
+<p><img src="https://s3.amazonaws.com/www.speedshop.co/assets/img/videoexample.jpg" /></p>
+<p>Here's just some of the things you and your team will not only learn
+how to do, but apply during the Workshop:</p>
+<ul>
+<li><ul>
+<li>Lower your response times to 200 milliseconds or less.</li>
+<li>Reduce how much you're spending on deployment, by as much as
+half.</li>
+<li>Build a clear plan to scale for the next 12 months.</li>
+<li>Apply the three-step "DRM" method to solve 80% of Rails performance
+issues quickly and simply.</li>
+<li>Practice a simple, repeatable performance process to diagnose and
+solve any issue. No genius required.</li>
+<li>Fix any N+1 scenario, even the weird ones that go 12 stack levels
+deep that you've never been able to figure out.</li>
+<li>Set targets and performance budgets within your organization that
+make sense for you and your customers.</li>
+<li>Learn how to diagnose performance issues anywhere in the stack: DB,
+Ruby itself, the browser, and more.</li>
+<li>Understand what "breaks" simple preload/eager_load schemes and how
+to get around it.</li>
+<li>Scale services mathematically without load testing.</li>
+<li>Decipher metrics on services like NewRelic and Scout.</li>
+<li>... and a whole lot more.</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div class="row" style="padding-bottom:4rem">
+<div class="column card">
+<h4 id="a-unique-format">A unique format</h4>
+<p>Delivered via the CLI, this workshop delivers 6 hours of video
+content, 10 hands-on exercises, and a full "guided sprint program" for
+making your app faster.</p>
+</div>
+<div class="column card">
+<h4 id="attended-by-hundreds">Attended by hundreds</h4>
+<p>Taken by hundreds of individuals and dozens of companies in its
+previous formats.</p>
+</div>
+</div>
+<div class="row">
+<div class="column">
+<h3 id="learn-to-scale-your-app-in-4-weeks">Learn to Scale Your App in 4
+Weeks</h3>
+<p>Modern platforms, like Heroku and AWS, have made it easier than ever
+to scale: just add more instances! But no one ever tells you how many,
+or how to scale them efficiently and correctly. This can cost you tens
+or even hundreds of thousands of dollars per year.</p>
+<p>This workshop uses basic queueing theory to show you how to scale
+anything: your Rails app, your database, your load balancing.
+Fundamentally, all of these systems work the same way, and the workshop
+can show you how to scale each one.</p>
+<p>The workshop also covers the specifics of scaling Rails, like
+database pools and concurrency settings. Incorrect database pool
+settings can bring your application to a complete standstill. Settings
+thread counts incorrectly can invalidate your metrics and double
+response times. We'll show you how to deal with all of it.</p>
+<div class="sales-testimonials">
+<div class="row">
+<div class="column">
+<p>"If you haven’t checked Nate Berkopec's training, books and tutorials
+yet, then I highly recommend him as an expert resource with an organized
+set of performance diagnostics tools. His workshop <strong>shaved
+$7,000/year off our Heroku bills</strong> with one change."<br />
+- Ken Mayer</p>
+</div>
+</div>
+<div class="row">
+<div class="column">
+<p>"After training from Nate and a concerted effort from a few
+engineers, we had <strong>performance improvements of 10-50% on key
+flows.</strong>”<br />
+- Rory O’Connell, Grand Rounds</p>
+</div>
+<div class="column">
+<p>"I have <strong>a bunch of pull requests that came out of the
+workshop.</strong> I have more tools in my toolset that I could use for
+future consulting projects."<br />
+- Ernesto Tagwerker, Ombu Labs</p>
+</div>
+</div>
+</div>
+<h3 id="a-proven-process-used-by-hundreds">A Proven Process Used By
+Hundreds</h3>
+<p>The Workshop is self-guided and can be done at your own pace. We
+suggest that it takes either about 5 days of full-time work to complete,
+or 4-6 weeks of "20% time", working on it one day every week.</p>
+<p>The Rails Performance Workshop is meant for developers with Rails
+experience of a year or more. Although the course is aimed at Ruby and
+Rails, we've had many companies send front-end engineers and even
+engineers from other language stacks through the workshop, and they've
+also found it very valuable.</p>
+<p>The Rails Performance Workshop started 2 years ago as an in-person,
+one-day event. However, over the years, after dozens of companies and
+hundreds of individuals have participated in various formats, we learned
+that a 4-week remote-only format, centered around video and hands-on
+exercises, was the most effective way for developers to learn.</p>
+<p>Attendees of the Rails Performance Workshop have <strong>reduced
+server bills by tens of thousands of dollars</strong>, sped up critical
+endpoints by over 50%, solved bugs and N+1 issues that evaded them for
+years, and built critical capacity in their engineering teams.</p>
+<p>The entire course is taught by Nate Berkopec, author of the Complete
+Guide to Rails Performance and maintainer of the Puma web server.</p>
+<p><img src="https://s3.amazonaws.com/www.speedshop.co/assets/img/workshopcontent.jpg"
+style="margin-bottom: 4rem" /></p>
+<h3 id="delivered-via-cli-powered-by-free-software">Delivered via CLI,
+Powered By Free Software</h3>
+<p>At Speedshop, we believe software should respect our freedom.</p>
+<p>We're pretty sure this is the world's first educational product
+delivered at the command line. Using the GPL-licensed CLI client, you'll
+go through the Rails Performance Workshop in the environment where
+you're most comfortable as a developer: the command line.</p>
+<p>Want to try the client right now?</p>
+<p><code
+style="display:block;margin-bottom: 3rem">$ gem install rpw &amp;&amp; rpw list</code></p>
+<p>In addition, while you need a license key to download course content,
+there is no DRM on any files you download, and all software that you
+need to consume this course is Free or Open-Source.</p>
+<p>All course content is offline-compatible: you can download the entire
+workshop at once and then work offline, or you can download one lesson
+at a time.</p>
+<p>Although we encourage you to take the workshop in about 4 weeks, you
+have access to the material forever, and can start or stop at any
+time.</p>
+<h3 id="have-a-team-let-us-guide-your-perf-sprint">Have a Team? Let Us
+Guide Your Perf Sprint</h3>
+<p>If you have a team of engineers, consider signed up for the enhanced
+Tiers of the Rails Performance Workshop. Higher Tiers get you hands-on,
+one-on-one instruction from course author Nate Berkopec.</p>
+<p><strong>The Guided Training Addon</strong> brings Nate on as your
+advisor for the 4 week period. You'll have weekly strategy calls and
+Nate will take a look at your metrics and give you feedback. <strong>The
+Consulting Addon</strong> embeds Nate full-time in your application as a
+consultant, making performance improvements and scaling changes
+himself.</p>
+<p>We've found many companies make the most of their workshop time when
+they dedicate a 4-week period to a performance-focused "sprint". This
+allows all attendees to comfortably make the workshop their "full-time
+job", and results in the best outcomes.</p>
+<div class="buy-now">
+<div class="row">
+<div class="column" style="text-align: center;">
+<h2 id="take-the-workshop">Take the Workshop</h2>
+<h3 id="per-person-plus-optional-add-ons">$500 per person, plus optional
+add-ons</h3>
+</div>
+</div>
+<div class="row">
+<div class="column">
+<ul>
+<li>6 hours of HD video instruction</li>
+<li>10 hands-on "labs" that demonstrate concepts and demonstrate
+learning</li>
+<li>36 guided pull requests, which show how to apply what you've learned
+to your real production app</li>
+<li>30 pages of detailed hand-outs, aide-memoires and reminders for
+concepts taught in the workshop</li>
+<li>A free copy of the Complete Guide to Rails Performance ($50
+value)</li>
+<li>Access to the Speedshop Rails Performance Slack channel, with over
+1000 members</li>
+<li>Free updates to all content, forever.</li>
+</ul>
+</div>
+</div>
+<div class="row" style="margin-bottom: 4rem">
+<div class="column column-50 column-offset-25">
+<p><a href="https://buy.stripe.com/00gg0Q2WS5M77E48ww"
+id="checkout-button" class="button button-workshop">Buy Now</a></p>
+</div>
+</div>
+<div class="row">
+<div class="column">
+<h3 id="add-ons-for-large-teams">Add-Ons for Large Teams</h3>
+<p>Are you a large team looking to do a performance-focused sprint? Most
+other teams have found the following add-on services extremely
+valuable:</p>
+<ul>
+<li><strong>4 weeks Guided Training (+$7,500):</strong> Includes 4
+hour-long calls with Nate Berkopec, unlimited code review on any
+performance-related changes for 4 weeks, and a basic review by Nate of
+your application. Nate will also sit in your team's Slack/chat for rapid
+Q&amp;A.</li>
+<li><strong>Consulting (+$10,000 to +$40,000, custom):</strong> For 1-4
+weeks, Nate Berkopec will embed full-time with your team to improve the
+performance and scale of your Rails application.</li>
+</ul>
+</div>
+</div>
+<div style="margin-bottom: 4rem">
+<div class="row">
+<div class="column">
+<p><a href="https://savvycal.com/nateberkopec/join-the-retainer"
+class="button">Book a call</a> <span class="cta-separator">|</span> <a
+href="mailto:nate.berkopec+sales@speedshop.co">Email us instead</a></p>
+</div>
+</div>
+</div>
+</div>
+<h3 id="complete-syllabus">Complete Syllabus</h3>
+<p>In case you were wondering, here's the complete syllabus:</p>
+<div class="row">
+<div class="column">
+<ul>
+<li><strong>Section 1: Performance Measurement</strong></li>
+<li>Understanding Requirements</li>
+<li>Production Profilers (NewRelic, Scout, Skylight, DataDog, etc)</li>
+<li>Assessing a Rails App for Perf</li>
+<li>Live Example: CodeTriage <strong>Section 2: Full-Stack
+Performance</strong></li>
+<li>How Front-End Perf Works</li>
+<li>How To Optimize Page Load Time</li>
+<li>How to Optimize Largest Contentful Paint</li>
+<li>Using webpagetest.org as a Synthetic Benchmark</li>
+<li>Analyzing Interactions <strong>Section 3: Ruby
+Benchmarking</strong></li>
+<li>Benchmarking and Profiling</li>
+<li>Creating a Local Performance Environment</li>
+<li>Using Apache Bench</li>
+<li>Using benchmark-ips</li>
+<li>Benchmarking Background Jobs</li>
+<li>Benchmarking Rails' Boot</li>
+</ul>
+</div>
+<div class="column">
+<ul>
+<li><strong>Section 4: ActiveRecord</strong></li>
+<li>"DRM": Database, Ruby, Memory</li>
+<li>Profiling SQL with rack-mini-profiler</li>
+<li>Fix N+1s</li>
+<li>Diagnose unnecessary SQL</li>
+<li>Understand Rails' Secret SQL Caches</li>
+<li>Fix slow SQL queries <strong>Section 5: Profiling</strong></li>
+<li>How Profiling Works</li>
+<li>Stackprof and rack-mini-profiler</li>
+<li>Profiling Background Jobs</li>
+<li>Profiling test suites</li>
+<li>Profiling Boot</li>
+<li>Profiling Memory</li>
+<li>Reviewing PRs For Performance</li>
+<li>Optimize Any Rails Transaction <strong>Section 6:
+Scaling</strong></li>
+<li>MMC Queues</li>
+<li>The USE Method of Scale Analysis</li>
+<li>When to Scale Up Or Down</li>
+<li>Database pools in Rails</li>
+<li>Understanding Threads and the GVL</li>
+<li>Scaling in Miniature</li>
+</ul>
+</div>
+</div>
+<h3 id="whos-this">Who's this?</h3>
+<div class="row">
+<div class="column column-75">
+<p>My name is Nate Berkopec. I'm a software developer and author of the
+<a href="https://railsspeed.com">Complete Guide to Rails
+Performance</a>. I've previously worked for people like Getty Images,
+Intercom.io, ClickFunnels and more 500Startups and YCombinator startups
+than I can count. I was on Shark Tank once.</p>
+</div>
+<div class="column column-25">
+<p><img src="https://www.speedshop.co/assets/img/nate.jpg" /></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</body>
+</html>
