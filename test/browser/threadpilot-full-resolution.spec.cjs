@@ -31,6 +31,22 @@ function dataset() {
   return { schemaVersion: 2, samplingHz: 20, validation: false, complete: true, scenarios };
 }
 
+function splitDataset(data) {
+  const files = new Map();
+  const index = JSON.parse(JSON.stringify(data));
+  for (const [kind, workloads] of Object.entries(index.scenarios)) {
+    for (const [io, workload] of Object.entries(workloads)) {
+      for (const [configuration, run] of Object.entries(workload.runs)) {
+        const url = `/assets/data/threadpilot-runs/fixture/${kind}-${io}-${configuration}.json`;
+        files.set(url, run);
+        const { threads, throughput, latency, ...metadata } = run;
+        workload.runs[configuration] = { ...metadata, dataUrl: url };
+      }
+    }
+  }
+  return { index, files };
+}
+
 async function serve(page, data) {
   await page.route('**/assets/data/threadpilot_scenarios.json', route => route.fulfill({ json: data }));
   await page.goto('/threadpilot.html');
@@ -128,6 +144,56 @@ test('leaves missing timed observations unconnected and labels whole-run summari
   });
   expect(pixels[0]).not.toEqual([85, 255, 255]);
   expect(pixels[1]).toEqual([85, 255, 255]);
+});
+
+test('loads only selected full-resolution runs and ignores late results from old selections', async ({ page }) => {
+  const { index, files } = splitDataset(dataset());
+  const requested = [];
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.route('**/assets/data/threadpilot-runs/**', async route => {
+    const path = new URL(route.request().url()).pathname;
+    requested.push(path);
+    if (path.endsWith('/high-90-1.json')) await new Promise(resolve => setTimeout(resolve, 250));
+    await route.fulfill({ json: files.get(path) });
+  });
+  await serve(page, index);
+  for (const kind of ['high', 'low', 'changing']) await expect(page.locator(`[data-scenario="${kind}"]`)).toHaveAttribute('data-source', 'measured');
+  expect(requested.sort()).toEqual(['high-90-5', 'high-90-adaptive', 'low-10-5', 'low-10-adaptive', 'changing-90-5', 'changing-90-adaptive'].map(name => `/assets/data/threadpilot-runs/fixture/${name}.json`).sort());
+  const controls = page.locator('[data-scenario="high"] .threadpilot-baseline-control');
+  await controls.getByText('1', { exact: true }).click();
+  await controls.getByText('3', { exact: true }).click();
+  await page.waitForLoadState('networkidle');
+  for (const kind of ['high', 'low', 'changing']) {
+    const section = page.locator(`[data-scenario="${kind}"]`);
+    await expect(section).toHaveAttribute('data-baseline', '3');
+    await expect(section).toHaveAttribute('data-source', 'measured');
+    await expect(section).not.toHaveAttribute('aria-busy');
+    const io = kind === 'low' ? 10 : 90;
+    await expect(section.locator('[data-throughput-detail]')).toHaveText(`${io + 7} vs ${io + 3} ${kind === 'high' ? 'requests/s' : 'jobs/s'}`);
+  }
+  expect(requested.filter(path => path.endsWith('-adaptive.json'))).toHaveLength(3);
+  expect(errors).toEqual([]);
+});
+
+test('marks a missing run unavailable rather than plotting estimates and recovers on retry', async ({ page }) => {
+  const { index, files } = splitDataset(dataset());
+  let fail = true;
+  await page.route('**/assets/data/threadpilot-runs/**', route => {
+    const path = new URL(route.request().url()).pathname;
+    return fail && path.endsWith('/high-90-5.json') ? route.fulfill({ status: 404 }) : route.fulfill({ json: files.get(path) });
+  });
+  await serve(page, index);
+  const section = page.locator('[data-scenario="high"]');
+  await expect(section).toHaveAttribute('data-source', 'unavailable');
+  await expect(section.locator('[data-throughput-claim]')).toHaveText('Unavailable');
+  await expect(section.locator('[data-chart="latency"]')).toHaveAttribute('aria-label', 'Measured benchmark data unavailable');
+  fail = false;
+  await section.locator('.threadpilot-baseline-control').getByText('1', { exact: true }).click();
+  await expect(section).toHaveAttribute('data-source', 'measured');
+  await section.locator('.threadpilot-baseline-control').getByText('5', { exact: true }).click();
+  await expect(section).toHaveAttribute('data-source', 'measured');
+  await expect(section.locator('[data-throughput-detail]')).toHaveText('97 vs 95 requests/s');
 });
 
 test('never presents validation exports as measured comparisons', async ({ page }) => {

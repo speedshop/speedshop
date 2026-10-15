@@ -9,6 +9,7 @@
     if (!response.ok) throw new Error(`Benchmark data: HTTP ${response.status}`);
     const dataset = await response.json();
     if (dataset.validation) throw new Error("Short validation runs are not performance comparisons");
+    if (dataset.schemaVersion === 2 && !dataset.complete) throw new Error("Incomplete benchmark dataset");
     measurements = dataset.scenarios;
     if (dataset.schemaVersion === 2 && dataset.samplingHz > 0) samplingInterval = 1 / dataset.samplingHz;
   } catch (error) {
@@ -20,6 +21,9 @@
   let frame;
   const workloads = { low: 10, high: 90, changing: 90 };
   const results = new Map();
+  const updates = new WeakMap();
+  const runRequests = new Map();
+  const requests = new AbortController();
   const mean = (values) => values.reduce((sum, value) => sum + value, 0) / values.length;
   const format = (value) => new Intl.NumberFormat("en", { maximumFractionDigits: 1 }).format(value);
   const poolFor = (io) => Math.min(25, Math.ceil(1 / (1 - io) - 0.0001));
@@ -53,10 +57,31 @@
     }).value;
   }
 
+  function selectedWorkload(kind) {
+    const workload = measurements[kind];
+    return workload?.io === workloads[kind] ? workload : workload?.[workloads[kind]];
+  }
+
+  async function loadRun(run) {
+    if (!run?.dataUrl || Array.isArray(run.threads)) return;
+    if (!runRequests.has(run.dataUrl)) {
+      runRequests.set(run.dataUrl, fetch(run.dataUrl, { signal: requests.signal }).then(async (response) => {
+        if (!response.ok) throw new Error(`Benchmark run: HTTP ${response.status}`);
+        const payload = await response.json();
+        if (payload.status !== "success" || ![payload.threads, payload.throughput, payload.latency].every(Array.isArray)) throw new Error("Incomplete benchmark run");
+        if (payload.duration !== run.duration || payload.summary.throughput !== run.summary.throughput || payload.summary.latency !== run.summary.latency || payload.provenance?.workItemId !== run.provenance?.workItemId) throw new Error("Benchmark run identity mismatch");
+        return payload;
+      }).catch((error) => {
+        runRequests.delete(run.dataUrl);
+        throw error;
+      }));
+    }
+    Object.assign(run, await runRequests.get(run.dataUrl));
+  }
+
   function scenario(kind) {
     const changing = kind === "changing";
-    const workload = measurements[kind];
-    const selected = workload?.io === workloads[kind] ? workload : workload?.[workloads[kind]];
+    const selected = selectedWorkload(kind);
     const recording = selected?.runs?.adaptive?.status !== "failed" && selected?.runs?.adaptive?.summary ? selected : null;
     const duration = recording ? Math.ceil(recording.runs.adaptive.duration) : changing ? 720 : 120;
     const ioBands = changing ? recording?.runs.adaptive.ioBands || recording?.ioBands || [[180, 360], [540, 720]] : [];
@@ -125,17 +150,50 @@
     return `${format(Math.abs(difference))}% ${difference > 0 ? "lower" : "higher"}`;
   }
 
-  function update(section) {
+  async function update(section) {
     const kind = section.dataset.scenario;
-    const data = scenario(kind);
-    results.set(section, data);
+    const version = Symbol();
+    updates.set(section, version);
     section.dataset.baseline = baseline;
     section.dataset.workload = workloads[kind];
-    section.dataset.source = data.measured.fixed ? "measured" : data.measured.adaptive ? "mixed" : "estimated";
     section.querySelectorAll("[data-baseline]").forEach((input) => {
       input.checked = Number(input.value) === baseline;
     });
     const write = (selector, text) => { section.querySelector(selector).textContent = text; };
+    const selected = selectedWorkload(kind);
+    const runs = [selected?.runs?.adaptive, selected?.runs?.[baseline]];
+    if (runs.some((run) => run?.dataUrl && !Array.isArray(run.threads))) {
+      section.dataset.source = "loading";
+      section.setAttribute("aria-busy", "true");
+      results.delete(section);
+      write("[data-throughput-heading]", "Loading measurements…");
+    }
+    try {
+      await Promise.all(runs.map(loadRun));
+    } catch (error) {
+      if (updates.get(section) !== version || !section.isConnected) return;
+      section.dataset.source = "unavailable";
+      write("[data-adaptive-label]", "Threadpilot · unavailable");
+      write("[data-baseline-label]", `Fixed · ${baseline} ${baseline === 1 ? "thread" : "threads"} · unavailable`);
+      write("[data-insight]", "Measurements could not be loaded. Choose another setting to retry.");
+      write("[data-throughput-heading]", "Measured data unavailable");
+      write("[data-latency-heading]", "Measured data unavailable");
+      for (const selector of ["[data-throughput-claim]", "[data-throughput-detail]", "[data-latency-claim]", "[data-latency-detail]", "[data-capacity-claim]"]) write(selector, "Unavailable");
+      for (const canvas of section.querySelectorAll("[data-chart]")) {
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        canvas.setAttribute("aria-label", "Measured benchmark data unavailable");
+      }
+      console.warn("Measured benchmark run unavailable.", error);
+      return;
+    } finally {
+      if (updates.get(section) === version) section.removeAttribute("aria-busy");
+    }
+    if (updates.get(section) !== version || !section.isConnected) return;
+    const data = scenario(kind);
+    results.set(section, data);
+    section.dataset.source = data.measured.fixed ? "measured" : data.measured.adaptive ? "mixed" : "estimated";
     const throughputGain = data.throughput.adaptive / data.throughput.fixed - 1;
     const capacity = (1 - data.throughput.fixed / data.throughput.adaptive) * 100;
     const units = kind === "high" ? "requests/s" : "jobs/s";
@@ -316,6 +374,7 @@
     frame = requestAnimationFrame(() => {
       for (const section of sections) {
         const data = results.get(section);
+        if (!data) continue;
         for (const canvas of section.querySelectorAll("[data-chart]")) draw(canvas, data, section.dataset.scenario);
       }
     });
@@ -342,6 +401,7 @@
   sections.forEach((section) => section.addEventListener("change", change));
   document.fonts.ready.then(redraw);
   function cleanup() {
+    requests.abort();
     observer.disconnect();
     alignment.disconnect();
     cancelAnimationFrame(frame);
