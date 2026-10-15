@@ -201,6 +201,6 @@ test('never presents validation exports as measured comparisons', async ({ page 
   data.validation = true;
   await serve(page, data);
   for (const kind of ['high', 'low', 'changing']) {
-    await expect(page.locator(`[data-scenario="${kind}"]`)).toHaveAttribute('data-source', 'estimated');
+    await expect(page.locator(`[data-scenario="${kind}"]`)).toHaveAttribute('data-source', 'unavailable');
   }
 });

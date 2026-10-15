@@ -10,7 +10,7 @@ test.describe('Threadpilot interactive comparisons', () => {
   test('synchronizes every baseline selector and redraws every comparison', async ({ page }) => {
     await page.goto('/threadpilot.html');
     await expect(page.locator('[data-scenario]')).toHaveCount(3);
-    await expect(page.locator('[data-scenario="high"] [data-throughput-claim]')).toHaveText('1.6x');
+    await expect(page.locator('[data-scenario="high"] [data-throughput-claim]')).toHaveText('1.9x');
     for (const [index, count] of [1, 3, 5, 10, 25].entries()) {
       const source = page.locator(`[data-scenario="${scenarios[index % 3]}"]`);
       await select(source, 'baseline', count);
@@ -54,19 +54,17 @@ test.describe('Threadpilot interactive comparisons', () => {
           await expect(section.locator('.threadpilot-scenario-result')).not.toContainText(/NaN|Infinity|undefined/);
           await expect(section.locator('[data-throughput-claim]')).toHaveText(/^\d+\.\dx$/);
           await expect(section.locator('[data-latency-claim]')).not.toBeEmpty();
-          const hasWorkload = ratio === (kind === 'low' ? 10 : 90);
-          const hasBaseline = (kind === 'high' ? [1, 3] : [1, 5]).includes(count);
-          await expect(section).toHaveAttribute('data-source', hasWorkload ? hasBaseline ? 'measured' : 'mixed' : 'estimated');
+          await expect(section).toHaveAttribute('data-source', 'measured');
         }
       }
     }
   });
 
-  test('labels measured and estimated data and retains explainer placeholders', async ({ page }) => {
+  test('labels every run measured, keeps resource estimates, and retains explainer placeholders', async ({ page }) => {
     await page.goto('/threadpilot.html');
     for (const kind of scenarios) {
       const section = page.locator(`[data-scenario="${kind}"]`);
-      await expect(section.locator('[data-throughput-heading]')).toHaveText(`${kind === 'high' ? 'Estimated' : 'Measured'} throughput`);
+      await expect(section.locator('[data-throughput-heading]')).toHaveText('Measured throughput');
       await expect(section.locator('[data-adaptive-label]')).toHaveText('Threadpilot · measured');
       await expect(section.locator('.threadpilot-scenario-metrics')).toContainText('Server resources');
       await expect(section.locator('[data-capacity-detail]')).toHaveText(`Estimated ${kind === 'high' ? 'Puma' : 'Sidekiq'} process count for same load`);
@@ -85,20 +83,20 @@ test.describe('Threadpilot interactive comparisons', () => {
     await expect(changing).toHaveAttribute('data-source', 'measured');
     await expect(changing.locator('[data-workload][value="90"]')).toBeChecked();
     await expect(changing.locator('[data-throughput-claim]')).toHaveText('1.1x');
-    await expect(changing.locator('[data-throughput-detail]')).toHaveText('18.3 vs 17.1 jobs/s');
-    await expect(changing.locator('[data-latency-detail]')).toHaveText('303.8 vs 463.4 ms');
+    await expect(changing.locator('[data-throughput-detail]')).toHaveText('18.2 vs 17.1 jobs/s');
+    await expect(changing.locator('[data-latency-detail]')).toHaveText('339.3 vs 458.4 ms');
     await expect(low.locator('[data-throughput-claim]')).toHaveText('1.0x');
-    await expect(low.locator('[data-latency-detail]')).toHaveText('2,081.6 vs 473.9 ms');
+    await expect(low.locator('[data-latency-detail]')).toHaveText('2,114.6 vs 464.9 ms');
     await expect(low.locator('[data-latency-claim]')).toContainText('higher');
     await select(high, 'baseline', 3);
     await expect(high).toHaveAttribute('data-source', 'measured');
-    await expect(high.locator('[data-throughput-claim]')).toHaveText('3.0x');
-    await expect(high.locator('[data-throughput-detail]')).toHaveText('32.1 vs 10.9 requests/s');
-    await expect(high.locator('[data-latency-detail]')).toHaveText('244.8 vs 1,555.9 ms');
-    await expect(high.locator('[data-chart="latency"]')).toHaveAttribute('aria-label', /Measured comparison.*median queueing/);
+    await expect(high.locator('[data-throughput-claim]')).toHaveText('2.9x');
+    await expect(high.locator('[data-throughput-detail]')).toHaveText('31.9 vs 10.9 requests/s');
+    await expect(high.locator('[data-latency-detail]')).toHaveText('244.3 vs 1,574.5 ms');
+    await expect(high.locator('[data-chart="latency"]')).toHaveAttribute('aria-label', /Measured comparison.*Individual request\/job observations/);
     await select(high, 'baseline', 1);
-    await expect(high.locator('[data-throughput-claim]')).toHaveText('8.2x');
-    await expect(high.locator('[data-latency-detail]')).toHaveText('244.8 vs 4,845.4 ms');
+    await expect(high.locator('[data-throughput-claim]')).toHaveText('8.1x');
+    await expect(high.locator('[data-latency-detail]')).toHaveText('244.3 vs 4,831.3 ms');
     await expect(low).toHaveAttribute('data-source', 'measured');
     await expect(low.locator('[data-latency-claim]')).toContainText('higher');
     await expect(changing).toHaveAttribute('data-source', 'measured');
@@ -115,19 +113,19 @@ test.describe('Threadpilot interactive comparisons', () => {
     expect(adaptiveEnd).toBeGreaterThan(0.45);
     expect(adaptiveEnd).toBeLessThan(0.65);
     await select(high, 'baseline', 5);
-    await expect(high).toHaveAttribute('data-source', 'mixed');
-    await expect(high.locator('[data-baseline-label]')).toContainText('estimated');
-    await expect(high.locator('[data-throughput-detail]')).toHaveText('32.1 vs 20 requests/s');
+    await expect(high).toHaveAttribute('data-source', 'measured');
+    await expect(high.locator('[data-baseline-label]')).toContainText('measured');
+    await expect(high.locator('[data-throughput-detail]')).toHaveText('31.9 vs 16.5 requests/s');
   });
 
-  test('labels every comparison as estimated when the measured data cannot load', async ({ page }) => {
+  test('marks comparisons unavailable without inventing estimates when data cannot load', async ({ page }) => {
     await page.route('**/assets/data/threadpilot_scenarios.json', route => route.abort());
     await page.goto('/threadpilot.html');
     for (const kind of scenarios) {
       const section = page.locator(`[data-scenario="${kind}"]`);
-      await expect(section).toHaveAttribute('data-source', 'estimated');
-      await expect(section.locator('[data-adaptive-label]')).toHaveText('Threadpilot · estimated');
-      await expect(section.locator('[data-chart="latency"]')).toHaveAttribute('aria-label', /Estimates, not measured results/);
+      await expect(section).toHaveAttribute('data-source', 'unavailable');
+      await expect(section.locator('[data-adaptive-label]')).toHaveText('Threadpilot · unavailable');
+      await expect(section.locator('[data-chart="latency"]')).toHaveAttribute('aria-label', 'Measured benchmark data unavailable');
     }
   });
 

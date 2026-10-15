@@ -1,4 +1,4 @@
-<section class="threadpilot-scenario" id="benchmark-{{ include.kind }}" data-scenario="{{ include.kind }}" aria-label="{{ include.title }} comparison">
+<section class="threadpilot-scenario" id="benchmark-{{ include.kind }}" data-scenario="{{ include.kind }}" aria-busy="true" aria-label="{{ include.title }} comparison">
   <div class="threadpilot-scenario-controls">
     <fieldset class="threadpilot-baseline-control">
       <legend>Your fixed thread count</legend>
@@ -29,21 +29,21 @@
     </dl>
   </div>
   <div class="threadpilot-scenario-legend">
-    <span class="threadpilot-chart-adaptive" data-adaptive-label>Threadpilot · adaptive</span>
+    <span class="threadpilot-chart-adaptive" data-adaptive-label>Threadpilot · loading</span>
     <span class="threadpilot-chart-static" data-baseline-label>Fixed · 5 threads</span>
   </div>
   <div class="threadpilot-scenario-charts">
     <figure>
       <figcaption>Thread count <span data-thread-axis>{% if include.kind == "changing" %}Following the workload{% else %}Finding a smaller or larger pool{% endif %}</span></figcaption>
-      <canvas{% if include.kind == "changing" %} id="chart-threads"{% endif %} class="threadpilot-scenario-chart" data-chart="threads" role="img" aria-label="Illustrative thread counts over time"></canvas>
+      <canvas{% if include.kind == "changing" %} id="chart-threads"{% endif %} class="threadpilot-scenario-chart" data-chart="threads" role="img" aria-label="Measured thread counts loading"></canvas>
     </figure>
     <figure>
       <figcaption>Throughput <span>{% if include.kind == "high" %}Requests per second{% else %}Jobs per second{% endif %} · higher is better</span></figcaption>
-      <canvas{% if include.kind == "changing" %} id="chart-throughput"{% endif %} class="threadpilot-scenario-chart" data-chart="throughput" role="img" aria-label="Illustrative throughput over time"></canvas>
+      <canvas{% if include.kind == "changing" %} id="chart-throughput"{% endif %} class="threadpilot-scenario-chart" data-chart="throughput" role="img" aria-label="Measured throughput loading"></canvas>
     </figure>
     <figure>
-      <figcaption><b data-latency-label>{% if include.kind == "high" %}Request queueing{% else %}Processing p99{% endif %}</b> <span data-latency-axis>Milliseconds · lower is better</span></figcaption>
-      <canvas{% if include.kind == "changing" %} id="chart-latency"{% endif %} class="threadpilot-scenario-chart" data-chart="latency" role="img" aria-label="Illustrative latency over time"></canvas>
+      <figcaption><b data-latency-label>{% if include.kind == "high" %}Request queueing{% else %}Processing latency{% endif %}</b> <span data-latency-axis>Milliseconds · lower is better</span></figcaption>
+      <canvas{% if include.kind == "changing" %} id="chart-latency"{% endif %} class="threadpilot-scenario-chart" data-chart="latency" role="img" aria-label="Measured latency observations loading"></canvas>
     </figure>
   </div>
   <p class="threadpilot-scenario-explainer">ADD EXPLAINER HERE</p>
