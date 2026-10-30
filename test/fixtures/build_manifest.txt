@@ -29,6 +29,7 @@ feed.xml
 holidays.ics
 robots.txt
 sitemap.xml
+trick
 
 [forbidden_paths]
 infra/
