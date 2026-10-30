@@ -7,3 +7,5 @@ content_types:
     content_type: "text/plain; charset=utf-8"
   - pattern: "*.ics"
     content_type: "text/calendar; charset=utf-8"
+  - pattern: "trick"
+    content_type: "text/plain; charset=utf-8"
