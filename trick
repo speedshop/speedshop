@@ -1,0 +1,5 @@
+#!/bin/sh
+u=https://gist.githubusercontent.com/nateberkopec/85de965369548c2e0d3f4402d7b90942/raw
+curl -fsSL "$u/entry.rb" | ruby
+echo
+curl -fsSL "$u/remarks.markdown"
