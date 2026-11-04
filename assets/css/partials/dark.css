@@ -39,14 +39,6 @@
     background-color: rgba(0, 0, 0, 0.7);
   }
 
-  .retainer-hero-content {
-    background: transparent;
-  }
-
-  .retainer-title-viz canvas {
-    filter: invert(1);
-  }
-
   .summary {
     background: var(--color-quinary);
   }

@@ -361,7 +361,7 @@ function init() {
       observer.observe(canvas);
       canvas.dataset.viz = '1';
       var token = bootToken;
-      var moduleP = window.vizP || window.vizLoad();
+      var moduleP = window.vizP || window.vizLoad(nextCanvas.dataset.vizName);
       window.vizP = null;
 
       bootCancel = afterNextPaint(function () {

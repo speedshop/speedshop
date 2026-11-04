@@ -1,6 +1,9 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
 
+// Exercise WebGL rendering even when headless Chromium has no hardware GPU.
+test.use({ launchOptions: { args: ['--enable-unsafe-swiftshader'] } });
+
 async function installAnimationFrameTracker(page) {
   await page.addInitScript(() => {
     const nativeRequestAnimationFrame = window.requestAnimationFrame.bind(window);
