@@ -541,6 +541,143 @@ button {
   margin: var(--status-space-lg) 0;
 }
 
+.work-categories {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 0.6em;
+  margin-bottom: var(--rhythm-main);
+}
+
+.work-category {
+  border-top: 1px solid #ddd;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  padding: 0.7em 0;
+
+  & p {
+    margin: 0;
+  }
+}
+
+.work-count {
+  align-self: baseline;
+  font: bold 1.7em/1 'Helvetica Neue', Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+  grid-column: 1;
+  grid-row: 1;
+  text-align: right;
+}
+
+.work-name {
+  align-self: baseline;
+  font: bold 0.95em/1 'Helvetica Neue', Arial, sans-serif;
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.work-track {
+  background: #eee;
+  grid-column: 2;
+  height: 0.28em;
+  margin: 0.45em 0 0.5em;
+
+  & span {
+    background: #555;
+    display: block;
+    height: 100%;
+  }
+}
+
+.work-includes,
+.work-description {
+  color: #444;
+  font-size: 0.85em;
+  grid-column: 2;
+  line-height: 1.45;
+}
+
+.work-term {
+  cursor: help;
+  outline: none;
+  position: relative;
+  text-decoration: underline dotted #888;
+  text-underline-offset: 0.2em;
+
+  &:hover .work-tip,
+  &:focus .work-tip {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.work-tip {
+  background: #111;
+  border-radius: 0.3em;
+  bottom: calc(100% + 0.5em);
+  color: #fff;
+  font: 0.8em/1.4 'Helvetica Neue', Arial, sans-serif;
+  left: 0;
+  opacity: 0;
+  padding: 0.6em 0.75em;
+  position: absolute;
+  transition: opacity 0.12s;
+  visibility: hidden;
+  width: 18em;
+  z-index: 5;
+}
+
+@media (hover: none) {
+  .work-term {
+    cursor: auto;
+    text-decoration: none;
+  }
+
+  .work-tip {
+    display: none;
+  }
+}
+
+.work-types {
+  display: none;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+  margin: 0;
+
+  & dt {
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+
+  & dd {
+    color: #444;
+    font-size: 0.85em;
+    line-height: 1.4;
+    margin: 0 0 0.55em;
+  }
+}
+
+@media (min-width: 768px) {
+  .work-categories-expanded {
+    grid-template-columns: max-content minmax(10em, 13em) 1fr;
+    column-gap: 0.8em;
+
+    & .work-category {
+      padding: 1em 0;
+    }
+
+    & .work-description {
+      display: none;
+    }
+
+    & .work-types {
+      display: block;
+      grid-column: 3;
+      grid-row: 1 / span 3;
+      padding-left: 1em;
+    }
+  }
+}
+
 .stat {
   display: flex;
   flex-direction: column;

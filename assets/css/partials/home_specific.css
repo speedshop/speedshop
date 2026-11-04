@@ -28,6 +28,10 @@
   width: auto;
 }
 
+.trusted-by-list {
+  column-count: 2;
+}
+
 .home-person-photo {
   height: calc(var(--rhythm-main) * 4) !important;
 }

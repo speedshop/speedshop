@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "generated_at": "2026-01-17T00:00:00Z",
   "sla": {
     "start_date": "2026-01-01",
@@ -176,5 +176,63 @@
       "p99": null
     },
     "bins": []
-  }
+  },
+  "clients": [
+    {
+      "name": "Featured Example",
+      "featured": true
+    },
+    {
+      "name": "Another Example",
+      "featured": false
+    },
+    {
+      "name": "Example Company",
+      "featured": false
+    },
+    {
+      "name": "Sample Corp",
+      "featured": false
+    }
+  ],
+  "retainer_clients": 12,
+  "work_last_12_months": [
+    {
+      "name": "Example work",
+      "description": "Example category description.",
+      "count": 12,
+      "types": [
+        {
+          "label": "Example tasks",
+          "description": "An example task."
+        },
+        {
+          "label": "SLOs example",
+          "description": "An example SLO."
+        }
+      ]
+    },
+    {
+      "name": "Sample work",
+      "description": "Sample category description.",
+      "count": 30,
+      "types": [
+        {
+          "label": "Sample tasks",
+          "description": "A sample task."
+        }
+      ]
+    },
+    {
+      "name": "Unused work",
+      "description": "Unused category description.",
+      "count": 0,
+      "types": [
+        {
+          "label": "Unused tasks",
+          "description": "An unused task."
+        }
+      ]
+    }
+  ]
 }

@@ -1,0 +1,24 @@
+<h3>Client work, last 12 months</h3>
+
+<p>Across every Speedshop client in the last 12 months: <b>{{ site.data.track_record.work_total }}</b> logged pieces of work.</p>
+
+<div class="work-categories{% if include.expanded %} work-categories-expanded{% endif %}">
+  {% for category in site.data.track_record.work_last_12_months %}
+  <div class="work-category">
+    <span class="work-count">{{ category.count }}</span>
+    <span class="work-name">{{ category.name | escape }}</span>
+    <span class="work-track"><span style="width: {{ category.percent }}%"></span></span>
+    {% if include.expanded %}
+    <p class="work-description">{{ category.description | escape }}</p>
+    <dl class="work-types">
+      {% for type in category.types %}
+      <dt>{{ type.label | escape }}</dt>
+      <dd>{{ type.description | escape }}</dd>
+      {% endfor %}
+    </dl>
+    {% else %}
+    <p class="work-includes">Includes {% for type in category.types %}<span class="work-term" tabindex="0" aria-describedby="work-tip-{{ forloop.parentloop.index }}-{{ forloop.index }}">{{ type.phrase | escape }}<span class="work-tip" id="work-tip-{{ forloop.parentloop.index }}-{{ forloop.index }}" role="tooltip">{{ type.description | escape }}</span></span>{% unless forloop.last %}, {% endunless %}{% endfor %}.</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>

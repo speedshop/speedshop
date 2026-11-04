@@ -4,19 +4,22 @@ The website consumes one public JSON snapshot rather than checking out or execut
 
 ## Contract
 
-Version 1 contains exactly `version`, `generated_at`, `sla`, `availability`, `holidays`, `archive`, and `reply_histogram`.
+Version 2 contains exactly `version`, `generated_at`, `sla`, `availability`, `holidays`, `archive`, `reply_histogram`, `clients`, `retainer_clients`, and `work_last_12_months`.
 
 - SLA: date coverage and daily status enums.
 - Availability: the next three months and availability enums, without client identities, contracts, workload weights, or remaining capacity.
 - Holidays: public names and dates.
 - Archive: released numbered Markdown from canonical `YYYY_MM_DD.md` newsletter files, without editorial notes or future issues.
 - Histogram: numeric bins, counts, maximum, and percentiles, without individual inbox timestamps.
+- Clients: public names of at most 18 characters with a `featured` flag, ordered featured first and then alphabetically. The homepage renders them in two columns, and the limit keeps each name on one line. Clients opt out in client_notes; legal names, contracts, and contacts are not included.
+- Retainer clients: the number of clients with a started retainer contract.
+- Work: one count per category for the trailing 12 months, with each category's name, description, and the labels and descriptions of the types it includes. Counts per type, individual events, client attribution, and private types are not included. client_notes owns all of this copy; the website renders it verbatim, showing nonzero categories largest first.
 
 The producer checks exact fields, coverage, dates, enums, text limits, control characters, histogram consistency, and a 5 MiB serialized-size limit before emitting the upload file. Missing released newsletters or holidays abort generation. A failed generation or validation never reaches the upload step.
 
 These checks catch unintended fields and malformed projections. They do not prove that every permitted text field is free of private information. Producer code retains automatic publication authority; it must never serialize raw client records or credentials into allowed text fields.
 
-The website independently validates the downloaded data, rejects empty holiday and newsletter collections, and renders sanitized newsletter HTML, numeric histogram SVG, and escaped calendar text. Malformed JSON errors do not quote input into public logs. Production refuses snapshots older than 24 hours or more than five minutes in the future, and refuses fixture mode. Failed builds leave the deployed site unchanged. Generation time is not a claim that every underlying business record was recently edited.
+The website independently validates the downloaded data, rejects empty holiday, newsletter, client, and work collections, and renders sanitized newsletter HTML, numeric histogram SVG, and escaped calendar text. Malformed JSON errors do not quote input into public logs. Production refuses snapshots older than 24 hours or more than five minutes in the future, and refuses fixture mode. Failed builds leave the deployed site unchanged. Generation time is not a claim that every underlying business record was recently edited.
 
 ## Storage and access
 
@@ -63,4 +66,4 @@ bundle exec rake site:build_and_validate
 mise run test:website-snapshot
 ```
 
-The system tests cover fresh, stale, future, missing, malformed, unexpected-field, and empty-collection snapshots, preservation of previous output after rejection, sanitized rendering, payload-free diagnostics, and refusal of production fixture mode.
+The system tests cover fresh, stale, future, missing, malformed, unexpected-field, overlong-name, and empty-collection snapshots, preservation of previous output after rejection, sanitized rendering, payload-free diagnostics, and refusal of production fixture mode.

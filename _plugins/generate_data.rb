@@ -93,8 +93,15 @@ Jekyll::Hooks.register :site, :after_init do |site|
     {"label" => Date.strptime(month.fetch("month"), "%Y-%m").strftime("%B %Y"), "status" => month.fetch("status")}
   end}
   archive = Speedshop::FourLineArchiveGenerator.generate(lines: snapshot.fetch("archive"), generated_at: snapshot.fetch("generated_at"))
+  categories = snapshot.fetch("work_last_12_months").reject { |category| category.fetch("count").zero? }.sort_by.with_index { |category, index| [-category.fetch("count"), index] }
+  largest = categories.map { |category| category.fetch("count") }.max
+  work = categories.map do |category|
+    types = category.fetch("types").map { |type| type.merge("phrase" => type.fetch("label").sub(/\A[A-Z](?=[a-z])/, &:downcase)) }
+    category.merge("percent" => (category.fetch("count") * 100.0 / largest).round(1), "types" => types)
+  end
+  track_record = {"clients" => snapshot.fetch("clients").map { |client| client.fetch("name") }, "retainer_clients" => snapshot.fetch("retainer_clients"), "work_total" => categories.sum { |category| category.fetch("count") }, "work_last_12_months" => work}
 
-  {"sla_status" => sla, "availability" => availability, "four_line_archive" => archive}.each do |name, payload|
+  {"sla_status" => sla, "availability" => availability, "four_line_archive" => archive, "track_record" => track_record}.each do |name, payload|
     File.write(File.join(data_dir, "#{name}.json"), "#{JSON.pretty_generate(payload)}\n")
   end
   File.write(File.join(site.source, "holidays.ics"), Speedshop::WebsiteCalendar.render(snapshot.fetch("holidays")))
