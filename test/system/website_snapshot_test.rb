@@ -32,6 +32,7 @@ class WebsiteSnapshotSystemTest < Minitest::Test
 
   def test_fresh_snapshot_builds_without_private_repository_and_sanitizes_content
     @payload["archive"] << {"issue_date" => "2026-01-17", "markdown" => '<script>alert("export")</script><svg onload="alert(1)"></svg><a href="javascript:alert(1)" onclick="alert(1)">unsafe</a> **safe text**'}
+    @payload["clients"].insert(1, {"name" => "<b>Bold</b> Co", "featured" => false})
     @payload["reply_histogram"] = {
       "count" => 3, "bin_width_hours" => 1, "max_hours" => 6,
       "percentiles" => {"p99" => 5.98, "p95" => 5.9, "p75" => 5.5, "p50" => 5},
@@ -46,6 +47,16 @@ class WebsiteSnapshotSystemTest < Minitest::Test
     refute lines.css("script, svg, [onclick], [onload]").any?
     refute lines.css("a").any? { |link| link["href"].to_s.start_with?("javascript:") }
     assert_includes lines.text, "safe text"
+    home = Nokogiri::HTML(File.read(File.join(@destination, "index.html")))
+    assert_equal ["Featured Example", "<b>Bold</b> Co", "Another Example", "Example Company", "Sample Corp", "... and more."], home.css(".trusted-by-list li").map(&:text)
+    refute home.css(".trusted-by-list b").any?
+    retainer = Nokogiri::HTML(File.read(File.join(@destination, "retainer.html")))
+    assert_includes retainer.text, "12 businesses have already joined this program"
+    stats = retainer.css(".work-stats .stat").map { |stat| [stat.at_css(".stat-label").text, stat.at_css(".stat-value").text] }
+    assert_equal ["Production changes", "37"], stats.first
+    assert_equal ["Other client work", "11"], stats.last
+    refute_includes stats.map(&:first), "Chat conversations"
+    assert_equal stats, Nokogiri::HTML(File.read(File.join(@destination, "status.html"))).css(".work-stats .stat").map { |stat| [stat.at_css(".stat-label").text, stat.at_css(".stat-value").text] }
     refute File.exist?(File.join(@destination, "snapshot.json"))
     refute Dir.exist?(File.join(@destination, "tmp"))
   end
@@ -67,6 +78,17 @@ class WebsiteSnapshotSystemTest < Minitest::Test
 
   def test_empty_archive_refuses_to_build_and_preserve_previous_output
     assert_empty_collection_rejected("archive")
+  end
+
+  def test_empty_clients_refuse_to_build_and_preserve_previous_output
+    assert_empty_collection_rejected("clients")
+  end
+
+  def test_overlong_client_name_refuses_to_build
+    @payload["clients"].last["name"] = "Sample Corporation Holdings"
+    output, status = build
+    refute status.success?
+    assert_includes output, "Invalid website snapshot text"
   end
 
   def test_future_timestamp_refuses_to_build

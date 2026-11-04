@@ -541,6 +541,13 @@ button {
   margin: var(--status-space-lg) 0;
 }
 
+.work-stats {
+  display: grid;
+  gap: var(--rhythm-main);
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  margin-bottom: var(--rhythm-main);
+}
+
 .stat {
   display: flex;
   flex-direction: column;

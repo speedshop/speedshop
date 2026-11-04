@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "generated_at": "2026-01-17T00:00:00Z",
   "sla": {
     "start_date": "2026-01-01",
@@ -176,5 +176,40 @@
       "p99": null
     },
     "bins": []
+  },
+  "clients": [
+    {
+      "name": "Featured Example",
+      "featured": true
+    },
+    {
+      "name": "Another Example",
+      "featured": false
+    },
+    {
+      "name": "Example Company",
+      "featured": false
+    },
+    {
+      "name": "Sample Corp",
+      "featured": false
+    }
+  ],
+  "retainer_clients": 12,
+  "work_last_12_months": {
+    "chat_conversation": 0,
+    "office_hours_call": 7,
+    "adhoc_call": 14,
+    "issue_created": 21,
+    "issue_commented": 28,
+    "pr_opened": 35,
+    "pr_reviewed": 2,
+    "issue_completed": 9,
+    "dashboard_created": 16,
+    "slo_created": 23,
+    "audit_report": 30,
+    "production_change": 37,
+    "monthly_report": 4,
+    "other": 11
   }
 }

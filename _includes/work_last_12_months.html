@@ -1,0 +1,10 @@
+<h3>Client work, last 12 months</h3>
+
+<div class="work-stats">
+  {% for item in site.data.track_record.work_last_12_months %}
+  <div class="stat">
+    <span class="stat-value">{{ item.count }}</span>
+    <span class="stat-label">{{ item.label }}</span>
+  </div>
+  {% endfor %}
+</div>

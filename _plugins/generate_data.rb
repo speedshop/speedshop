@@ -93,8 +93,12 @@ Jekyll::Hooks.register :site, :after_init do |site|
     {"label" => Date.strptime(month.fetch("month"), "%Y-%m").strftime("%B %Y"), "status" => month.fetch("status")}
   end}
   archive = Speedshop::FourLineArchiveGenerator.generate(lines: snapshot.fetch("archive"), generated_at: snapshot.fetch("generated_at"))
+  work = snapshot.fetch("work_last_12_months").reject { |_type, count| count.zero? }
+    .sort_by { |type, count| [(type == "other") ? 1 : 0, -count] }
+    .map { |type, count| {"label" => Speedshop::WebsiteSnapshot::WORK_LABELS.fetch(type), "count" => count} }
+  track_record = {"clients" => snapshot.fetch("clients").map { |client| client.fetch("name") }, "retainer_clients" => snapshot.fetch("retainer_clients"), "work_last_12_months" => work}
 
-  {"sla_status" => sla, "availability" => availability, "four_line_archive" => archive}.each do |name, payload|
+  {"sla_status" => sla, "availability" => availability, "four_line_archive" => archive, "track_record" => track_record}.each do |name, payload|
     File.write(File.join(data_dir, "#{name}.json"), "#{JSON.pretty_generate(payload)}\n")
   end
   File.write(File.join(site.source, "holidays.ics"), Speedshop::WebsiteCalendar.render(snapshot.fetch("holidays")))

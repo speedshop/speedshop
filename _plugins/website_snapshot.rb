@@ -6,6 +6,23 @@ module Speedshop
   class WebsiteSnapshot
     MAX_BYTES = 5 * 1024 * 1024
     MAX_AGE = 24 * 60 * 60
+    MAX_CLIENT_NAME_LENGTH = 18
+    WORK_LABELS = {
+      "pr_opened" => "Pull requests opened",
+      "pr_reviewed" => "Pull requests reviewed",
+      "production_change" => "Production changes",
+      "dashboard_created" => "Dashboards created",
+      "slo_created" => "SLOs created",
+      "issue_created" => "Issues created",
+      "issue_commented" => "Issue comments",
+      "issue_completed" => "Issues completed",
+      "audit_report" => "Audit reports",
+      "monthly_report" => "Monthly reports",
+      "office_hours_call" => "Office hours calls",
+      "adhoc_call" => "Ad hoc calls",
+      "chat_conversation" => "Chat conversations",
+      "other" => "Other client work"
+    }.freeze
 
     def self.load(path, now: Time.now, check_freshness: true)
       raise "Website snapshot missing: #{path}" unless path && File.file?(path)
@@ -24,8 +41,8 @@ module Speedshop
     end
 
     def validate!(check_freshness: true)
-      object!(@payload, %w[version generated_at sla availability holidays archive reply_histogram])
-      check!(@payload["version"].is_a?(Integer) && @payload["version"] == 1, "Unsupported website snapshot version")
+      object!(@payload, %w[version generated_at sla availability holidays archive reply_histogram clients retainer_clients work_last_12_months])
+      check!(@payload["version"].is_a?(Integer) && @payload["version"] == 2, "Unsupported website snapshot version")
       timestamp = @payload["generated_at"]
       check!(timestamp.is_a?(String) && timestamp.match?(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\z/), "Invalid snapshot timestamp")
       generated_at = Time.iso8601(timestamp)
@@ -39,6 +56,10 @@ module Speedshop
       validate_holidays!
       validate_archive!(generated_at.getlocal("+09:00").to_date)
       validate_histogram!
+      validate_clients!
+      count!(@payload["retainer_clients"])
+      object!(@payload["work_last_12_months"], WORK_LABELS.keys)
+      @payload["work_last_12_months"].each_value { |count| count!(count) }
       @payload
     end
 
@@ -115,6 +136,19 @@ module Speedshop
         count!(bin["count"])
       end
       check!(histogram["bins"].sum { |bin| bin["count"] } == histogram["count"], "Histogram count mismatch")
+    end
+
+    def validate_clients!
+      clients = @payload["clients"]
+      array!(clients, 500)
+      check!(!clients.empty?, "Website snapshot clients must not be empty")
+      clients.each do |client|
+        object!(client, %w[name featured])
+        text!(client["name"], MAX_CLIENT_NAME_LENGTH)
+        check!([true, false].include?(client["featured"]), "Invalid featured flag")
+      end
+      check!(clients.map { |client| client["name"].downcase }.uniq.length == clients.length, "Duplicate public client name")
+      check!(clients == clients.sort_by { |client| [client["featured"] ? 0 : 1, client["name"].downcase] }, "Unordered public client list")
     end
 
     def object!(value, keys)

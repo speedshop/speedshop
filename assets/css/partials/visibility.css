@@ -14,19 +14,11 @@
   .margin-top-xl {
     margin-top: 2em;
   }
-
-  .trusted-by-list {
-    column-count: 2;
-  }
 }
 
 @media (min-width: 768px) {
   .margin-top-xl {
     margin-top: 10em;
-  }
-
-  .trusted-by-list {
-    column-count: 3;
   }
 }
 
