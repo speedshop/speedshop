@@ -128,7 +128,7 @@ When Aaron says "managed by the GC" here, he means "inside the `ObjectSpace` lis
 
 Ok, so let's talk about where per-thread memory arenas come in.
 
-The per-thread memory arena was an optimization introduced in `glibc` 2.10, [and lives today in `arena.c`](https://github.molgen.mpg.de/git-mirror/glibc/blob/master/malloc/arena.c). It's designed to decrease contention between threads when accessing memory.
+The per-thread memory arena was an optimization introduced in `glibc` 2.10, [and lives today in `arena.c`](https://codebrowser.dev/glibc/glibc/malloc/arena.c.html). It's designed to decrease contention between threads when accessing memory.
 
 In a naive, basic allocator design, the allocator makes sure only one thread can request a memory chunk from the main arena at a time. This ensures that two threads don't accidentally get the same chunk of memory. If they did, that would cause some pretty nasty multi-threading bugs. However, for programs with a lot of threads, this can be slow, since there's a lot of contention for the lock. *All* memory access for *all* threads is gated through this lock, so you can see how this could be a bottleneck.
 
