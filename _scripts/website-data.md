@@ -13,13 +13,13 @@ Version 2 contains exactly `version`, `generated_at`, `sla`, `availability`, `ho
 - Histogram: numeric bins, counts, maximum, and percentiles, without individual inbox timestamps.
 - Clients: public names of at most 18 characters with a `featured` flag, ordered featured first and then alphabetically. The homepage renders them in two columns, and the limit keeps each name on one line. Clients opt out in client_notes; legal names, contracts, and contacts are not included.
 - Retainer clients: the number of clients with a started retainer contract.
-- Work: value-event counts by type for the trailing 12 months, without individual events, client attribution, or ratings. The retainer and status pages show nonzero counts, largest first, with `other` last.
+- Work: one count per category for the trailing 12 months, with each category's name, description, and the labels and descriptions of the types it includes. Counts per type, individual events, client attribution, and private types are not included. client_notes owns all of this copy; the website renders it verbatim, showing nonzero categories largest first.
 
 The producer checks exact fields, coverage, dates, enums, text limits, control characters, histogram consistency, and a 5 MiB serialized-size limit before emitting the upload file. Missing released newsletters or holidays abort generation. A failed generation or validation never reaches the upload step.
 
 These checks catch unintended fields and malformed projections. They do not prove that every permitted text field is free of private information. Producer code retains automatic publication authority; it must never serialize raw client records or credentials into allowed text fields.
 
-The website independently validates the downloaded data, rejects empty holiday, newsletter, and client collections, and renders sanitized newsletter HTML, numeric histogram SVG, and escaped calendar text. Malformed JSON errors do not quote input into public logs. Production refuses snapshots older than 24 hours or more than five minutes in the future, and refuses fixture mode. Failed builds leave the deployed site unchanged. Generation time is not a claim that every underlying business record was recently edited.
+The website independently validates the downloaded data, rejects empty holiday, newsletter, client, and work collections, and renders sanitized newsletter HTML, numeric histogram SVG, and escaped calendar text. Malformed JSON errors do not quote input into public logs. Production refuses snapshots older than 24 hours or more than five minutes in the future, and refuses fixture mode. Failed builds leave the deployed site unchanged. Generation time is not a claim that every underlying business record was recently edited.
 
 ## Storage and access
 
