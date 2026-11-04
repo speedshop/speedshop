@@ -4,47 +4,94 @@ const WORDMARK = [
   'm1064.43 133.14c-2.23 0-4.25-.8-5.87-2.43l16-52.8c4.26-6.5 8.72-7.7 10.34-7.7 5.07 0 8.3 2.9.2 31.8-7.9 28-14.8 31.2-20.67 31.2zm-8.1-90.58c-16.2 0-35.26 5.26-36.88 11.75-1.83 6.7 9.52 5.9 6.48 15.4l-29.6 97.1c-3.43 12.2-10.73 9.5-12.35 15.4-1.2 3.5 1.83 6.1 8.92 6.1h46.4c8.52 0 12.16-1.4 13.18-4.8 1.62-5.4-8.72-5-5.07-16l6.5-21.7c7.1 4.1 16 5.9 24.3 5.9 28 0 52.7-16.6 61.2-51.3 8.6-34.4-4-58.5-30.8-58.5-10.7 0-21.4 5.5-31 17.7-1.2-10.5-9.3-16.8-21.2-16.8z',
 ];
 const FONT = '"Helvetica Neue", Inter, Roboto, "Arial Nova", "Nimbus Sans", Arial, sans-serif';
-const PHRASE = 'P95 LATENCY · QUEUE TIME · GC PAUSES · I/O WAIT · THROUGHPUT · PUMA · SIDEKIQ · N+1 · MEMORY · APDEX · SLOS · MONITORING · ROADMAPPING · SUPPORT · ';
+const QUOTES = [
+  'Every feature imposes some kind of performance cost.',
+  'Rather than ignore these costs, we should quantify them.',
+  "Isn't a slowdown really a partial outage?",
+  "80% of an application's memory usage will come from 20% of its allocated objects.",
+  "Actually, usually it's way more severe - 90/10, 95/5, 99/1.",
+  'Asking for a profile is asking the computer to show its work.',
+  'Profile, and figure out where the time goes.',
+  'It cannot magically make the actual execution of our code any faster.',
+  'In production, most Ruby applications are memory-constrained.',
+  'ActiveRecord is a double-edged sword.',
+  'Performance debt, like technical debt, mounts quickly.',
+  'We have to get speed from executing less Ruby on each request.',
+  'Do the work once, cache the result, serve the cached result in the future.',
+  "Application servers can't actually make your app significantly faster.",
+  'Without tests, regressions can happen at any time.',
+  'Memory fragmentation causes logarithmic growth in memory.',
+  'Page weight, while important, is a false idol.',
+  'Webpages are text-delivery mechanisms.',
+  "There's one universal law of front-end performance - less is more.",
+  'Network latency is a kind of speed limit imposed on our network traffic, governed by the speed of light.',
+  'TCP connections are, and always will be, expensive.',
+  'Creating a perception of the page loading is just as important as the page actually loading.',
+];
 
 const strip = () => {
   const c = document.createElement('canvas');
   c.width = 2048;
-  c.height = 128;
+  c.height = 1024;
   const x = c.getContext('2d');
   x.fillStyle = '#000';
-  x.fillRect(0, 0, 2048, 128);
+  x.fillRect(0, 0, 2048, 1024);
   x.fillStyle = '#fff';
-  x.font = `bold 44px ${FONT}`;
-  x.setTransform(2048 / x.measureText(PHRASE).width, 0, 0, 1, 0, 0);
-  x.fillText(PHRASE, 0, 48);
   const s = 52 / 190;
   for (let i = 0; i < 5; i++) {
-    x.setTransform(s, 0, 0, s, i * 409.6 + 47, 70 + s);
+    x.setTransform(s, 0, 0, s, i * 409.6 + 47, 6 + s);
     for (const d of WORDMARK) x.fill(new Path2D(d));
   }
-  return c;
+  x.font = `bold 40px ${FONT}`;
+  const gap = 60;
+  const lines = [[]];
+  let w = 0;
+  for (const q of QUOTES) {
+    const qw = x.measureText(q).width + gap;
+    if (w && w + qw > 2048) {
+      lines.push([]);
+      w = 0;
+    }
+    lines[lines.length - 1].push(q);
+    w += qw;
+  }
+  lines.slice(0, 15).forEach((line, i) => {
+    const ws = line.map((q) => x.measureText(q).width);
+    const total = ws.reduce((a, b) => a + b, 0);
+    const k = Math.min(1, 2048 / (total + gap * line.length));
+    const g = (2048 / k - total) / line.length;
+    const y = 64 * (i + 1) + 48;
+    x.setTransform(k, 0, 0, 1, 0, 0);
+    let px = g / 2;
+    line.forEach((q, j) => {
+      x.fillText(q, px, y);
+      x.fillText('·', px + ws[j] + g / 2 - 6, y);
+      px += ws[j] + g;
+    });
+  });
+  return { c, lines: Math.min(lines.length, 15) };
 };
 
 export const make = ({ canvas, gl, mkProg, mkTex, mkSDF, PRE }) => {
   const prog = mkProg(PRE + `
-uniform float DK;uniform vec3 M;uniform sampler2D X,W;
+uniform float DK,L;uniform vec3 M;uniform sampler2D X,W;
 float sw(vec2 q){
 vec2 b=abs(q)-1.3;
 return(texture2D(W,clamp(q*vec2(.3846,-.3846)+.5,0.,1.)).r-.5)*1.625+length(max(b,0.));}
 float m2(vec2 p){return 2.*p.x+3.*p.y-4.*p.x*p.y;}
 float bay(vec2 p){return(4.*m2(mod(p,2.))+m2(mod(floor(p*.5),2.)))/16.+.03;}
-float tx(vec2 p,float h,float v0,float sp,float seed){
+float tx(vec2 p,float h,float s0,float n,float sp,float seed){
 float yy=p.y/h;
 float r=floor(yy);
 float u=p.x/(h*32.)+(mod(r,2.)*2.-1.)*T*sp+hs(vec2(r,seed));
-return step(.5,texture2D(X,vec2(u,v0+(1.-fract(yy))*.5)).r);}
+return step(.5,texture2D(X,vec2(u,(s0+mod(r,n)+1.-fract(yy))/16.)).r);}
 float field(vec2 p,float th){
 vec2 uv=(2.*p-R)/R.y;
 float d=sw(uv*1.08);
 float dp=d*R.y/2.16;
 if(dp<0.){
 if(dp>-3.)return 1.;
-return 1.-tx(vec2(p.x,p.y-R.y*.03*sin(uv.x*2.1-T*1.3)),20.,.5,-.04,7.);}
+return 1.-tx(vec2(p.x,p.y-R.y*.03*sin(uv.x*2.1-T*1.3)),20.,0.,1.,-.04,7.);}
 if(dp<5.)return 0.;
 float lm=M.z*(1.-smoothstep(80.,130.,length(p-M.xy)));
 p=mix(p,M.xy,.3*lm);
@@ -52,7 +99,7 @@ float a=R.y*(.025+.09*smoothstep(0.,1.,d))*smoothstep(0.,3.,T);
 vec2 w=vec2(p.x,p.y+a*sin(uv.x*2.4+T*1.2+uv.y*1.5)+R.y*.02*sin(uv.x*6.1-T*1.9));
 float r0=(.32+.08*sin(T*.6))*smoothstep(0.,3.,T);
 float near=max(1.-smoothstep(r0-.1,r0+.1,d),lm);
-if(th<near)return tx(w,16.,0.,.03,3.);
+if(th<near)return tx(w,16.,1.,L,.03,3.);
 return step(abs(fract(w.y/16.)-.25)*16.,.6);}
 void main(){
 vec2 fc=gl_FragCoord.xy;
@@ -64,7 +111,8 @@ gl_FragColor=vec4(mix(c,1.-c,DK),1.);}`);
   gl.useProgram(prog);
   mkSDF(2, 160);
   mkTex(1, gl.LINEAR, gl.REPEAT);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, strip());
+  const { c, lines } = strip();
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c);
   const dark = matchMedia('(prefers-color-scheme: dark)');
   let h = 0, mx = 0, my = 0, ms = 0, tx = 0, ty = 0, on = 0;
   canvas.addEventListener('pointermove', (e) => {
@@ -87,6 +135,7 @@ gl_FragColor=vec4(mix(c,1.-c,DK),1.);}`);
       gl.uniform2f(prog.u.R, W, H);
       gl.uniform1i(prog.u.X, 1);
       gl.uniform1i(prog.u.W, 2);
+      gl.uniform1f(prog.u.L, lines);
     },
     draw(t) {
       gl.uniform1f(prog.u.T, t);
