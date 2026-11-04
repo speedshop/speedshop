@@ -553,6 +553,7 @@ button {
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
+  grid-template-rows: auto auto 1fr;
   padding: 0.7em 0;
 
   & p {
@@ -579,6 +580,7 @@ button {
 .work-track {
   background: #eee;
   grid-column: 2;
+  grid-row: 2;
   height: 0.28em;
   margin: 0.45em 0 0.5em;
 
@@ -594,7 +596,31 @@ button {
   color: #444;
   font-size: 0.85em;
   grid-column: 2;
+  grid-row: 3;
   line-height: 1.45;
+}
+
+@supports (text-box: trim-both cap alphabetic) {
+  .work-count {
+    align-self: end;
+    font-size: 1.9em;
+    grid-row: 1 / span 2;
+    text-box: trim-both cap alphabetic;
+  }
+
+  .work-name {
+    align-self: start;
+    text-box: trim-both cap alphabetic;
+  }
+
+  .work-track {
+    align-self: end;
+    margin: 0.4em 0 0;
+  }
+
+  .work-category :is(.work-includes, .work-description) {
+    margin-top: 0.6em;
+  }
 }
 
 .work-term {
@@ -672,7 +698,7 @@ button {
     & .work-types {
       display: block;
       grid-column: 3;
-      grid-row: 1 / span 3;
+      grid-row: 1 / -1;
       padding-left: 1em;
     }
   }
