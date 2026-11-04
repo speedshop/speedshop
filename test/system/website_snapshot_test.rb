@@ -33,6 +33,7 @@ class WebsiteSnapshotSystemTest < Minitest::Test
   def test_fresh_snapshot_builds_without_private_repository_and_sanitizes_content
     @payload["archive"] << {"issue_date" => "2026-01-17", "markdown" => '<script>alert("export")</script><svg onload="alert(1)"></svg><a href="javascript:alert(1)" onclick="alert(1)">unsafe</a> **safe text**'}
     @payload["clients"].insert(1, {"name" => "<b>Bold</b> Co", "featured" => false})
+    @payload["work_last_12_months"].first["description"] = "<i>Example</i> description."
     @payload["reply_histogram"] = {
       "count" => 3, "bin_width_hours" => 1, "max_hours" => 6,
       "percentiles" => {"p99" => 5.98, "p95" => 5.9, "p75" => 5.5, "p50" => 5},
@@ -52,11 +53,17 @@ class WebsiteSnapshotSystemTest < Minitest::Test
     refute home.css(".trusted-by-list b").any?
     retainer = Nokogiri::HTML(File.read(File.join(@destination, "retainer.html")))
     assert_includes retainer.text, "12 businesses have already joined this program"
-    stats = retainer.css(".work-stats .stat").map { |stat| [stat.at_css(".stat-label").text, stat.at_css(".stat-value").text] }
-    assert_equal ["Production changes", "37"], stats.first
-    assert_equal ["Other client work", "11"], stats.last
-    refute_includes stats.map(&:first), "Chat conversations"
-    assert_equal stats, Nokogiri::HTML(File.read(File.join(@destination, "status.html"))).css(".work-stats .stat").map { |stat| [stat.at_css(".stat-label").text, stat.at_css(".stat-value").text] }
+    categories = ->(page) { page.css(".work-category").map { |category| [category.at_css(".work-name").text, category.at_css(".work-count").text] } }
+    assert_includes retainer.text, "42 logged pieces of work"
+    assert_equal [["Sample work", "30"], ["Example work", "12"]], categories.call(retainer)
+    assert_equal ["Sample category description.", "<i>Example</i> description."], retainer.css(".work-description").map { |description| description.text.strip }
+    assert_equal ["Sample tasks", "Example tasks", "SLOs example"], retainer.css(".work-types dt").map(&:text)
+    refute retainer.css(".work-types i").any?
+    status = Nokogiri::HTML(File.read(File.join(@destination, "status.html")))
+    assert_equal categories.call(retainer), categories.call(status)
+    terms = status.css(".work-term")
+    assert_equal ["sample tasks", "example tasks", "SLOs example"], terms.map { |term| term.children.first.text }
+    assert_equal ["A sample task.", "An example task.", "An example SLO."], terms.map { |term| status.at_css("##{term["aria-describedby"]}").text }
     refute File.exist?(File.join(@destination, "snapshot.json"))
     refute Dir.exist?(File.join(@destination, "tmp"))
   end
@@ -82,6 +89,17 @@ class WebsiteSnapshotSystemTest < Minitest::Test
 
   def test_empty_clients_refuse_to_build_and_preserve_previous_output
     assert_empty_collection_rejected("clients")
+  end
+
+  def test_empty_work_categories_refuse_to_build_and_preserve_previous_output
+    assert_empty_collection_rejected("work_last_12_months")
+  end
+
+  def test_per_type_work_counts_refuse_to_build
+    @payload["work_last_12_months"].first["types"].first["count"] = 3
+    output, status = build
+    refute status.success?
+    assert_includes output, "Unexpected website snapshot fields"
   end
 
   def test_overlong_client_name_refuses_to_build

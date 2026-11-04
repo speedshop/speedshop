@@ -7,22 +7,6 @@ module Speedshop
     MAX_BYTES = 5 * 1024 * 1024
     MAX_AGE = 24 * 60 * 60
     MAX_CLIENT_NAME_LENGTH = 18
-    WORK_LABELS = {
-      "pr_opened" => "Pull requests opened",
-      "pr_reviewed" => "Pull requests reviewed",
-      "production_change" => "Production changes",
-      "dashboard_created" => "Dashboards created",
-      "slo_created" => "SLOs created",
-      "issue_created" => "Issues created",
-      "issue_commented" => "Issue comments",
-      "issue_completed" => "Issues completed",
-      "audit_report" => "Audit reports",
-      "monthly_report" => "Monthly reports",
-      "office_hours_call" => "Office hours calls",
-      "adhoc_call" => "Ad hoc calls",
-      "chat_conversation" => "Chat conversations",
-      "other" => "Other client work"
-    }.freeze
 
     def self.load(path, now: Time.now, check_freshness: true)
       raise "Website snapshot missing: #{path}" unless path && File.file?(path)
@@ -58,8 +42,7 @@ module Speedshop
       validate_histogram!
       validate_clients!
       count!(@payload["retainer_clients"])
-      object!(@payload["work_last_12_months"], WORK_LABELS.keys)
-      @payload["work_last_12_months"].each_value { |count| count!(count) }
+      validate_work!
       @payload
     end
 
@@ -149,6 +132,26 @@ module Speedshop
       end
       check!(clients.map { |client| client["name"].downcase }.uniq.length == clients.length, "Duplicate public client name")
       check!(clients == clients.sort_by { |client| [client["featured"] ? 0 : 1, client["name"].downcase] }, "Unordered public client list")
+    end
+
+    def validate_work!
+      categories = @payload["work_last_12_months"]
+      array!(categories, 20)
+      check!(!categories.empty?, "Website snapshot work_last_12_months must not be empty")
+      categories.each do |category|
+        object!(category, %w[name description count types])
+        text!(category["name"], 40)
+        text!(category["description"], 300)
+        count!(category["count"])
+        array!(category["types"], 20)
+        check!(!category["types"].empty?, "Work category types missing")
+        category["types"].each do |type|
+          object!(type, %w[label description])
+          text!(type["label"], 40)
+          text!(type["description"], 300)
+        end
+      end
+      check!(categories.uniq { |category| category["name"] }.length == categories.length, "Duplicate work category")
     end
 
     def object!(value, keys)

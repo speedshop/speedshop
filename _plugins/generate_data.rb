@@ -93,10 +93,13 @@ Jekyll::Hooks.register :site, :after_init do |site|
     {"label" => Date.strptime(month.fetch("month"), "%Y-%m").strftime("%B %Y"), "status" => month.fetch("status")}
   end}
   archive = Speedshop::FourLineArchiveGenerator.generate(lines: snapshot.fetch("archive"), generated_at: snapshot.fetch("generated_at"))
-  work = snapshot.fetch("work_last_12_months").reject { |_type, count| count.zero? }
-    .sort_by { |type, count| [(type == "other") ? 1 : 0, -count] }
-    .map { |type, count| {"label" => Speedshop::WebsiteSnapshot::WORK_LABELS.fetch(type), "count" => count} }
-  track_record = {"clients" => snapshot.fetch("clients").map { |client| client.fetch("name") }, "retainer_clients" => snapshot.fetch("retainer_clients"), "work_last_12_months" => work}
+  categories = snapshot.fetch("work_last_12_months").reject { |category| category.fetch("count").zero? }.sort_by.with_index { |category, index| [-category.fetch("count"), index] }
+  largest = categories.map { |category| category.fetch("count") }.max
+  work = categories.map do |category|
+    types = category.fetch("types").map { |type| type.merge("phrase" => type.fetch("label").sub(/\A[A-Z](?=[a-z])/, &:downcase)) }
+    category.merge("percent" => (category.fetch("count") * 100.0 / largest).round(1), "types" => types)
+  end
+  track_record = {"clients" => snapshot.fetch("clients").map { |client| client.fetch("name") }, "retainer_clients" => snapshot.fetch("retainer_clients"), "work_total" => categories.sum { |category| category.fetch("count") }, "work_last_12_months" => work}
 
   {"sla_status" => sla, "availability" => availability, "four_line_archive" => archive, "track_record" => track_record}.each do |name, payload|
     File.write(File.join(data_dir, "#{name}.json"), "#{JSON.pretty_generate(payload)}\n")
