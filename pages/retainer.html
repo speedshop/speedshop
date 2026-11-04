@@ -7,126 +7,16 @@ summary: "Would you like a principal-level Ruby performance engineer on your tea
 permalink: /retainer.html
 ---
 
+<div class="retainer-logo-viz">
+  <img src="/assets/icons/speedshop_s.svg" alt="Speedshop" width="72" height="60">
+  <canvas id="sslogocanvas" data-viz-options="signal" aria-hidden="true"></canvas>
+</div>
+
 <div class="container">
-  <div class="row" style="margin-top: 3.5rem">
-    <div class="hero-content retainer-hero-content">
-      <img src="/assets/icons/speedshop_s.svg" alt="Speedshop" width="72" height="60">
-      <div id="viz" class="retainer-title-viz">
-        <canvas id="demo" width="800" height="240" aria-hidden="true"></canvas>
-        <h1>
-          Performance monitoring, roadmapping, and support.<br>100% managed by Speedshop.
-        </h1>
-        <script>
-        (() => {
-            const canvas = document.getElementById('demo');
-            if (!canvas) return;
-
-            const context = canvas.getContext('2d');
-            const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
-            let t = 0;
-            let disposed = false;
-            let frameId = null;
-            let firstPaintFrameId = null;
-            let secondPaintFrameId = null;
-            let resizeObserver = null;
-
-            function prefersReducedMotion() {
-                return reducedMotion && reducedMotion.matches;
-            }
-
-            function resize() {
-                if (disposed || !document.contains(canvas)) return;
-
-                const width = canvas.offsetWidth;
-                const height = canvas.offsetHeight;
-                if (canvas.width !== width) canvas.width = width;
-                if (canvas.height !== height) canvas.height = height;
-            }
-
-            function draw() {
-                frameId = null;
-                if (disposed || !document.contains(canvas)) return;
-
-                resize();
-                if (!prefersReducedMotion()) t += 0.001;
-                context.fillStyle = "#fff";
-                context.fillRect(0, 0, canvas.width, canvas.height);
-
-                const w = canvas.width,
-                    h = canvas.height;
-                const cx = w / 2,
-                    cy = h / 2;
-
-                const s = Math.sin(t),
-                    co = Math.cos(t);
-                const s2 = Math.sin(t * 0.7),
-                    co2 = Math.cos(t * 0.7);
-
-                for (let i = 0; i < 5000; i++) {
-                    let px = (i % 15) * 60 - 450;
-                    let py = Math.floor(i / 15) % 15 * 60 - 450;
-                    let pz = Math.floor(i / 225) * 40 - 500;
-
-                    let rx = px * co - pz * s;
-                    let ry = py * co2 - (px * s + pz * co) * s2;
-                    let rz = (px * s + pz * co) * co2 + py * s2;
-
-                    let d = 600 / (rz + 600);
-                    let x1 = cx + rx * d;
-                    let y1 = cy + ry * d;
-
-                    if ((Math.floor(px / 20) & Math.floor(py / 20) & Math.floor(pz / 20)) === 0) {
-                        const size = 2 + 3 * d;
-                        context.fillStyle = `rgba(0,0,0,${0.3*d})`;
-                        context.fillRect(x1 - size / 2, y1 - size / 2, size, size);
-                    }
-                }
-
-                if (!prefersReducedMotion()) {
-                    frameId = requestAnimationFrame(draw);
-                }
-            }
-
-            function start() {
-                if (disposed || frameId !== null) return;
-                frameId = requestAnimationFrame(draw);
-            }
-
-            function startAfterNextPaint() {
-                firstPaintFrameId = requestAnimationFrame(() => {
-                    firstPaintFrameId = null;
-                    secondPaintFrameId = requestAnimationFrame(() => {
-                        secondPaintFrameId = null;
-                        start();
-                    });
-                });
-            }
-
-            function cleanup() {
-                disposed = true;
-                if (frameId !== null) cancelAnimationFrame(frameId);
-                if (firstPaintFrameId !== null) cancelAnimationFrame(firstPaintFrameId);
-                if (secondPaintFrameId !== null) cancelAnimationFrame(secondPaintFrameId);
-                if (resizeObserver) resizeObserver.disconnect();
-                window.removeEventListener('resize', resize);
-                document.removeEventListener('pjax:send', cleanup);
-                window.removeEventListener('pagehide', cleanup);
-            }
-
-            if (window.ResizeObserver) {
-                resizeObserver = new ResizeObserver(resize);
-                resizeObserver.observe(canvas.parentElement);
-            }
-            window.addEventListener('resize', resize);
-            document.addEventListener('pjax:send', cleanup, { once: true });
-            window.addEventListener('pagehide', cleanup, { once: true });
-
-            resize();
-            startAfterNextPaint();
-        })();
-        </script>
-      </div>
-    </div>
+  <div class="row">
+    <h1 class="retainer-title">
+      Performance monitoring, roadmapping, and support.<br>100% managed by Speedshop.
+    </h1>
   </div>
 
   <div class="row" style="margin-top: 3.5rem">

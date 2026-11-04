@@ -32,8 +32,8 @@
   <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | absolute_url }}">
 
   <script>
-    window.vizLoad = function () {
-      var vizOptions = ['dazzle', 'xerox', 'ttt'];
+    window.vizLoad = function (options) {
+      var vizOptions = (options || 'dazzle xerox ttt').split(' ');
       var vizName = new URLSearchParams(location.search).get('viz');
       if (vizOptions.indexOf(vizName) < 0) {
         vizName = vizOptions[(Math.random() * vizOptions.length) | 0];

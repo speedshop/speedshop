@@ -36,7 +36,7 @@ t+=clamp(d,.04,.4);
 if(r<.02||t>5.)break;}
 return clamp(r,0.,1.);}`;
 
-const buildSDF = () => {
+const buildSDF = (spread) => {
   const c = document.createElement('canvas');
   c.width = c.height = N;
   const x = c.getContext('2d');
@@ -75,7 +75,7 @@ const buildSDF = () => {
   dt(dout);
   const sdf = new Uint8Array(N * N);
   for (let i = 0; i < N * N; i++) {
-    sdf[i] = 255 * (0.5 + Math.max(-1, Math.min(1, (dout[i] - din[i]) / 40)) / 2);
+    sdf[i] = 255 * (0.5 + Math.max(-1, Math.min(1, (dout[i] - din[i]) / spread)) / 2);
   }
   return sdf;
 };
@@ -120,15 +120,19 @@ const runGL = (canvas, make, onFirstFrame) => {
     return tex;
   };
   gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-  mkTex(0, gl.LINEAR, gl.CLAMP_TO_EDGE);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, N, N, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, buildSDF());
+  const mkSDF = (unit, spread) => {
+    mkTex(unit, gl.LINEAR, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, N, N, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, buildSDF(spread));
+  };
+  mkSDF(0, 40);
 
-  const viz = make({ canvas, gl, mkProg, mkTex, PRE, MARCH, SH });
+  const viz = make({ canvas, gl, mkProg, mkTex, mkSDF, PRE, MARCH, SH });
 
   let W = 0, H = 0, frameId = null, shown = false, still = false;
   const t0 = performance.now();
   const resize = () => {
-    const w = (canvas.clientWidth / 2) | 0, h = (canvas.clientHeight / 2) | 0;
+    const px = viz.pixel || 2;
+    const w = (canvas.clientWidth / px) | 0, h = (canvas.clientHeight / px) | 0;
     if (w < 1 || (w === W && h === H)) return;
     W = w;
     H = h;
