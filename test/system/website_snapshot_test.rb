@@ -54,7 +54,7 @@ class WebsiteSnapshotSystemTest < Minitest::Test
     retainer = Nokogiri::HTML(File.read(File.join(@destination, "retainer.html")))
     assert_includes retainer.text, "12 businesses have already joined this program"
     categories = ->(page) { page.css(".work-category").map { |category| [category.at_css(".work-name").text, category.at_css(".work-count").text] } }
-    assert_includes retainer.text, "42 logged pieces of work"
+    assert_includes retainer.text.split.join(" "), "These 42 individual pieces of work are logged and updated daily from our internal notes."
     assert_equal [["Sample work", "30"], ["Example work", "12"]], categories.call(retainer)
     assert_equal ["Sample category description.", "<i>Example</i> description."], retainer.css(".work-description").map { |description| description.text.strip }
     assert_equal ["Sample tasks", "Example tasks", "SLOs example"], retainer.css(".work-types dt").map(&:text)
