@@ -16,6 +16,14 @@ test.describe('Retainer hero', () => {
         if (message.type() === 'error') errors.push(message.text());
       });
 
+      await page.addInitScript(() => {
+        window.canvasText = [];
+        const fillText = CanvasRenderingContext2D.prototype.fillText;
+        CanvasRenderingContext2D.prototype.fillText = function (...args) {
+          window.canvasText.push(args[0]);
+          return fillText.apply(this, args);
+        };
+      });
       await page.setViewportSize(viewport);
       await page.goto('/retainer.html');
 
@@ -35,6 +43,7 @@ test.describe('Retainer hero', () => {
       expect(sizes.width).toBe(sizes.clientWidth);
       expect(sizes.height).toBe(sizes.clientHeight);
       expect(errors).toEqual([]);
+      expect(await page.evaluate(() => window.canvasText)).toEqual([]);
     }
   });
 });
