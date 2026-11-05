@@ -53,6 +53,7 @@ exclude:
    - infra/**
    - workers
    - workers/**
+   - fnox.toml
    - Rakefile
    - package.json
    - package-lock.json

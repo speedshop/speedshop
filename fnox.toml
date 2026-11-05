@@ -1,0 +1,6 @@
+[providers]
+op-threadpilot = { type = "1password", vault = "Threadpilot", account = "thespeedshop.1password.com" }
+
+[secrets.CLOUDFLARE_API_TOKEN]
+provider = "op-threadpilot"
+value = "Cloudflare/api_key"
