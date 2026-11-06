@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { setTimeout } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 import { unstable_readConfig } from "wrangler";
 
@@ -56,10 +57,15 @@ if (deployment.error) throw deployment.error;
 if (deployment.status !== 0) process.exit(deployment.status ?? 1);
 
 for (const path of ["/", "/assets/css/threadpilot.css"]) {
-  const response = await fetch(`https://${hostname}${path}`, { redirect: "manual", signal: AbortSignal.timeout(30_000) });
-  const location = response.headers.get("location");
-  if (response.status < 300 || response.status >= 400 || !location || !new URL(location, `https://${hostname}`).hostname.endsWith(".cloudflareaccess.com")) {
-    throw new Error(`Signed-out request to ${path} did not redirect to Cloudflare Access (HTTP ${response.status}).`);
+  for (let attempt = 1; attempt <= 12; attempt += 1) {
+    const response = await fetch(`https://${hostname}${path}`, { redirect: "manual", signal: AbortSignal.timeout(30_000) });
+    const location = response.headers.get("location");
+    if (response.status >= 300 && response.status < 400 && location && new URL(location, `https://${hostname}`).hostname.endsWith(".cloudflareaccess.com")) break;
+    if (response.status !== 404 || attempt === 12) {
+      throw new Error(`Signed-out request to ${path} did not redirect to Cloudflare Access (HTTP ${response.status}).`);
+    }
+    console.log(`Waiting for ${hostname}${path} to propagate (HTTP 404; attempt ${attempt}/12).`);
+    await setTimeout(5_000);
   }
 }
 console.log(`Private Threadpilot preview deployed: https://${hostname}/`);

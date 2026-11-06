@@ -32,7 +32,9 @@ dashboard's existing Google-only policy is unchanged.
 The task builds the artifact, loads the API token, and verifies that an Access
 application and email-restricted policies protect the hostname before uploading.
 After deployment it checks that signed-out requests for both the page and a
-static asset redirect to Access login.
+static asset redirect to Access login. For transient 404 responses it makes up to
+12 attempts, with five seconds between checks. Publicly accessible responses still
+fail immediately.
 
 The API token is resolved at runtime from the existing Threadpilot vault's
 `Cloudflare` item. Do not put its value in `.env` or source files.
