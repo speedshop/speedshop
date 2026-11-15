@@ -10,7 +10,7 @@ A perceived benefit of a client-side JS framework is the responsiveness of its i
 
 Is Rails dead? Can the old Ruby web framework no longer keep up in this age of "native-like" performance?
 
-Shopify (an e-commerce provider that lets you set up your own online shop) has [over 150,000 customers](http://www.sec.gov/Archives/edgar/data/1594805/000119312515129273/d863202df1.htm) and is a [Top 1000](http://www.alexa.com/siteinfo/shopify.com) site on Alexa.{% marginnote_lazy https://i.imgur.com/F49D9La.png %} In addition, Shopify hosts their customers' sites, with an average of 100ms response times for over 300 million monthly page views. Now that's Web Scale. And they did it all on Rails.
+Shopify (an e-commerce provider that lets you set up your own online shop) has [over 150,000 customers](http://www.sec.gov/Archives/edgar/data/1594805/000119312515129273/d863202df1.htm) and is a Top 1000 site on Alexa.{% marginnote_lazy https://i.imgur.com/F49D9La.png %} In addition, Shopify hosts their customers' sites, with an average of 100ms response times for over 300 million monthly page views. Now that's Web Scale. And they did it all on Rails.
 
 They're not the only ones doing huge deployments with blazing fast response times on Rails. [DHH claims Basecamp's average server response time is 27ms](https://www.youtube.com/watch?v=yhseQP52yIY). [Github averages about 60ms](https://status.github.com/).
 
