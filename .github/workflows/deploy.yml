@@ -55,8 +55,9 @@ jobs:
         env:
           WEBSITE_SNAPSHOT_PATH: tmp/website-snapshot.json
           JEKYLL_ENV: production
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          ./_scripts/canonical-env.sh --env WEBSITE_SNAPSHOT_PATH --env JEKYLL_ENV '
+          ./_scripts/canonical-env.sh --env WEBSITE_SNAPSHOT_PATH --env JEKYLL_ENV --env GITHUB_TOKEN '
             set -euo pipefail
             mise trust --yes /workspaces/speedshop/mise.toml
             mise exec -- bundle config set --global path /workspaces/speedshop/vendor/bundle
@@ -92,8 +93,10 @@ jobs:
         with:
           ruby-version: ${{ steps.ruby.outputs.version }}
       - name: Install deployment tools
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          ./_scripts/canonical-env.sh '
+          ./_scripts/canonical-env.sh --env GITHUB_TOKEN '
             set -euo pipefail
             mise trust --yes /workspaces/speedshop/mise.toml
             mise install node awscli
